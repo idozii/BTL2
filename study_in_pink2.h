@@ -238,108 +238,137 @@ public:
 };
 
 class BaseItem {
+    friend class TestStudyInPink;
 public:
-    virtual string str() const = 0;
-    virtual bool canUse(Character *obj, Robot *robot) = 0;
+    virtual bool canUse(Character *obj, Robot *robot);
+    virtual void use(Character *obj, Robot *robot);
+
+};
+
+class MagicBook : public BaseItem{
+    friend class TestStudyInPink;
+
+public:
+    virtual bool canUse(Character* obj, Robot *robot);
+    virtual void use(Character* obj, Robot *robot);
+};
+
+class EnergyDrink : public BaseItem{
+    friend class TestStudyInPink;
+
+public:
+    virtual bool canUse(Character* obj, Robot *robot);
+    virtual void use(Character* obj, Robot *robot);
+};
+
+class FirstAid : public BaseItem{
+    friend class TestStudyInPink;
+
+public:
+    virtual bool canUse(Character* obj, Robot *robot);
+    virtual void use(Character* obj, Robot *robot);
+};
+
+class ExemptionCard : public BaseItem{
+    friend class TestStudyInPink;
+
+public:
+    virtual bool canUse(Character* obj, Robot *robot);
+    virtual void use(Character* obj, Robot *robot);
+};
+
+class PassingCard : public BaseItem{
+    friend class TestStudyInPink;
+
+public:
+    virtual bool canUse(Character* obj, Robot *robot);
+    virtual void use(Character* obj, Robot *robot);
 };
 
 class BaseBag {
-protected:
-    class Node{
-    public:
-         BaseItem *item;
-         Node *next;
-         friend class BaseBag;
-    public:
-     Node(BaseItem *item, Node *next = NULL) : item(item), next(next) {}
-    };
-protected:
-    int size;
-    int capacity;
-    Node* head;
+    friend class TestStudyInPink;
+private:
+    Character* obj;
 public:
-    BaseBag(int capacity):capacity(capacity){};
-    virtual ~BaseBag();
     virtual bool insert(BaseItem* item);
     virtual BaseItem* get();
+    virtual BaseItem* get(ItemType type);
+    virtual string str() const;
 };
 
-// Robot, BaseItem, BaseBag,...
-class Robot : public MovingObject {
+class Robot : public MovingObject{
     friend class TestStudyInPink;
 private:
     RobotType robot_type;
-    Position pos;
-    int hp;
-    int exp;
 
 public:
-    Robot(RobotType in_type, const Position & in_pos, int in_hp, int in_exp);
-    virtual ~Robot();
-    virtual Position getNextPosition() = 0;
-    virtual Position getCurrentPosition() const;
-    virtual void move() = 0;
-    virtual string str() const = 0;
+    Robot(int index , const Position & init_pos , Map * map , RobotType robot_type);
 };
 
 class RobotC : public Robot {
     friend class TestStudyInPink;
 private:
+    Criminal* criminal;
     RobotType robot_type;
     BaseItem* item;
 
 public:
     RobotC ( int index , const Position & init_pos , Map * map , RobotType robot_type , Criminal * criminal);
-    virtual ~RobotC();
-    virtual Position getNextPosition() = 0;
-    virtual void move() = 0;
-    virtual Position getDistance() const;
-    virtual string str() const = 0;
+    virtual Position getNextPosition();
+    virtual void move();
+    virtual string str() const;
 };
 
 class RobotS : public Robot {
     friend class TestStudyInPink;
 private:
+    Criminal* criminal;
+    Sherlock* sherlock;
     RobotType robot_type;
+    int dist;
     BaseItem* item;
 
 public:
     RobotS ( int index , const Position & init_pos , Map * map , RobotType robot_type , Criminal * criminal , Sherlock * Sherlock);
-    virtual ~RobotS();
-    virtual Position getNextPosition() = 0;
-    virtual void move() = 0;
+    virtual Position getNextPosition();
+    virtual void move();
     virtual Position getDistance() const;
-    virtual string str() const = 0;
+    virtual string str() const;
 };
 
 class RobotW : public Robot {
     friend class TestStudyInPink;
 private:
     RobotType robot_type;
+    int dist;
+    Criminal* criminal;
+    Watson* watson;
     BaseItem* item;
 
 public:
-    RobotW ( int index , const Position & init_pos , Map * map , RobotType robot_type , Criminal * criminal , Watson * watson ) ;
-    virtual ~RobotW();
-    virtual Position getNextPosition() = 0;
-    virtual void move() = 0;
+    RobotW ( int index , const Position & init_pos , Map * map , RobotType robot_type , Criminal * criminal , Watson * watson);
+    virtual Position getNextPosition();
+    virtual void move();
     virtual Position getDistance() const;
-    virtual string str() const = 0;
+    virtual string str() const;
 };
 
 class RobotSW : public Robot {
     friend class TestStudyInPink;
 private:
     RobotType robot_type;
+    int dist;
+    Criminal* criminal;
+    Sherlock* sherlock;
+    Watson* watson;
     BaseItem* item;
 
 public:
     RobotSW ( int index , const Position & init_pos , Map * map , RobotType robot_type , Criminal * criminal , Sherlock * sherlock , Watson* watson);
-    virtual ~RobotSW();
-    virtual Position getNextPosition() = 0;
-    virtual void move() = 0;
+    virtual Position getNextPosition();
+    virtual void move();
     virtual Position getDistance() const;
-    virtual string str() const = 0;
+    virtual string str() const;
 };
 
 class StudyPinkProgram {

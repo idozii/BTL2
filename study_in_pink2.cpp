@@ -321,7 +321,7 @@ MovingObject* ArrayMovingObject::get(int index) const{
     return arr_mv_objs[index];
 };
 string ArrayMovingObject::str() const{
-    return "ArrayMovingObject[count="+to_string(count)+"]";
+    return "ArrayMovingObject[count="+to_string(count)+";capacity="+to_string(capacity)+arr_mv_objs[index].str();
 };
 
 //TODO: 3.9: CONFIGURATION
@@ -376,7 +376,7 @@ Configuration::Configuration(const string & filepath){
                 }
                 cout<<"arr_walls: ";
                 for(int i = 0; i < walls.size(); i++){
-                    cout<<arr_walls[i]<<" ";
+                    
                 }
                 cout<<endl;
             }
@@ -395,7 +395,7 @@ Configuration::Configuration(const string & filepath){
                 }
                 cout<<"arr_fake_walls: ";
                 for(int i = 0; i < walls.size(); i++){
-                    cout<<arr_fake_walls[i]<<" ";
+                    
                 }
                 cout<<endl;
             }
@@ -408,31 +408,104 @@ string Configuration::str() const{
 };
 
 //TODO: 3.10: ROBOT
-Robot::Robot(RobotType in_type, const Position& in_pos, int in_hp, int in_exp) : MovingObject(index, pos, map, name){
-    this->robot_type = in_type;
-    this->pos = in_pos;
-    this->hp = in_hp;
-    this->exp = in_exp;
+Robot::Robot(int index, const Position& init_pos, Map* map, RobotType robot_type) : MovingObject(index, pos, map, name){
+    this->index = index;
+    this->pos = init_pos;
+    this->map = map;
+    this->robot_type = robot_type;
+    this->name = "Robot";
 };
-Position Robot::getNextPosition() {
-    //TODO: MANHATTAN EQUATION
+
+//TODO: 3.10.1: ROBOTC
+RobotC::RobotC(int index, const Position & init_pos, Map* map, RobotType robot_type, Criminal* criminal) : Robot(index, pos, map, robot_type){
+    this->robot_type = robot_type;
+    this->criminal = criminal;
+    this->name = "RobotC";
+};
+Position RobotC::getNextPosition() {
     Position next_pos = npos;
     return next_pos;
 };
-Position Robot::getCurrentPosition() const{
-    return this->pos;
-};
-void Robot::move(){
+void RobotC::move(){
     pos = getNextPosition();
 };
-string Robot::str() const{
-    return "Robot[pos="+pos.str()+"type="+to_string(robot_type)+"]";
+string RobotC::str() const{
+    return "Robot[pos="+pos.str()+"type="+to_string(robot_type)+"dist="+""+"]";
 };
 
-//TODO:3.10.2: ROBOT C, S, W, SW
-//TODO: 3.11: BASE ITEM
-//TODO: 3.12: BASE BAG
+//TODO:3.10.2: ROBOT S
+RobotS::RobotS(int index, const Position & init_pos, Map* map, RobotType robot_type, Criminal* criminal, Sherlock* sherlock) : Robot(index, pos, map, robot_type){
+    this->robot_type = robot_type;
+    this->criminal = criminal;
+    this->sherlock = sherlock;
+    this->name = "RobotS";
+};
+Position RobotS::getNextPosition() {
+    Position next_pos = npos;
+    return next_pos;
+};
+void RobotS::move(){
+    pos = getNextPosition();
+};
+Position RobotS::getDistance() const{
+    return dist;
+};
+string RobotS::str() const{
+    return "Robot[pos="+pos.str()+"type="+to_string(robot_type)+"dist="+to_string(dist)+"]";
+};
 
+//TODO:3.10.3: ROBOT W
+RobotW::RobotW(int index, const Position & init_pos, Map* map, RobotType robot_type, Criminal* criminal, Watson* watson) : Robot(index, pos, map, robot_type){
+    this->robot_type = robot_type;
+    this->criminal = criminal;
+    this->watson = watson;
+    this->name = "RobotW";
+};
+Position RobotW::getNextPosition() {
+    Position next_pos = npos;
+    return next_pos;
+};
+void RobotW::move(){
+    pos = getNextPosition();
+};
+Position RobotW::getDistance() const{
+    return dist;
+};
+string RobotW::str() const{
+    return "Robot[pos="+pos.str()+"type="+to_string(robot_type)+"dist="+to_string(dist)+"]";
+};
+
+//TODO:3.10.4: ROBOT SW
+RobotSW::RobotSW(int index, const Position & init_pos, Map* map, RobotType robot_type, Criminal* criminal, Sherlock* sherlock, Watson* watson) : Robot(index, pos, map, robot_type){
+    this->robot_type = robot_type;
+    this->criminal = criminal;
+    this->sherlock = sherlock;
+    this->watson = watson;
+    this->name = "RobotSW";
+};
+Position RobotSW::getNextPosition() {
+    Position next_pos = npos;
+    return next_pos;
+};
+void RobotSW::move(){
+    pos = getNextPosition();
+};
+Position RobotSW::getDistance() const{
+    return dist;
+};
+string RobotSW::str() const{
+    return "Robot[pos="+pos.str()+"type="+to_string(robot_type)+"dist="+to_string(dist)+"]";
+};
+
+//TODO: 3.11: BASE ITEM
+//TODO: 3.11.1: MAGIC BOOK
+//TODO: 3.11.2: ENERGY DRINK
+//TODO: 3.11.3: FIRST AID
+//TODO: 3.11.4: EXEMPTIONCARD
+//TODO: 3.11.5: PASSING CARD
+//TODO: 3.12: BASE BAG
+//TODO: getnextposition robot, criminal
+//TODO: configuration, str() arr_mv_obj
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

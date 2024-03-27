@@ -110,6 +110,7 @@ class MovingObject {
     friend class TestStudyInPink;
 protected:
     int index;
+    int exp;
     Position pos;
     Map* map;
     string name;
@@ -121,6 +122,7 @@ public:
     virtual Position getCurrentPosition() const = 0;
     virtual void move() = 0;
     virtual string str() const = 0;
+    virtual int getExp() const = 0;
     virtual string getName() const = 0;
 };
 
@@ -413,10 +415,10 @@ public:
     bool isStop() const;
 
     void printResult() const {
-        if (sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition())) {
+        if (sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition().getRow(), criminal->getCurrentPosition().getCol())) {
             cout << "Sherlock caught the criminal" << endl;
         }
-        else if (watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())) {
+        else if (watson->getCurrentPosition().isEqual(criminal->getCurrentPosition().getRow(), criminal->getCurrentPosition().getCol())) {
             cout << "Watson caught the criminal" << endl;
         }
         else {

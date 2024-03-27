@@ -74,15 +74,14 @@ bool Map::isValid ( const Position & pos , MovingObject * mv_obj ) const {
         return false;
     }
     if ( map[pos.getRow()][pos.getCol()]->getType() == FAKE_WALL ) {
-        if(mv_obj->getName() == "Sherlock" || mv_obj->getName() == "Criminal") return true;
+        if(mv_obj->getName() == "Sherlock" || mv_obj->getName() == "Criminal" || mv_obj->getName() == "Robot") return true;
         else if(mv_obj->getName() == "Watson"){
-            if(((pos.getRow()*257+pos.getCol()*139+89)%900+1)) return true;
-            //TODO:CHECK WATSON EXP
+            if(mv_obj->getExp()>((pos.getRow()*257+pos.getCol()*139+89)%900+1)) return true;
             else return false;
         }
         else return false;
     }
-    if ( map[pos.getRow()][pos.getCol()]->getType() == PATH ) {
+    if ( map[pos.getRow()][pos.getCol()]->getType() == PATH && (mv_obj->getName() == "Criminal" || mv_obj->getName()=="Robot")) {
         return true;
     }
     return false;
@@ -141,10 +140,15 @@ Position MovingObject::getCurrentPosition() const{
     return this->pos;
 };
 void MovingObject::move(){
-    pos = getNextPosition();
+    Position next_pos = getNextPosition();
+    if (next_pos.isEqual(-1, -1)) return;
+    pos = next_pos;
 };
 string MovingObject::str() const{
     return "MovingObject[index="+to_string(index)+";pos="+pos.str()+"]";
+};
+int MovingObject::getExp() const{
+    return this->exp;
 }
 string MovingObject::getName() const{
     return this->name;
@@ -170,7 +174,9 @@ Position Character::getCurrentPosition() const {
     return this->pos;
 };
 void Character::move(){
-    pos = getNextPosition();
+    Position next_pos = getNextPosition();
+    if (next_pos.isEqual(-1, -1)) return;
+    pos = next_pos;
 };
 string Character::str() const {
     return "Character[index="+to_string(index)+";pos="+pos.str()+"]"; 
@@ -207,7 +213,9 @@ Position Sherlock::getCurrentPosition() const {
     return this->pos;
 };
 void Sherlock::move(){
-    pos = getNextPosition();
+    Position next_pos = getNextPosition();
+    if (next_pos.isEqual(-1, -1)) return;
+    pos = next_pos;    
 };
 string Sherlock::str() const {
     return "Sherlock[index="+to_string(index)+";pos="+pos.str()+";moving_rule="+moving_rule+"]";
@@ -260,7 +268,9 @@ Position Watson::getCurrentPosition() const {
     return this->pos;
 };
 void Watson::move(){
-    pos = getNextPosition();
+    Position next_pos = getNextPosition();
+    if (next_pos.isEqual(-1, -1)) return;
+    pos = next_pos;
 };
 string Watson::str() const {
     return "Watson[index="+to_string(index)+";pos="+pos.str()+";moving_rule="+moving_rule+"]";
@@ -290,15 +300,35 @@ Criminal::Criminal(int index, const Position & init_pos, Map * map, const string
     this->name = "Criminal";
 };
 Position Criminal::getNextPosition() {
-    //TODO: MANHATTAN EQUATION
-    Position next_pos = npos;
+    Position next_pos = pos;
+    int max_distance = -1;
+    Position arr[4];
+    // 4 elements of the arr is the position after moving U,L,D,R respectively, ex: (1,2)
+    arr[0] = Position(pos.getRow() - 1, pos.getCol());
+    arr[1] = Position(pos.getRow(), pos.getCol() - 1);
+    arr[2] = Position(pos.getRow() + 1, pos.getCol());
+    arr[3] = Position(pos.getRow(), pos.getCol() + 1);
+    for (int i = 0; i < 4; i++){
+        if (map->isValid(arr[i], this)){
+            int distance = abs(arr[i].getRow() - sherlock->getCurrentPosition().getRow()) + abs(arr[i].getCol() - sherlock->getCurrentPosition().getCol()) + abs(arr[i].getRow() - watson->getCurrentPosition().getRow()) + abs(arr[i].getCol() - watson->getCurrentPosition().getCol());
+            if (distance > max_distance){
+                max_distance = distance;
+                next_pos = arr[i];
+            }
+            else if (distance == max_distance){
+                continue;
+            }
+        }
+    }
     return next_pos;
 };
 Position Criminal::getCurrentPosition() const {
     return this->pos;
 };
 void Criminal::move(){
-    pos = getNextPosition();
+    Position next_pos = getNextPosition();
+    if (next_pos.isEqual(-1, -1)) return;
+    pos = next_pos;
 };
 string Criminal::str() const {
     return "Criminal[index="+to_string(index)+";pos="+pos.str()+"]";
@@ -464,7 +494,9 @@ Position RobotC::getNextPosition() {
     return next_pos;
 };
 void RobotC::move(){
-    pos = getNextPosition();
+    Position next_pos = getNextPosition();
+    if (next_pos.isEqual(-1, -1)) return;
+    pos = next_pos;
 };
 string RobotC::str() const{
     return "Robot[pos="+pos.str()+"type="+to_string(robot_type)+"dist="+""+"]";
@@ -482,7 +514,9 @@ Position RobotS::getNextPosition() {
     return next_pos;
 };
 void RobotS::move(){
-    pos = getNextPosition();
+    Position next_pos = getNextPosition();
+    if (next_pos.isEqual(-1, -1)) return;
+    pos = next_pos;
 };
 Position RobotS::getDistance() const{
     return dist;
@@ -503,7 +537,9 @@ Position RobotW::getNextPosition() {
     return next_pos;
 };
 void RobotW::move(){
-    pos = getNextPosition();
+    Position next_pos = getNextPosition();
+    if (next_pos.isEqual(-1, -1)) return;
+    pos = next_pos;
 };
 Position RobotW::getDistance() const{
     return dist;
@@ -525,7 +561,9 @@ Position RobotSW::getNextPosition() {
     return next_pos;
 };
 void RobotSW::move(){
-    pos = getNextPosition();
+    Position next_pos = getNextPosition();
+    if (next_pos.isEqual(-1, -1)) return;
+    pos = next_pos;
 };
 Position RobotSW::getDistance() const{
     return dist;

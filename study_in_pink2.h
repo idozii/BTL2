@@ -153,8 +153,10 @@ public:
     virtual Position getCurrentPosition() const;
     virtual void move();
     virtual string str() const;
-    virtual int setInitHP(int init_hp) const;
-    virtual int setInitExp(int init_exp) const;
+    virtual int getHp() const;
+    virtual int getExp() const;
+    virtual int setHp(int init_hp) const;
+    virtual int setExp(int init_exp) const;
 };
 
 class Watson : public Character {
@@ -173,8 +175,10 @@ public:
     virtual Position getCurrentPosition() const;
     virtual void move();
     virtual string str() const;
-    virtual int setInitHP(int init_hp) const;
-    virtual int setInitExp(int init_exp) const;
+    virtual int getExp() const;
+    virtual int getHp() const;
+    virtual int setHp(int init_hp) const;
+    virtual int setExp(int init_exp) const;
 };
 
 class Criminal : public Character {
@@ -248,6 +252,10 @@ public:
 class MagicBook : public BaseItem{
     friend class TestStudyInPink;
 
+private:
+    Sherlock *sherlock;
+    Watson *watson;
+
 public:
     virtual bool canUse(Character* obj, Robot *robot);
     virtual void use(Character* obj, Robot *robot);
@@ -255,6 +263,10 @@ public:
 
 class EnergyDrink : public BaseItem{
     friend class TestStudyInPink;
+
+private:
+    Sherlock *sherlock;
+    Watson *watson;
 
 public:
     virtual bool canUse(Character* obj, Robot *robot);
@@ -264,6 +276,10 @@ public:
 class FirstAid : public BaseItem{
     friend class TestStudyInPink;
 
+private:
+    Sherlock* sherlock;
+    Watson* watson;
+
 public:
     virtual bool canUse(Character* obj, Robot *robot);
     virtual void use(Character* obj, Robot *robot);
@@ -271,6 +287,9 @@ public:
 
 class ExemptionCard : public BaseItem{
     friend class TestStudyInPink;
+
+private:
+    Sherlock* sherlock;
 
 public:
     virtual bool canUse(Character* obj, Robot *robot);
@@ -280,6 +299,10 @@ public:
 class PassingCard : public BaseItem{
     friend class TestStudyInPink;
 
+private:
+    Watson* watson;
+    string challenge;
+    
 public:
     virtual bool canUse(Character* obj, Robot *robot);
     virtual void use(Character* obj, Robot *robot);

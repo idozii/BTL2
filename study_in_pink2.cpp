@@ -131,6 +131,7 @@ Position MovingObject::getNextPosition(){
     Position next_pos = pos;
     if(this->map->isValid(this->pos, this)){
         next_pos.setRow(next_pos.getRow() + 1);
+        next_pos.setCol(next_pos.getCol() + 1);
     }
     else{
         next_pos = npos;
@@ -160,6 +161,7 @@ Position Character::getNextPosition() {
     Position next_pos = pos;
     if(map->isValid(next_pos, this)){
         next_pos.setRow(next_pos.getRow() + 1);
+        next_pos.setCol(next_pos.getCol() + 1);
     }else{
         next_pos = npos;
     }
@@ -210,12 +212,18 @@ void Sherlock::move(){
 string Sherlock::str() const {
     return "Sherlock[index="+to_string(index)+";pos="+pos.str()+";moving_rule="+moving_rule+"]";
 };
-int Sherlock::setInitExp(int init_exp) const{
+int Sherlock::getHp() const{
+    return this->hp;
+};
+int Sherlock::getExp() const{
+    return this->exp;
+};
+int Sherlock::setExp(int init_exp) const{
     if(init_exp < 0) return 0;
     else if(init_exp > 900) return 900;
     else return init_exp;
 };
-int Sherlock::setInitHP(int init_hp) const{
+int Sherlock::setHp(int init_hp) const{
     if(init_hp < 0) return 0;
     else if(init_hp > 500) return 500;
     else return init_hp;
@@ -256,13 +264,19 @@ void Watson::move(){
 };
 string Watson::str() const {
     return "Watson[index="+to_string(index)+";pos="+pos.str()+";moving_rule="+moving_rule+"]";
-}
-int Watson::setInitExp(int init_exp) const{
+};
+int Watson::getExp() const{
+    return this->exp;
+};
+int Watson::getHp() const{
+    return this->hp;
+};
+int Watson::setExp(int init_exp) const{
     if(init_exp < 0) return 0;
     else if(init_exp > 900) return 900;
     else return init_exp;
 };
-int Watson::setInitHP(int init_hp) const{
+int Watson::setHp(int init_hp) const{
     if(init_hp < 0) return 0;
     else if(init_hp > 500) return 500;
     else return init_hp;
@@ -321,7 +335,15 @@ MovingObject* ArrayMovingObject::get(int index) const{
     return arr_mv_objs[index];
 };
 string ArrayMovingObject::str() const{
-    return "ArrayMovingObject[count="+to_string(count)+";capacity="+to_string(capacity)+arr_mv_objs[index].str();
+    string arraymovingobject;
+    int i = 0;
+    arraymovingobject = "ArrayMovingObject[count="+to_string(count)+";capacity="+to_string(capacity)+";";
+    while ((i+1)==count){
+        arraymovingobject += arr_mv_objs[i]->str();
+        arraymovingobject += ";";
+        i++;
+    }
+    return arraymovingobject;
 };
 
 //TODO: 3.9: CONFIGURATION
@@ -404,7 +426,21 @@ Configuration::Configuration(const string & filepath){
     }  
 };
 string Configuration::str() const{
-    cout<<"Configuration["<<endl<<"MAP_NUM_ROWS="<<map_num_rows<<endl<<"MAP_NUM_COLS="<<map_num_cols<<endl<<"MAX_NUM_MOVING_OBJECTS="<<max_num_moving_objects<<endl<<"NUM_WALLS="<<num_walls<<endl<<"ARRAY_WALLS="<<arr_walls<<endl<<"NUM_FAKE_WALLS="<<num_fake_walls<<endl<<"ARRAY_FAKE_WALLS="<<arr_fake_walls<<endl<<"SHERLOCK_MOVING_RULE="<<sherlock_moving_rule<<endl<<"SHERLOCK_INIT_POS="<<sherlock_init_pos.str()<<endl<<"WATSON_MOVING_RULE="<<watson_moving_rule<<endl<<"WATSON_INIT_POS="<<watson_init_pos.str()<<endl<<"CRIMINAL_INIT_POS="<<criminal_init_pos.str()<<endl<<"NUM_STEPS="<<num_steps<<endl<<"]";
+    cout<<"Configuration["<<endl;
+    cout<<"MAP_NUM_ROWS="<<map_num_rows<<endl;
+    cout<<"MAP_NUM_COLS="<<map_num_cols<<endl;
+    cout<<"MAX_NUM_MOVING_OBJECTS="<<max_num_moving_objects<<endl;
+    cout<<"NUM_WALLS="<<num_walls<<endl;
+    cout<<"ARRAY_WALLS="<<arr_walls<<endl;
+    cout<<"NUM_FAKE_WALLS="<<num_fake_walls<<endl;
+    cout<<"ARRAY_FAKE_WALLS="<<arr_fake_walls<<endl;
+    cout<<"SHERLOCK_MOVING_RULE="<<sherlock_moving_rule<<endl;
+    cout<<"SHERLOCK_INIT_POS="<<sherlock_init_pos.str()<<endl;
+    cout<<"WATSON_MOVING_RULE="<<watson_moving_rule<<endl;
+    cout<<"WATSON_INIT_POS="<<watson_init_pos.str()<<endl;
+    cout<<"CRIMINAL_INIT_POS="<<criminal_init_pos.str()<<endl;
+    cout<<"NUM_STEPS="<<num_steps<<endl;
+    cout<<"]";
 };
 
 //TODO: 3.10: ROBOT
@@ -423,7 +459,8 @@ RobotC::RobotC(int index, const Position & init_pos, Map* map, RobotType robot_t
     this->name = "RobotC";
 };
 Position RobotC::getNextPosition() {
-    Position next_pos = npos;
+    //Moves to the next location in the same location as the criminal position
+    Position next_pos = criminal->getCurrentPosition();
     return next_pos;
 };
 void RobotC::move(){
@@ -498,14 +535,111 @@ string RobotSW::str() const{
 };
 
 //TODO: 3.11: BASE ITEM
+bool BaseItem::canUse(Character *obj, Robot *robot){
+    if(obj->getName() == "Sherlock" || obj->getName() == "Watson"){
+        return true;
+    }
+    else{
+        return false;
+    }
+};
 //TODO: 3.11.1: MAGIC BOOK
+bool MagicBook::canUse(Character *obj, Robot *robot){
+    if(obj->getName() == "Sherlock" && sherlock->getExp()<=350){
+        return true;
+    }
+    else if(obj->getName() == "Watson" && watson->getExp()<=350){
+        return true;
+    }
+    else{
+        return false;
+    }
+};
+void MagicBook::use(Character *obj, Robot *robot){
+    if(canUse(sherlock, robot)){
+        sherlock->setExp(sherlock->getExp()*1.25);
+    }
+    if(canUse(watson, robot)){
+        watson->setExp(watson->getExp()*1.25);
+    }
+};
+
 //TODO: 3.11.2: ENERGY DRINK
+bool EnergyDrink::canUse(Character *obj, Robot *robot){
+    if(obj->getName() == "Sherlock" && sherlock->getHp()<=100){
+        return true;
+    }
+    else if(obj->getName() == "Watson" && watson->getHp()<=100){
+        return true;
+    }
+    else{
+        return false;
+    }
+};
+void EnergyDrink::use(Character *obj, Robot *robot){
+    if(canUse(sherlock, robot)){
+        sherlock->setHp(sherlock->getHp()*1.2);
+    }
+    if(canUse(watson, robot)){
+        watson->setHp(watson->getHp()*1.2);
+    }
+};
+
 //TODO: 3.11.3: FIRST AID
+bool FirstAid::canUse(Character *obj, Robot *robot){
+    if((obj->getName() == "Sherlock" && sherlock->getHp()<=100) || (obj->getName()=="Sherlock" && sherlock->getExp()<=350) ){
+        return true;
+    }
+    else if((obj->getName() == "Watson" && watson->getHp()<=100) || (obj->getName()=="Watson" && watson->getExp()<=350) ){
+        return true;
+    }
+    else{
+        return false;
+    }
+};
+void FirstAid::use(Character *obj, Robot *robot){
+    if(canUse(sherlock, robot)){
+        sherlock->setHp(sherlock->getHp()*1.5);
+    }
+    if(canUse(watson, robot)){
+        watson->setHp(watson->getHp()*1.5);
+    }
+};
+
 //TODO: 3.11.4: EXEMPTIONCARD
+bool ExemptionCard::canUse(Character *obj, Robot *robot){
+    if(obj->getName() == "Sherlock" && (sherlock->getHp()%2!=0) ){
+        return true;
+    }
+    else{
+        return false;
+    }
+};
+void ExemptionCard::use(Character *obj, Robot *robot){
+    if(canUse(sherlock, robot)){
+        sherlock->setHp(sherlock->getHp());
+        sherlock->setExp(sherlock->getExp());
+    }
+};
+
 //TODO: 3.11.5: PASSING CARD
+bool PassingCard::canUse(Character *obj, Robot *robot){
+    if(obj->getName() == "Watson" && (watson->getHp()%2==0) ){
+        return true;
+    }
+    else{
+        return false;
+    }
+};
+void PassingCard::use(Character *obj, Robot *robot){
+    if(canUse(watson, robot)){
+        
+    }
+};
+
 //TODO: 3.12: BASE BAG
 //TODO: getnextposition robot, criminal
-//TODO: configuration, str() arr_mv_obj
+//TODO: configuration
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

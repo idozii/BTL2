@@ -159,7 +159,7 @@ Character::Character(int index, const Position &init_pos, Map* map, const string
     this->index = index;
     this->pos = init_pos;
     this->map = map;
-    this->name = name;
+    this->name = "Character";
 };
 Position Character::getNextPosition() {
     Position next_pos = pos;
@@ -187,6 +187,8 @@ Sherlock::Sherlock(int index, const string & moving_rule, const Position & init_
     this->moving_rule = moving_rule;
     this->index_moving_rule = index_moving_rule;
     this->name = "Sherlock";
+    this->hp = init_hp;
+    this->exp = init_exp;
 };
 Position Sherlock::getNextPosition() {
     Position next_pos = npos;
@@ -238,10 +240,12 @@ int Sherlock::setHp(int init_hp) const{
 };
 
 //TODO: 3.6: WATSON
-Watson::Watson(int index, const string & moving_rule, const Position & init_pos, Map * map, const string &name = "Watson", int init_hp, int init_exp) : Character(index, init_pos, map, name){
+Watson::Watson(int index, const string & moving_rule, const Position & init_pos, Map * map, const string &name = "", int init_hp, int init_exp) : Character(index, init_pos, map, name){
     this->moving_rule = moving_rule;
     this->index_moving_rule = index_moving_rule;
     this->name = "Watson";
+    this->hp = init_hp;
+    this->exp = init_exp;
 };
 Position Watson::getNextPosition() {
     Position next_pos = npos;
@@ -676,7 +680,7 @@ void PassingCard::use(Character *obj, Robot *robot){
 };
 
 //TODO: 3.12: BASE BAG
-//TODO: getnextposition robot, criminal
+//TODO: getnextposition robot
 //TODO: configuration
 
 ////////////////////////////////////////////////

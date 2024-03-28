@@ -421,45 +421,36 @@ Configuration::Configuration(const string & filepath){
                 criminal_init_pos.setRow(stoi(line.substr(line.find("=")+1)));
                 criminal_init_pos.setCol(stoi(line.substr(line.find(",")+1)));
             }
-            else if(line.find("NUM_WALLS")!= string::npos){
-                num_walls = stoi(line.substr(line.find("=")+1));
-            }
             else if(line.find("ARRAY_WALLS")!= string::npos) {
-                string walls = line.substr(line.find("=")+1);
+                string walls = line.substr(line.find("["), line.find("]"));
+                string array_walls;
                 for(int i = 0; i < walls.size(); i++){
                     if(walls[i] == '1'){
-                        arr_walls[i] = true;
+                        array_walls[i] = true;
                     }
                     else{
-                        arr_walls[i] = false;
+                        array_walls[i] = false;
                     }
                 }
-                cout<<"arr_walls: ";
                 for(int i = 0; i < walls.size(); i++){
-                    
+                    arr_walls+=array_walls[i];
                 }
-                cout<<endl;
-            }
-            else if(line.find("NUM_FAKE_WALLS")!= string::npos){
-                num_fake_walls = stoi(line.substr(line.find("=")+1));
             }
             else if(line.find("ARRAY_FAKE_WALLS")!= string::npos){
-                string walls = line.substr(line.find("=")+1);
+                string walls = line.substr(line.find("["), line.find("]"));
+                string array_fake_walls;
                 for(int i = 0; i < walls.size(); i++){
                     if(walls[i] == '1'){
-                        arr_fake_walls[i] = true;
+                        array_fake_walls[i] = true;
                     }
                     else{
-                        arr_fake_walls[i] = false;
+                        array_fake_walls[i] = false;
                     }
                 }
-                cout<<"arr_fake_walls: ";
                 for(int i = 0; i < walls.size(); i++){
-                    
+                    arr_fake_walls+=array_fake_walls[i];
                 }
-                cout<<endl;
             }
-
         }
     }  
 };

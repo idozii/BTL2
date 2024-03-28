@@ -241,7 +241,6 @@ private:
 
 public:
     Configuration(const string & filepath);
-    ~Configuration();
     string str() const;
 };
 

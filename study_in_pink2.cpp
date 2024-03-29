@@ -5,6 +5,10 @@
 /// Complete the following functions
 /// DO NOT modify any parameters in the functions.
 ////////////////////////////////////////////////////////////////////////
+//TODO: 3.0: DISTANCE FUNCTION(MANHATTAN)
+int distance(const Position &pos1, const Position &pos2){
+    return abs(pos1.getRow()-pos2.getRow())+abs(pos1.getCol()-pos2.getCol());
+};
 //TODO: 3.1: MAP ELEMENT
 MapElement::MapElement(ElementType in_type){
     this->type = type;
@@ -562,11 +566,14 @@ Robot::Robot(int index , const Position pos , Map * map , RobotType robot_type, 
 Robot* Robot::create(int index, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson){
     if(criminal->isCreatedRobotNext(criminal->move_count)){
         return new RobotC(index, criminal->getCurrentPosition(), map, C, criminal);
-    }
-    else if(){
+    }    
+    else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) > distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
         return new RobotS(index, criminal->getCurrentPosition(), map, S, criminal, sherlock);
     }
-    else return NULL;
+    else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) < distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
+        return new RobotW(index, criminal->getCurrentPosition(), map, W, criminal, watson);
+    }
+    else return new RobotSW(index, criminal->getCurrentPosition(), map, SW, criminal, sherlock, watson);
 };
 MovingObjectType Robot::getObjectType() const {
     return ROBOT;
@@ -600,10 +607,10 @@ RobotType RobotC::getType() const{
     return C;
 }
 int RobotC::getDistance(Sherlock* sherlock) const{
-    return (abs(pos.getRow()-sherlock->getCurrentPosition().getRow())+abs(pos.getCol()-sherlock->getCurrentPosition().getCol()));
+    return distance(pos, sherlock->getCurrentPosition());
 };
 int RobotC::getDistance(Watson* watson) const{
-    return (abs(pos.getRow()-watson->getCurrentPosition().getRow())+abs(pos.getCol()-watson->getCurrentPosition().getCol()));
+    return distance(pos, watson->getCurrentPosition());
 };
 string RobotC::str() const{
     return "Robot[pos="+pos.str()+"type="+to_string(robot_type)+"dist="+""+"]";
@@ -647,7 +654,7 @@ RobotType RobotS::getType() const{
     return S;
 };
 int RobotS::getDistance() const{
-    return (abs(pos.getRow()-sherlock->getCurrentPosition().getRow())+abs(pos.getCol()-sherlock->getCurrentPosition().getCol()));
+    return distance(pos, sherlock->getCurrentPosition());
 };
 string RobotS::str() const{
     return "Robot[pos="+pos.str()+"type="+to_string(robot_type)+"dist="+to_string(getDistance())+"]";
@@ -691,7 +698,7 @@ RobotType RobotW::getType() const{
     return W;
 };
 int RobotW::getDistance() const{
-    return (abs(pos.getRow()-watson->getCurrentPosition().getRow())+abs(pos.getCol()-watson->getCurrentPosition().getCol()));
+    return distance(pos, watson->getCurrentPosition());
 };
 string RobotW::str() const{
     return "Robot[pos="+pos.str()+"type="+to_string(robot_type)+"dist="+to_string(getDistance())+"]";
@@ -736,7 +743,7 @@ void RobotSW::move(){
     return SW;
 };
 int RobotSW::getDistance() const{
-    return (abs(pos.getRow()-watson->getCurrentPosition().getRow())+abs(pos.getCol()-watson->getCurrentPosition().getCol())) + (abs(pos.getRow()-sherlock->getCurrentPosition().getRow())+abs(pos.getCol()-sherlock->getCurrentPosition().getCol())); 
+    return distance(pos, sherlock->getCurrentPosition()) + distance(pos, watson->getCurrentPosition());
 };
 string RobotSW::str() const{
     return "Robot[pos="+pos.str()+"type="+to_string(robot_type)+"dist="+to_string(getDistance())+"]";

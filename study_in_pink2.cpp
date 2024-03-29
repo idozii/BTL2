@@ -14,7 +14,7 @@ MapElement::MapElement(ElementType in_type){
     this->type = type;
 };
 MapElement::~MapElement(){
-
+    delete this;
 };
 ElementType MapElement::getType() const {
     return this->type;
@@ -874,7 +874,13 @@ bool StudyPinkProgram::isStop() const{
 void StudyPinkProgram::run(bool verbose){
     
 };
-//TODO: class Robot create
+StudyPinkProgram::~StudyPinkProgram(){
+    delete map;
+    delete arr_mv_objs;
+    delete sherlock;
+    delete watson;
+    delete criminal;
+};
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

@@ -39,33 +39,32 @@ int FakeWall::getReqExp() const {
 
 //TODO: 3.2: MAP
 Map::Map(int num_rows, int num_cols, int num_walls, Position* array_walls, int num_fake_walls, Position* array_fake_walls){
+    this->num_rows = num_rows;
+    this->num_cols = num_cols;
     map = new MapElement**[num_rows];
     for(int i = 0; i < num_rows; i++){
         map[i] = new MapElement*[num_cols];
         for(int j = 0; j < num_cols; j++){
-            for(int k = 0; k < num_walls; k++){
-                if(array_walls[k].isEqual(i,j)){
-                    map[i][j] = new Wall();
-                }else{
-                    map[i][j] = new Path();
-                }
-            }
-            for(int l = 0; l<num_fake_walls; l++){
-                if(array_fake_walls[l].isEqual(i,j)){
-                    map[i][j] = new FakeWall((i*257 + j*139+89)%900+1);
-                }else{
-                    map[i][j] = new Path();
-                }
-            }
-            if(array_fake_walls->isEqual(array_walls->getRow(),array_walls->getCol())){
-                map[array_fake_walls->getRow()][array_fake_walls->getCol()] = new Wall();
+            map[i][j] = new Path();
+        }
+    }
+    for(int i = 0; i < num_walls; i++){
+        map[array_walls[i].getRow()][array_walls[i].getCol()] = new Wall();
+    }
+    for(int i = 0; i < num_fake_walls; i++){
+        map[array_fake_walls[i].getRow()][array_fake_walls[i].getCol()] = new FakeWall((array_fake_walls[i].getRow()*257+array_fake_walls[i].getCol()*139+89)%900+1);
+    }
+    for(int i = 0; i < num_walls; i++){
+        for(int j = 0; j < num_fake_walls; j++){
+            if(array_walls[i].getRow() == array_fake_walls[j].getRow() && array_walls[i].getCol() == array_fake_walls[j].getCol()){
+                map[array_walls[i].getRow()][array_walls[i].getCol()] = new Wall();
             }
         }
-    } 
+    }
 };
 Map::~Map(){
-    for (int i = 0; i < num_rows; i++) {
-        for (int j = 0; j < num_cols; j++) {
+    for(int i = 0; i < num_rows; i++){
+        for(int j = 0; j < num_cols; j++){
             delete map[i][j];
         }
         delete[] map[i];
@@ -109,10 +108,8 @@ Position::Position(int r = 0, int c= 0){
     this->c = c;
 };
 Position::Position(const string& str_pos){
-    r = str_pos[str_pos.find("(")+1, str_pos.find(",")-1];
-    c = str_pos[str_pos.find(",")+1, str_pos.find(")")-1];
-    this->r = r;
-    this->c = c;
+    this->r = stoi(str_pos.substr(1, str_pos.find(",")-1));
+    this->c = stoi(str_pos.substr(str_pos.find(",")+1, str_pos.find(")")-1));
 };
 int Position::getRow() const {
     return this->r;
@@ -129,8 +126,8 @@ void Position::setCol(int c){
 string Position::str() const{
     return "(" + to_string(r) + "," + to_string(c) + ")";
 };
-bool Position::isEqual(int in_r, int in_c) const{
-    if(r == in_r && c == in_c) return true;
+bool Position::isEqual(const Position &pos) const{
+    if(r == pos.getRow() && c == pos.getCol()) return true;
     else return false;
 };
 
@@ -157,7 +154,7 @@ Position MovingObject::getCurrentPosition() const{
 };
 void MovingObject::move(){
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(-1, -1)) return;
+    if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;
 };
 string MovingObject::str() const{
@@ -172,9 +169,6 @@ MovingObjectType MovingObject::getObjectType() const{
 
 //TODO: 3.5.1: CHARACTER
 Character::Character(int index, const Position pos, Map* map, const string &name="") : MovingObject(index, pos, map, name){
-    this->index = index;
-    this->pos = pos;
-    this->map = map;
     this->name = "Character";
 };
 Position Character::getNextPosition() {
@@ -182,14 +176,15 @@ Position Character::getNextPosition() {
     if(map->isValid(next_pos, this)){
         next_pos.setRow(next_pos.getRow() + 1);
         next_pos.setCol(next_pos.getCol() + 1);
-    }else{
+    }
+    else{
         next_pos = npos;
     }
     return next_pos;
 };
 void Character::move(){
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(-1, -1)) return;
+    if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;
 };
 string Character::str() const {
@@ -228,7 +223,7 @@ Position Sherlock::getNextPosition() {
 };
 void Sherlock::move(){
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(-1, -1)) return;
+    if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;    
 };
 MovingObjectType Sherlock::getObjectType()const{
@@ -254,16 +249,44 @@ int Sherlock::setHp(int init_hp) const{
     else return init_hp;
 };
 void Sherlock::meet(RobotS* robotS){
-
+    if (distance(pos, robotS->getCurrentPosition()) == 1){
+        this->meet(robotS);
+        if (exp > 400){
+            delete robotS;
+        }
+        else{
+            exp = exp*0.9;
+        }
+    }
 };
 void Sherlock::meet(RobotC* robotC){
-
+    if (distance(pos, robotC->getCurrentPosition()) == 1){
+        this->meet(robotC);
+        if (exp > 500){
+            delete robotC;
+        }
+        else{
+            delete robotC;
+        }
+    }
 };
 void Sherlock::meet(RobotSW* robotSW){
-
+    if (distance(pos, robotSW->getCurrentPosition()) == 1){
+        this->meet(robotSW);
+        if (exp > 300 && hp > 335){
+            delete robotSW;
+        }
+        else{
+            hp = hp*0.85;
+            exp = exp*0.85;
+        }
+    }
 };
 void Sherlock::meet(RobotW* robotW){
-
+    if (distance(pos, robotW->getCurrentPosition()) == 1){
+        this->meet(robotW);
+        delete robotW;
+    }
 };
 void Sherlock::meet(Watson* watson){
 
@@ -298,7 +321,7 @@ Position Watson::getNextPosition() {
 };
 void Watson::move(){
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(-1, -1)) return;
+    if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;
 };
 MovingObjectType Watson::getObjectType() const {
@@ -324,15 +347,38 @@ int Watson::setHp(int init_hp) const{
     else return init_hp;
 };
 void Watson::meet(RobotS* robotS){
+    if(distance(pos, robotS->getCurrentPosition()) == 1){
+        ;
+    }
 };
 void Watson::meet(RobotC* robotC){
-
+    if (distance(pos, robotC->getCurrentPosition()) == 1){
+        this->meet(robotC);
+        delete robotC;
+    }
 };
 void Watson::meet(RobotSW* robotSW){
-
+    if (distance(pos, robotSW->getCurrentPosition()) == 1){
+        this->meet(robotSW);
+        if (exp > 600 && hp > 165){
+            delete robotSW;
+        }
+        else{
+            hp = hp*0.85;
+            exp = exp*0.85;
+        }
+    }
 };
 void Watson::meet(RobotW* robotW){
-
+    if (distance(pos, robotW->getCurrentPosition()) == 1){
+        this->meet(robotW);
+        if (hp > 350){
+            delete robotW;
+        }
+        else{
+            hp = hp*0.95;
+        }
+    }
 };
 void Watson::meet(Sherlock* sherlock){
 
@@ -368,7 +414,7 @@ Position Criminal::getNextPosition() {
 };
 void Criminal::move(){
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(-1, -1)) return;
+    if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;
     move_count++;
 };
@@ -442,25 +488,25 @@ string ArrayMovingObject::str() const{
 };
 bool ArrayMovingObject::checkMeet(int index){
     if(arr_mv_objs[index]->getObjectType() == SHERLOCK){
-        if(arr_mv_objs[index]->getCurrentPosition().isEqual(arr_mv_objs[index]->getNextPosition().getRow(), arr_mv_objs[index]->getNextPosition().getCol())){
+        if(arr_mv_objs[index]->getCurrentPosition().isEqual(arr_mv_objs[index]->getNextPosition())){
             return true;
         }
         else return false;
     }
     else if(arr_mv_objs[index]->getObjectType() == WATSON){
-        if(arr_mv_objs[index]->getCurrentPosition().isEqual(arr_mv_objs[index]->getNextPosition().getRow(), arr_mv_objs[index]->getNextPosition().getCol())){
+        if(arr_mv_objs[index]->getCurrentPosition().isEqual(arr_mv_objs[index]->getNextPosition())){
             return true;
         }
         else return false;
     }
     else if(arr_mv_objs[index]->getObjectType() == CRIMINAL){
-        if(arr_mv_objs[index]->getCurrentPosition().isEqual(arr_mv_objs[index]->getNextPosition().getRow(), arr_mv_objs[index]->getNextPosition().getCol())){
+        if(arr_mv_objs[index]->getCurrentPosition().isEqual(arr_mv_objs[index]->getNextPosition())){
             return true;
         }
         else return false;
     }
     else if(arr_mv_objs[index]->getObjectType() == ROBOT){
-        if(arr_mv_objs[index]->getCurrentPosition().isEqual(arr_mv_objs[index]->getNextPosition().getRow(), arr_mv_objs[index]->getNextPosition().getCol())){
+        if(arr_mv_objs[index]->getCurrentPosition().isEqual(arr_mv_objs[index]->getNextPosition())){
             return true;
         }
         else return false;
@@ -600,7 +646,7 @@ Position RobotC::getNextPosition() {
 };
 void RobotC::move(){
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(-1, -1)) return;
+    if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;
 };
 RobotType RobotC::getType() const{
@@ -647,7 +693,7 @@ Position RobotS::getNextPosition() {
 };
 void RobotS::move(){
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(-1, -1)) return;
+    if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;
 };
 RobotType RobotS::getType() const{
@@ -691,7 +737,7 @@ Position RobotW::getNextPosition() {
 };
 void RobotW::move(){
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(-1, -1)) return;
+    if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;
 };
 RobotType RobotW::getType() const{
@@ -736,7 +782,7 @@ Position RobotSW::getNextPosition() {
 };
 void RobotSW::move(){
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(-1, -1)) return;
+    if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;
 };
  RobotType RobotSW::getType() const{
@@ -758,6 +804,12 @@ bool BaseItem::canUse(Character *obj, Robot *robot){
         return false;
     }
 };
+void BaseItem::use(Character *obj, Robot *robot){
+    if(canUse(obj, robot)){
+        ;
+    }
+};
+
 //TODO: 3.11.1: MAGIC BOOK
 bool MagicBook::canUse(Character *obj, Robot *robot){
     if(obj->getObjectType() == SHERLOCK && sherlock->getExp()<=350){
@@ -866,7 +918,7 @@ StudyPinkProgram::StudyPinkProgram(const string &config_file_path){
     arr_mv_objs->add(criminal);
 };
 bool StudyPinkProgram::isStop() const{
-    if(sherlock->getHp() == 0 || watson->getHp() == 0 || sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition().getRow(), criminal->getCurrentPosition().getCol()) || watson->getCurrentPosition().isEqual(criminal->getCurrentPosition().getRow(), criminal->getCurrentPosition().getCol())){
+    if(sherlock->getHp() == 0 || watson->getHp() == 0 || sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition()) || watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())){
         return true;
     }
     else return false;
@@ -882,6 +934,8 @@ StudyPinkProgram::~StudyPinkProgram(){
     delete criminal;
 };
 
+
+//TODO: base item, base bag
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER
 ////////////////////////////////////////////////

@@ -41,7 +41,7 @@
 
 class TestStudyInPink;
 
-enum MovingObjectType{SHERLOCK, WATSON, CRIMINAL, ROBOT };
+enum MovingObjectType{ SHERLOCK, WATSON, CRIMINAL, ROBOT };
 enum ItemType { MAGIC_BOOK, ENERGY_DRINK, FIRST_AID, EXCEMPTION_CARD, PASSING_CARD };
 enum ElementType { PATH, WALL, FAKE_WALL };
 enum RobotType { C=0, S, W, SW };
@@ -107,7 +107,7 @@ public:
     void setRow(int r);
     void setCol(int c);
     string str() const;
-    bool isEqual(int in_r, int in_c) const;
+    bool isEqual(const Position &pos) const;
 };
 
 class MovingObject {
@@ -318,6 +318,7 @@ class BaseBag {
     friend class TestStudyInPink;
 private:
     Character* obj;
+
 public:
     virtual bool insert(BaseItem* item);
     virtual BaseItem* get();
@@ -431,10 +432,10 @@ public:
     StudyPinkProgram(const string & config_file_path);
     bool isStop() const;
     void printResult() const {
-        if (sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition().getRow(), criminal->getCurrentPosition().getCol())) {
+        if (sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition())) {
             cout << "Sherlock caught the criminal" << endl;
         }
-        else if (watson->getCurrentPosition().isEqual(criminal->getCurrentPosition().getRow(), criminal->getCurrentPosition().getCol())) {
+        else if (watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())) {
             cout << "Watson caught the criminal" << endl;
         }
         else {

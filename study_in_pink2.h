@@ -42,7 +42,7 @@
 class TestStudyInPink;
 
 enum MovingObjectType{ SHERLOCK, WATSON, CRIMINAL, ROBOT };
-enum ItemType { MAGIC_BOOK, ENERGY_DRINK, FIRST_AID, EXCEMPTION_CARD, PASSING_CARD };
+enum ItemType { MAGIC_BOOK, ENERGY_DRINK, FIRST_AID, EXEMPTION_CARD, PASSING_CARD };
 enum ElementType { PATH, WALL, FAKE_WALL };
 enum RobotType { C=0, S, W, SW };
 
@@ -250,9 +250,16 @@ public:
 
 class BaseItem {
     friend class TestStudyInPink;
+
+protected:
+    ItemType type;
+
 public:
+    BaseItem(ItemType type);
     virtual bool canUse(Character *obj, Robot *robot);
     virtual void use(Character *obj, Robot *robot);
+    virtual ItemType getType() const;
+    virtual string str() const;
 };
 
 class MagicBook : public BaseItem{
@@ -263,6 +270,7 @@ private:
     Watson *watson;
 
 public:
+    MagicBook(ItemType type, Sherlock *sherlock, Watson *watson);
     virtual bool canUse(Character* obj, Robot *robot);
     virtual void use(Character* obj, Robot *robot);
 };
@@ -275,6 +283,7 @@ private:
     Watson *watson;
 
 public:
+    EnergyDrink(ItemType type, Sherlock *sherlock, Watson *watson);
     virtual bool canUse(Character* obj, Robot *robot);
     virtual void use(Character* obj, Robot *robot);
 };
@@ -287,6 +296,7 @@ private:
     Watson* watson;
 
 public:
+    FirstAid(ItemType type, Sherlock* sherlock, Watson* watson);
     virtual bool canUse(Character* obj, Robot *robot);
     virtual void use(Character* obj, Robot *robot);
 };
@@ -298,6 +308,7 @@ private:
     Sherlock* sherlock;
 
 public:
+    ExemptionCard(ItemType type, Sherlock* sherlock);
     virtual bool canUse(Character* obj, Robot *robot);
     virtual void use(Character* obj, Robot *robot);
 };
@@ -310,16 +321,48 @@ private:
     string challenge;
     
 public:
+    PassingCard(ItemType type, Watson* watson, const string &challenge);
     virtual bool canUse(Character* obj, Robot *robot);
     virtual void use(Character* obj, Robot *robot);
 };
 
 class BaseBag {
     friend class TestStudyInPink;
-private:
+protected:
     Character* obj;
+    BaseItem* item;
+    int count;
 
 public:
+    BaseBag(Character* obj, BaseItem* item);
+    virtual bool insert(BaseItem* item) = 0; 
+    virtual BaseItem* get() = 0;
+    virtual BaseItem* get(ItemType type) = 0;
+    virtual string str() const = 0;
+};
+
+class SherlockBag : public BaseBag {
+    friend class TestStudyInPink;
+private:
+    Sherlock* sherlock;
+    BaseBag** arr_bag;
+
+public:
+    SherlockBag(Sherlock* sherlock);
+    virtual bool insert(BaseItem* item);
+    virtual BaseItem* get();
+    virtual BaseItem* get(ItemType type);
+    virtual string str() const;
+};
+
+class WatsonBag : public BaseBag {
+    friend class TestStudyInPink;
+private:
+    Watson* watson;
+    BaseBag** arr_bag;
+
+public:
+    WatsonBag(Watson* watson);
     virtual bool insert(BaseItem* item);
     virtual BaseItem* get();
     virtual BaseItem* get(ItemType type);
@@ -449,23 +492,7 @@ public:
             << sherlock->str() << "--|--" << watson->str() << "--|--" << criminal->str() << endl;
     }
 
-    void run(bool verbose) {
-        // Note: This is a sample code. You can change the implementation as you like.
-        // TODO
-        for (int istep = 0; istep < config->num_steps; ++istep) {
-            for (int i = 0; i < arr_mv_objs->size(); ++i) {
-                arr_mv_objs->get(i)->move();
-                if (isStop()) {
-                    printStep(istep);
-                    break;
-                }
-                if (verbose) {
-                    printStep(istep);
-                }
-            }
-        }
-        printResult();
-    }
+    void run(bool verbose);
     ~StudyPinkProgram();
 };
 

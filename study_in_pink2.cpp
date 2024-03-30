@@ -9,6 +9,7 @@
 int distance(const Position &pos1, const Position &pos2){
     return abs(pos1.getRow()-pos2.getRow())+abs(pos1.getCol()-pos2.getCol());
 };
+
 //TODO: 3.1: MAP ELEMENT
 MapElement::MapElement(ElementType in_type){
     this->type = type;
@@ -796,6 +797,9 @@ string RobotSW::str() const{
 };
 
 //TODO: 3.11: BASE ITEM
+BaseItem::BaseItem(ItemType type){
+    this->type = type;
+};
 bool BaseItem::canUse(Character *obj, Robot *robot){
     if(obj->getObjectType() == SHERLOCK || obj->getObjectType() == WATSON){
         return true;
@@ -809,8 +813,19 @@ void BaseItem::use(Character *obj, Robot *robot){
         ;
     }
 };
+ItemType BaseItem::getType() const{
+    return type;
+};
+string BaseItem::str() const{
+    return to_string(type);
+};
 
 //TODO: 3.11.1: MAGIC BOOK
+MagicBook::MagicBook(ItemType type, Sherlock* sherlock, Watson* watson) : BaseItem(type){
+    this->type = MAGIC_BOOK;
+    this->sherlock = sherlock;
+    this->watson = watson;
+};
 bool MagicBook::canUse(Character *obj, Robot *robot){
     if(obj->getObjectType() == SHERLOCK && sherlock->getExp()<=350){
         return true;
@@ -832,6 +847,11 @@ void MagicBook::use(Character *obj, Robot *robot){
 };
 
 //TODO: 3.11.2: ENERGY DRINK
+EnergyDrink::EnergyDrink(ItemType type, Sherlock* sherlock, Watson* watson) : BaseItem(type){
+    this->type = ENERGY_DRINK;
+    this->sherlock = sherlock;
+    this->watson = watson;
+};
 bool EnergyDrink::canUse(Character *obj, Robot *robot){
     if(obj->getObjectType() == SHERLOCK && sherlock->getHp()<=100){
         return true;
@@ -853,6 +873,11 @@ void EnergyDrink::use(Character *obj, Robot *robot){
 };
 
 //TODO: 3.11.3: FIRST AID
+FirstAid::FirstAid(ItemType type, Sherlock* sherlock, Watson* watson) : BaseItem(type){
+    this->type = FIRST_AID;
+    this->sherlock = sherlock;
+    this->watson = watson;
+};
 bool FirstAid::canUse(Character *obj, Robot *robot){
     if((obj->getObjectType() == SHERLOCK && sherlock->getHp()<=100) || (obj->getObjectType()== SHERLOCK && sherlock->getExp()<=350) ){
         return true;
@@ -874,6 +899,10 @@ void FirstAid::use(Character *obj, Robot *robot){
 };
 
 //TODO: 3.11.4: EXEMPTIONCARD
+ExemptionCard::ExemptionCard(ItemType type, Sherlock* sherlock) : BaseItem(type){
+    this->type = EXEMPTION_CARD;
+    this->sherlock = sherlock;
+};
 bool ExemptionCard::canUse(Character *obj, Robot *robot){
     if(obj->getObjectType() == SHERLOCK && (sherlock->getHp()%2!=0) ){
         return true;
@@ -890,6 +919,11 @@ void ExemptionCard::use(Character *obj, Robot *robot){
 };
 
 //TODO: 3.11.5: PASSING CARD
+PassingCard::PassingCard(ItemType type, Watson* watson, const string &challenge) : BaseItem(type){
+    this->type = PASSING_CARD;
+    this->watson = watson;
+    this->challenge = challenge;
+};
 bool PassingCard::canUse(Character *obj, Robot *robot){
     if(obj->getObjectType() == WATSON && (watson->getHp()%2==0) ){
         return true;
@@ -905,6 +939,50 @@ void PassingCard::use(Character *obj, Robot *robot){
 };
 
 //TODO: 3.12: BASE BAG
+BaseBag::BaseBag(Character* obj, BaseItem* item){
+    this->obj = obj;
+    this->item = item;
+};
+bool BaseBag::insert(BaseItem* item){
+    if(this->item == NULL){
+        this->item = item;
+        return true;
+    }
+    else return false;
+};
+BaseItem* BaseBag::get(){
+    return item;
+};
+BaseItem* BaseBag::get(ItemType type){
+    if(item->getType() == type){
+        return item;
+    }
+    else return NULL;
+};
+string BaseBag::str() const{
+    return "BaseBag[count="+to_string(count)+";"+item->str()+"]";
+};
+
+//TODO: 3.12.1: SHERLOCK BAG
+SherlockBag::SherlockBag(Sherlock* sherlock):BaseBag(sherlock, item){
+    this->sherlock = sherlock;
+    this->count = 0;
+    arr_bag = new BaseBag*[sherlock->getExp()];
+    for(int i = 0; i < sherlock->getExp(); i++){
+        arr_bag[i] = NULL;
+    }
+};
+
+//TODO: 3.12.2: WATSON BAG
+WatsonBag::WatsonBag(Watson* watson):BaseBag(watson, item){
+    this->watson = watson;
+    this->count = 0;
+    arr_bag = new BaseBag*[watson->getExp()];
+    for(int i = 0; i < watson->getExp(); i++){
+        arr_bag[i] = NULL;
+    }
+};
+
 //TODO: 3.13: StudyPink
 StudyPinkProgram::StudyPinkProgram(const string &config_file_path){
     Configuration config(config_file_path);
@@ -924,7 +1002,19 @@ bool StudyPinkProgram::isStop() const{
     else return false;
 };
 void StudyPinkProgram::run(bool verbose){
-    
+    for (int istep = 0; istep < config->num_steps; ++istep) {
+        for (int i = 0; i < arr_mv_objs->size(); ++i) {
+            arr_mv_objs->get(i)->move();
+            if (isStop()) {
+                printStep(istep);
+                break;
+            }
+            if (verbose) {
+                printStep(istep);
+            }
+        }
+    }
+    printResult();
 };
 StudyPinkProgram::~StudyPinkProgram(){
     delete map;
@@ -935,7 +1025,8 @@ StudyPinkProgram::~StudyPinkProgram(){
 };
 
 
-//TODO: base item, base bag
+//TODO: base item, base bag, sherlockbag, watsonbag
+
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER
 ////////////////////////////////////////////////

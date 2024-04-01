@@ -19,28 +19,6 @@
 /// DO NOT modify any parameters in the functions.
 ////////////////////////////////////////////////////////////////////////
 
-// Forward declaration
-// class MovingObject;
-// class Position;
-// class Configuration;
-// class Map;
-
-// class Criminal;
-// class RobotS;
-// class RobotW;
-// class RobotSW;
-// class RobotC;
-
-// class ArrayMovingObject;
-// class StudyPinkProgram;
-
-// class BaseItem;
-// class BaseBag;
-// class SherlockBag;
-// class WatsonBag;
-
-class TestStudyInPink;
-
 enum MovingObjectType{ SHERLOCK, WATSON, CRIMINAL, ROBOT };
 enum ItemType { MAGIC_BOOK, ENERGY_DRINK, FIRST_AID, EXEMPTION_CARD, PASSING_CARD };
 enum ElementType { PATH, WALL, FAKE_WALL };
@@ -193,6 +171,7 @@ class Criminal : public Character {
 private:
     Sherlock* sherlock;
     Watson* watson;
+    int moveCount = 0;
     
 public:
     Criminal(int index, const Position & init_pos, Map * map, const string &name = "", Sherlock * sherlock, Watson * watson) : Character(index, init_pos, map, name){};
@@ -200,8 +179,8 @@ public:
     virtual void move();
     MovingObjectType getObjectType() const;
     virtual string str() const;
-    int move_count = 0;
-    bool isCreatedRobotNext(int move_count) const;
+    int getCount();
+    bool isCreatedRobotNext();
 };
 
 class ArrayMovingObject {

@@ -5,6 +5,32 @@
 /// Complete the following functions
 /// DO NOT modify any parameters in the functions.
 ////////////////////////////////////////////////////////////////////////
+class MovingObject;
+class Position;
+class Configuration;
+class Map;
+class Character;
+class Sherlock;
+class Watson;
+class Criminal;
+class RobotS;
+class RobotW;
+class RobotSW;
+class RobotC;
+class Robot;
+class ArrayMovingObject;
+class StudyPinkProgram;
+class BaseItem;
+class MagicBook;
+class EnergyDrink;
+class FirstAid;
+class ExemptionCard;
+class PassingCard;
+class BaseBag;
+class SherlockBag;
+class WatsonBag;
+class TestStudyInPink;
+
 //TODO: 3.0: DISTANCE FUNCTION(MANHATTAN)
 int distance(const Position &pos1, const Position &pos2){
     return abs(pos1.getRow()-pos2.getRow())+abs(pos1.getCol()-pos2.getCol());
@@ -417,7 +443,7 @@ void Criminal::move(){
     Position next_pos = getNextPosition();
     if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;
-    move_count++;
+    moveCount++;
 };
 MovingObjectType Criminal::getObjectType() const{
     return CRIMINAL;
@@ -425,8 +451,11 @@ MovingObjectType Criminal::getObjectType() const{
 string Criminal::str() const {
     return "Criminal[index="+to_string(index)+";pos="+pos.str()+"]";
 };
-bool Criminal::isCreatedRobotNext(int move) const {
-    if (move % 3 == 0) return true;
+int Criminal::getCount(){
+    return this->moveCount;
+};
+bool Criminal::isCreatedRobotNext(){
+    if (getCount() % 3 == 0 && getCount()>0) return true;
     else return false;
 };
 
@@ -611,7 +640,7 @@ Robot::Robot(int index , const Position pos , Map * map , RobotType robot_type, 
     this->criminal = criminal;
 };
 Robot* Robot::create(int index, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson){
-    if(criminal->isCreatedRobotNext(criminal->move_count)){
+    if(criminal->isCreatedRobotNext()){
         return new RobotC(index, criminal->getCurrentPosition(), map, C, criminal);
     }    
     else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) > distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
@@ -620,9 +649,11 @@ Robot* Robot::create(int index, Map* map, Criminal* criminal, Sherlock* sherlock
     else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) < distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
         return new RobotW(index, criminal->getCurrentPosition(), map, W, criminal, watson);
     }
-    else return new RobotSW(index, criminal->getCurrentPosition(), map, SW, criminal, sherlock, watson);
+    else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) == distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
+        return new RobotSW(index, criminal->getCurrentPosition(), map, SW, criminal, sherlock, watson);
+    }
 };
-MovingObjectType Robot::getObjectType() const {
+MovingObjectType Robot::getObjectType() const{
     return ROBOT;
 };
 RobotType Robot::getType() const {
@@ -988,9 +1019,9 @@ StudyPinkProgram::StudyPinkProgram(const string &config_file_path){
     Configuration config(config_file_path);
     map = new Map(config.map_num_rows, config.map_num_cols, config.num_walls, config.arr_walls, config.num_fake_walls, config.arr_fake_walls);
     arr_mv_objs = new ArrayMovingObject(config.max_num_moving_objects);
-    sherlock = new Sherlock(0, config.sherlock_moving_rule, config.sherlock_init_pos, map, "Sherlock", config.sherlock_init_hp, config.sherlock_init_exp);
-    watson = new Watson(1, config.watson_moving_rule, config.watson_init_pos, map, "Watson", config.watson_init_hp, config.watson_init_exp);
-    criminal = new Criminal(2, config.criminal_init_pos, map, "Criminal", sherlock, watson);
+    sherlock = new Sherlock(1, config.sherlock_moving_rule, config.sherlock_init_pos, map, "Sherlock", config.sherlock_init_hp, config.sherlock_init_exp);
+    watson = new Watson(2, config.watson_moving_rule, config.watson_init_pos, map, "Watson", config.watson_init_hp, config.watson_init_exp);
+    criminal = new Criminal(0, config.criminal_init_pos, map, "Criminal", sherlock, watson);
     arr_mv_objs->add(sherlock);
     arr_mv_objs->add(watson);
     arr_mv_objs->add(criminal);
@@ -1002,19 +1033,30 @@ bool StudyPinkProgram::isStop() const{
     else return false;
 };
 void StudyPinkProgram::run(bool verbose){
-    for (int istep = 0; istep < config->num_steps; ++istep) {
-        for (int i = 0; i < arr_mv_objs->size(); ++i) {
+    for (int istep = 0; istep < config->num_steps; ++istep)
+    {
+        for (int i = 0; i < arr_mv_objs->size(); ++i)
+        {
+            MovingObject *robot = nullptr;
+            if (arr_mv_objs->get(i)->getObjectType() == MovingObjectType::CRIMINAL)
+            {
+                robot = Robot::create(arr_mv_objs->size(), map, criminal, sherlock, watson);
+            }
             arr_mv_objs->get(i)->move();
-            if (isStop()) {
-                printStep(istep);
-                break;
+            if (robot != nullptr)
+            {
+                if (criminal->isCreatedRobotNext())
+                {
+                    arr_mv_objs->add(robot);
+                }
+                else
+                {
+                    delete robot;
+                }
             }
-            if (verbose) {
-                printStep(istep);
-            }
+            printResult();
         }
     }
-    printResult();
 };
 StudyPinkProgram::~StudyPinkProgram(){
     delete map;

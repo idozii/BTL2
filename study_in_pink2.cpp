@@ -243,6 +243,7 @@ int Character::setHp(int init_hp) const{
 Sherlock::Sherlock(int index, const string & moving_rule, const Position & init_pos, Map * map, const string &name = "", int init_hp, int init_exp) : Character(index, init_pos, map, "Sherlock"){
     this->moving_rule = moving_rule;
     this->index_moving_rule = index_moving_rule;
+    Bag = new SherlockBag(this);
 };
 Position Sherlock::getNextPosition() {
     Position next_pos = pos;
@@ -341,6 +342,7 @@ void Sherlock::meet(Watson* watson){
 Watson::Watson(int index, const string & moving_rule, const Position & init_pos, Map * map, const string &name = "", int init_hp, int init_exp) : Character(index, init_pos, map, "Watson"){
     this->moving_rule = moving_rule;
     this->index_moving_rule = index_moving_rule;
+    Bag = new WatsonBag(this);
 };
 Position Watson::getNextPosition() {
     Position next_pos = pos;
@@ -905,7 +907,7 @@ string FirstAid::str() const{
 
 //TODO: 3.11.4: EXEMPTIONCARD
 bool ExemptionCard::canUse(Character *obj, Robot *robot){
-    if(obj->getHp()%2!=0 && robot!=nullptr){
+    if(obj->getObjectType() == SHERLOCK && obj->getHp()%2!=0 && robot!=nullptr){
         return true;
     }
     else return false;
@@ -920,7 +922,26 @@ string ExemptionCard::str() const{
 };
 
 //TODO: 3.11.5: PASSING CARD
+PassingCard::PassingCard(int i, int j){
+    int t = (i*11 + j)%4;
+    if(t==0){
+        challenge == "RobotS";
+    }
+    else if(t==1){
+        challenge == "RobotC";
+    }
+    else if(t==2){
+        challenge == "RobotSW";
+    }
+    else if(t==3){
+        challenge == "all";
+    }
+};
 bool PassingCard::canUse(Character *obj, Robot *robot){
+    if(obj->getObjectType() == WATSON && obj->getExp()%2==0 && robot!=nullptr){
+        return true;
+    }
+    else return false;
 };
 void PassingCard::use(Character *obj, Robot *robot){
 

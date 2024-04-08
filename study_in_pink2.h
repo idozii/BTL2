@@ -129,6 +129,7 @@ private:
     int index_moving_rule;
     int hp;
     int exp;
+    BaseBag* Bag;
 
 public:
     Sherlock(int index, const string & moving_rule, const Position & init_pos, Map * map, const string &name = "", int init_hp, int init_exp) :Character(index, init_pos, map, name){};
@@ -154,6 +155,7 @@ private:
     int index_moving_rule;
     int hp;
     int exp;
+    BaseBag* Bag;
 
 public:
     Watson(int index, const string & moving_rule, const Position & init_pos, Map * map, const string &name = "", int init_hp, int init_exp) : Character(index, init_pos, map, name){};

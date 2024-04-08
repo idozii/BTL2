@@ -185,6 +185,10 @@ public:
     virtual void move();
     MovingObjectType getObjectType() const;
     virtual string str() const;
+    virtual int getExp() const;
+    virtual int getHp() const;
+    virtual int setHp(int init_hp) const;
+    virtual int setExp(int init_exp) const;
     int getCount();
     bool isCreatedRobotNext();
 };

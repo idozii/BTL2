@@ -93,6 +93,7 @@ class MovingObject {
 protected:
     int index;
     int exp;
+    int hp;
     Position pos;
     Map* map;
     string name;
@@ -104,6 +105,7 @@ public:
     virtual void move() = 0;
     virtual string str() const = 0;
     int getExp() const;
+    int getHp() const;
     virtual MovingObjectType getObjectType() const = 0;
 };
 
@@ -113,6 +115,10 @@ public:
     virtual Position getNextPosition() = 0;
     virtual void move() = 0;
     virtual string str() const = 0;
+    virtual int getHp() const = 0;
+    virtual int getExp() const = 0;
+    virtual int setHp(int init_hp) const = 0;
+    virtual int setExp(int init_exp) const = 0;
     virtual MovingObjectType getObjectType() const = 0;
 };
 
@@ -229,123 +235,104 @@ public:
 
 class BaseItem {
     friend class TestStudyInPink;
-
-protected:
-    ItemType type;
-
 public:
-    BaseItem(ItemType type);
-    virtual bool canUse(Character *obj, Robot *robot);
-    virtual void use(Character *obj, Robot *robot);
-    virtual ItemType getType() const;
-    virtual string str() const;
+    virtual bool canUse(Character *obj, Robot *robot) = 0;
+    virtual void use(Character *obj, Robot *robot) = 0;
+    virtual ItemType getType() const = 0;
+    virtual string str() const = 0;
 };
 
 class MagicBook : public BaseItem{
     friend class TestStudyInPink;
-
-private:
-    Sherlock *sherlock;
-    Watson *watson;
-
 public:
-    MagicBook(ItemType type, Sherlock *sherlock, Watson *watson);
-    virtual bool canUse(Character* obj, Robot *robot);
-    virtual void use(Character* obj, Robot *robot);
+    bool canUse(Character* obj, Robot *robot);
+    void use(Character* obj, Robot *robot);
+    ItemType getType() const;
+    virtual string str() const;
 };
 
 class EnergyDrink : public BaseItem{
     friend class TestStudyInPink;
-
-private:
-    Sherlock *sherlock;
-    Watson *watson;
-
 public:
-    EnergyDrink(ItemType type, Sherlock *sherlock, Watson *watson);
-    virtual bool canUse(Character* obj, Robot *robot);
-    virtual void use(Character* obj, Robot *robot);
+    bool canUse(Character* obj, Robot *robot);
+    void use(Character* obj, Robot *robot);
+    ItemType getType() const;
+    virtual string str() const;
 };
 
 class FirstAid : public BaseItem{
     friend class TestStudyInPink;
-
-private:
-    Sherlock* sherlock;
-    Watson* watson;
-
 public:
-    FirstAid(ItemType type, Sherlock* sherlock, Watson* watson);
-    virtual bool canUse(Character* obj, Robot *robot);
-    virtual void use(Character* obj, Robot *robot);
+    bool canUse(Character* obj, Robot *robot);
+    void use(Character* obj, Robot *robot);
+    ItemType getType() const;
+    virtual string str() const;
 };
 
 class ExemptionCard : public BaseItem{
     friend class TestStudyInPink;
-
-private:
-    Sherlock* sherlock;
-
 public:
-    ExemptionCard(ItemType type, Sherlock* sherlock);
-    virtual bool canUse(Character* obj, Robot *robot);
-    virtual void use(Character* obj, Robot *robot);
+    bool canUse(Character* obj, Robot *robot);
+    void use(Character* obj, Robot *robot);
+    ItemType getType() const;
+    virtual string str() const;
 };
 
 class PassingCard : public BaseItem{
     friend class TestStudyInPink;
-
 private:
-    Watson* watson;
     string challenge;
-    
 public:
-    PassingCard(ItemType type, Watson* watson, const string &challenge);
-    virtual bool canUse(Character* obj, Robot *robot);
-    virtual void use(Character* obj, Robot *robot);
+    PassingCard(int i, int j);
+    bool canUse(Character* obj, Robot *robot);
+    void use(Character* obj, Robot *robot);
+    ItemType getType() const;
+    virtual string str() const;
 };
 
 class BaseBag {
     friend class TestStudyInPink;
 protected:
-    Character* obj;
-    BaseItem* item;
-    int count;
+    class Node{
+    public:
+        BaseItem* item;
+        Node* next;
+    public:
+        Node(BaseItem* item, Node* next = nullptr) : item(item), next(next){};
+    };
+
+protected:
+    int size;
+    int capacity;
+    Node* head;
 
 public:
-    BaseBag(Character* obj, BaseItem* item);
-    virtual bool insert(BaseItem* item) = 0; 
+    BaseBag(int capacity);
+    virtual ~BaseBag();
+    virtual bool insert(BaseItem* item); 
     virtual BaseItem* get() = 0;
-    virtual BaseItem* get(ItemType type) = 0;
-    virtual string str() const = 0;
+    virtual BaseItem* get(ItemType type);
+    virtual string str() const;
 };
 
 class SherlockBag : public BaseBag {
     friend class TestStudyInPink;
 private:
     Sherlock* sherlock;
-    BaseBag** arr_bag;
 
 public:
-    SherlockBag(Sherlock* sherlock);
-    virtual bool insert(BaseItem* item);
-    virtual BaseItem* get();
-    virtual BaseItem* get(ItemType type);
-    virtual string str() const;
+    SherlockBag(Sherlock* character);
+    BaseItem* get();
 };
 
 class WatsonBag : public BaseBag {
     friend class TestStudyInPink;
 private:
     Watson* watson;
-    BaseBag** arr_bag;
 
 public:
-    WatsonBag(Watson* watson);
-    virtual bool insert(BaseItem* item);
-    virtual BaseItem* get();
-    virtual BaseItem* get(ItemType type);
-    virtual string str() const;
+    WatsonBag(Watson* character);
+    BaseItem* get();
 };
 
 class Robot : public MovingObject{

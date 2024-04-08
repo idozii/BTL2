@@ -189,7 +189,10 @@ string MovingObject::str() const{
 };
 int MovingObject::getExp() const{
     return this->exp;
-}
+};
+int MovingObject::getHp() const{
+    return this->hp;
+};
 MovingObjectType MovingObject::getObjectType() const{
     return MovingObjectType();
 };
@@ -220,7 +223,22 @@ string Character::str() const {
 MovingObjectType Character::getObjectType() const{
     return MovingObjectType();
 };
-
+int Character::getExp() const{
+    return this->exp;
+};
+int Character::setExp(int init_exp) const{
+    if(init_exp < 0) return 0;
+    else if(init_exp > 900) return 900;
+    else return init_exp;
+};
+int Character::getHp() const{
+    return this->hp;
+};
+int Character::setHp(int init_hp) const{
+    if(init_hp < 0) return 0;
+    else if(init_hp > 500) return 500;
+    else return init_hp;
+};
 //TODO: 3.5.2: SHERLOCK
 Sherlock::Sherlock(int index, const string & moving_rule, const Position & init_pos, Map * map, const string &name = "", int init_hp, int init_exp) : Character(index, init_pos, map, "Sherlock"){
     this->moving_rule = moving_rule;
@@ -828,192 +846,95 @@ string RobotSW::str() const{
 };
 
 //TODO: 3.11: BASE ITEM
-BaseItem::BaseItem(ItemType type){
-    this->type = type;
-};
-bool BaseItem::canUse(Character *obj, Robot *robot){
-    if(obj->getObjectType() == SHERLOCK || obj->getObjectType() == WATSON){
-        return true;
-    }
-    else{
-        return false;
-    }
-};
-void BaseItem::use(Character *obj, Robot *robot){
-    if(canUse(obj, robot)){
-        ;
-    }
-};
-ItemType BaseItem::getType() const{
-    return type;
-};
-string BaseItem::str() const{
-    return to_string(type);
-};
-
 //TODO: 3.11.1: MAGIC BOOK
-MagicBook::MagicBook(ItemType type, Sherlock* sherlock, Watson* watson) : BaseItem(type){
-    this->type = MAGIC_BOOK;
-    this->sherlock = sherlock;
-    this->watson = watson;
-};
 bool MagicBook::canUse(Character *obj, Robot *robot){
-    if(obj->getObjectType() == SHERLOCK && sherlock->getExp()<=350){
-        return true;
-    }
-    else if(obj->getObjectType() == WATSON && watson->getExp()<=350){
-        return true;
-    }
-    else{
-        return false;
-    }
-};
-void MagicBook::use(Character *obj, Robot *robot){
-    if(canUse(sherlock, robot)){
-        sherlock->setExp(sherlock->getExp()*1.25);
-    }
-    if(canUse(watson, robot)){
-        watson->setExp(watson->getExp()*1.25);
-    }
-};
-
-//TODO: 3.11.2: ENERGY DRINK
-EnergyDrink::EnergyDrink(ItemType type, Sherlock* sherlock, Watson* watson) : BaseItem(type){
-    this->type = ENERGY_DRINK;
-    this->sherlock = sherlock;
-    this->watson = watson;
-};
-bool EnergyDrink::canUse(Character *obj, Robot *robot){
-    if(obj->getObjectType() == SHERLOCK && sherlock->getHp()<=100){
-        return true;
-    }
-    else if(obj->getObjectType() == WATSON && watson->getHp()<=100){
-        return true;
-    }
-    else{
-        return false;
-    }
-};
-void EnergyDrink::use(Character *obj, Robot *robot){
-    if(canUse(sherlock, robot)){
-        sherlock->setHp(sherlock->getHp()*1.2);
-    }
-    if(canUse(watson, robot)){
-        watson->setHp(watson->getHp()*1.2);
-    }
-};
-
-//TODO: 3.11.3: FIRST AID
-FirstAid::FirstAid(ItemType type, Sherlock* sherlock, Watson* watson) : BaseItem(type){
-    this->type = FIRST_AID;
-    this->sherlock = sherlock;
-    this->watson = watson;
-};
-bool FirstAid::canUse(Character *obj, Robot *robot){
-    if((obj->getObjectType() == SHERLOCK && sherlock->getHp()<=100) || (obj->getObjectType()== SHERLOCK && sherlock->getExp()<=350) ){
-        return true;
-    }
-    else if((obj->getObjectType() == WATSON && watson->getHp()<=100) || (obj->getObjectType()== WATSON && watson->getExp()<=350) ){
-        return true;
-    }
-    else{
-        return false;
-    }
-};
-void FirstAid::use(Character *obj, Robot *robot){
-    if(canUse(sherlock, robot)){
-        sherlock->setHp(sherlock->getHp()*1.5);
-    }
-    if(canUse(watson, robot)){
-        watson->setHp(watson->getHp()*1.5);
-    }
-};
-
-//TODO: 3.11.4: EXEMPTIONCARD
-ExemptionCard::ExemptionCard(ItemType type, Sherlock* sherlock) : BaseItem(type){
-    this->type = EXEMPTION_CARD;
-    this->sherlock = sherlock;
-};
-bool ExemptionCard::canUse(Character *obj, Robot *robot){
-    if(obj->getObjectType() == SHERLOCK && (sherlock->getHp()%2!=0) ){
-        return true;
-    }
-    else{
-        return false;
-    }
-};
-void ExemptionCard::use(Character *obj, Robot *robot){
-    if(canUse(sherlock, robot)){
-        sherlock->setHp(sherlock->getHp());
-        sherlock->setExp(sherlock->getExp());
-    }
-};
-
-//TODO: 3.11.5: PASSING CARD
-PassingCard::PassingCard(ItemType type, Watson* watson, const string &challenge) : BaseItem(type){
-    this->type = PASSING_CARD;
-    this->watson = watson;
-    this->challenge = challenge;
-};
-bool PassingCard::canUse(Character *obj, Robot *robot){
-    if(obj->getObjectType() == WATSON && (watson->getHp()%2==0) ){
-        return true;
-    }
-    else{
-        return false;
-    }
-};
-void PassingCard::use(Character *obj, Robot *robot){
-    if(canUse(watson, robot)){
-        
-    }
-};
-
-//TODO: 3.12: BASE BAG
-BaseBag::BaseBag(Character* obj, BaseItem* item){
-    this->obj = obj;
-    this->item = item;
-};
-bool BaseBag::insert(BaseItem* item){
-    if(this->item == NULL){
-        this->item = item;
+    if(obj->getExp()<=350 && robot==nullptr){
         return true;
     }
     else return false;
 };
-BaseItem* BaseBag::get(){
-    return item;
-};
-BaseItem* BaseBag::get(ItemType type){
-    if(item->getType() == type){
-        return item;
+void MagicBook::use(Character *obj, Robot *robot){
+    if(canUse(obj, robot)){
+        obj->setExp(obj->getExp()*1.25);
     }
-    else return NULL;
 };
-string BaseBag::str() const{
-    return "BaseBag[count="+to_string(count)+";"+item->str()+"]";
+ItemType MagicBook::getType() const{
+    return MAGIC_BOOK;
+};
+string MagicBook::str() const{
+    return "MagicBook";
 };
 
+//TODO: 3.11.2: ENERGY DRINK
+bool EnergyDrink::canUse(Character *obj, Robot *robot){
+    if(obj->getHp()<=100 && robot==nullptr){
+        return true;
+    }
+    else return false;
+};
+void EnergyDrink::use(Character *obj, Robot *robot){
+    if(canUse(obj, robot)){
+        obj->setHp(obj->getHp()*1.20);
+    }
+};
+ItemType EnergyDrink::getType() const{
+    return ENERGY_DRINK;
+};
+string EnergyDrink::str() const{
+    return "EnergyDrink";
+};
+
+//TODO: 3.11.3: FIRST AID
+bool FirstAid::canUse(Character *obj, Robot *robot){
+    if((obj->getHp()<=100 || obj->getExp()<=350) && robot==nullptr){
+        return true;
+    }
+    else return false;
+};
+void FirstAid::use(Character *obj, Robot *robot){
+    if(canUse(obj, robot)){
+        obj->setHp(obj->getHp()*1.50);
+    }
+};
+ItemType FirstAid::getType() const{
+    return FIRST_AID;
+};
+string FirstAid::str() const{
+    return "FirstAid";
+};
+
+//TODO: 3.11.4: EXEMPTIONCARD
+bool ExemptionCard::canUse(Character *obj, Robot *robot){
+    if(obj->getHp()%2!=0 && robot!=nullptr){
+        return true;
+    }
+    else return false;
+};
+void ExemptionCard::use(Character *obj, Robot *robot){
+};
+ItemType ExemptionCard::getType() const{
+    return EXEMPTION_CARD;
+};
+string ExemptionCard::str() const{
+    return "ExemptionCard";
+};
+
+//TODO: 3.11.5: PASSING CARD
+bool PassingCard::canUse(Character *obj, Robot *robot){
+};
+void PassingCard::use(Character *obj, Robot *robot){
+
+};
+ItemType PassingCard::getType() const{
+    return PASSING_CARD;
+};
+string PassingCard::str() const{
+    return "PassingCard";
+};
+
+//TODO: 3.12: BASE BAG
 //TODO: 3.12.1: SHERLOCK BAG
-SherlockBag::SherlockBag(Sherlock* sherlock):BaseBag(sherlock, item){
-    this->sherlock = sherlock;
-    this->count = 0;
-    arr_bag = new BaseBag*[sherlock->getExp()];
-    for(int i = 0; i < sherlock->getExp(); i++){
-        arr_bag[i] = NULL;
-    }
-};
-
 //TODO: 3.12.2: WATSON BAG
-WatsonBag::WatsonBag(Watson* watson):BaseBag(watson, item){
-    this->watson = watson;
-    this->count = 0;
-    arr_bag = new BaseBag*[watson->getExp()];
-    for(int i = 0; i < watson->getExp(); i++){
-        arr_bag[i] = NULL;
-    }
-};
-
 //TODO: 3.13: StudyPink
 StudyPinkProgram::StudyPinkProgram(const string &config_file_path){
     Configuration config(config_file_path);

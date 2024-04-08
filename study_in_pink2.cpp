@@ -954,8 +954,100 @@ string PassingCard::str() const{
 };
 
 //TODO: 3.12: BASE BAG
+BaseBag::BaseBag(int capacity){
+    this->capacity = capacity;
+    this->size = 0;
+    head = nullptr;
+};
+BaseBag::~BaseBag(){
+    Node* temp = head;
+    while (temp != nullptr){
+        head = head->next;
+        delete temp;
+        temp = head;
+    }    
+};
+bool BaseBag::insert(BaseItem* item){
+    Node* newNode = new Node(item, nullptr);
+    if(size==0){
+        head = newNode;
+    }else{
+        newNode->next = head;
+        head = newNode;
+    }
+    size++;
+    return true;
+};
+BaseItem* BaseBag::get(){
+    if(size==0) return nullptr;
+    BaseItem* item = head->item;
+    Node* temp = head;
+    head = head->next;
+    delete temp;
+    size--;
+    return item;
+};
+BaseItem* BaseBag::get(ItemType type){
+    Node* temp = head;
+    Node* prev = nullptr;
+    while(temp!=nullptr){
+        if(temp->item->getType()==type){
+            if(prev==nullptr){
+                head = temp->next;
+            }else{
+                prev->next = temp->next;
+            }
+            BaseItem* item = temp->item;
+            delete temp;
+            size--;
+            return item;
+        }
+        prev = temp;
+        temp = temp->next;
+    }
+    return nullptr;
+};
+string BaseBag::str() const{
+    string bag;
+    bag = "BaseBag[";
+    Node* temp = head;
+    while(temp!=nullptr){
+        bag += temp->item->str();
+        bag += ";";
+        temp = temp->next;
+    }
+    bag += "]";
+    return bag;
+};
+
 //TODO: 3.12.1: SHERLOCK BAG
+SherlockBag::SherlockBag(Sherlock* sherlock) : BaseBag(13){
+    this->sherlock = sherlock;
+};
+BaseItem* SherlockBag::get(){
+    if(size==0) return nullptr;
+    BaseItem* item = head->item;
+    Node* temp = head;
+    head = head->next;
+    delete temp;
+    size--;
+    return item;
+};
+
 //TODO: 3.12.2: WATSON BAG
+WatsonBag::WatsonBag(Watson* watson) : BaseBag(15){
+    this->watson = watson;
+};
+BaseItem* WatsonBag::get(){
+    if(size==0) return nullptr;
+    BaseItem* item = head->item;
+    Node* temp = head;
+    head = head->next;
+    delete temp;
+    size--;
+    return item;
+};
+
 //TODO: 3.13: StudyPink
 StudyPinkProgram::StudyPinkProgram(const string &config_file_path){
     Configuration config(config_file_path);
@@ -1009,7 +1101,7 @@ StudyPinkProgram::~StudyPinkProgram(){
 };
 
 
-//TODO: base item, base bag, sherlockbag, watsonbag
+//TODO: get basebag, sherlockbag, watsonbag
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

@@ -9,27 +9,20 @@ class MovingObject;
 class Position;
 class Configuration;
 class Map;
-class Character;
-class Sherlock;
-class Watson;
+
 class Criminal;
 class RobotS;
 class RobotW;
 class RobotSW;
 class RobotC;
-class Robot;
+
 class ArrayMovingObject;
 class StudyPinkProgram;
+
 class BaseItem;
-class MagicBook;
-class EnergyDrink;
-class FirstAid;
-class ExemptionCard;
-class PassingCard;
 class BaseBag;
 class SherlockBag;
 class WatsonBag;
-class TestStudyInPink;
 
 //TODO: 3.0: DISTANCE FUNCTION(MANHATTAN)
 int distance(const Position &pos1, const Position &pos2){
@@ -38,30 +31,31 @@ int distance(const Position &pos1, const Position &pos2){
 
 //TODO: 3.1: MAP ELEMENT
 MapElement::MapElement(ElementType in_type){
-    this->type = type;
+    type = in_type;
 };
-MapElement::~MapElement(){
-    delete this;
+MapElement::~MapElement(){};
+ElementType Path::getType() const{
+    return PATH;
 };
-ElementType MapElement::getType() const {
-    return this->type;
-};
-
 Path::Path() : MapElement(PATH){
     this->type = PATH;
 };
-
+ElementType Wall::getType() const{
+    return WALL;
+};
 Wall::Wall() : MapElement(WALL){
     this->type = WALL;
 };
-
 FakeWall::FakeWall(int in_req_exp) : MapElement(FAKE_WALL){
     this->type = FAKE_WALL;
-    req_exp = in_req_exp;
+    this->req_exp = in_req_exp;
 };
 
 int FakeWall::getReqExp() const {
     return req_exp;
+};
+ElementType FakeWall::getType() const{
+    return FAKE_WALL;
 };
 
 //TODO: 3.2: MAP
@@ -90,12 +84,6 @@ Map::Map(int num_rows, int num_cols, int num_walls, Position* array_walls, int n
     }
 };
 Map::~Map(){
-    for(int i = 0; i < num_rows; i++){
-        for(int j = 0; j < num_cols; j++){
-            delete map[i][j];
-        }
-        delete[] map[i];
-    }
     delete[] map;
 };
 int Map::getNumRows() const{
@@ -129,7 +117,7 @@ bool Map::isValid ( const Position & pos , MovingObject * mv_obj ) const {
 };
 
 //TODO: 3.3: POSITION
-static const Position npos = {-1, -1};
+static const Position npos = Position(-1,-1);
 Position::Position(int r = 0, int c= 0){
     this->r = r;
     this->c = c;

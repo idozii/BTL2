@@ -18,6 +18,31 @@
 /// Complete the following functions
 /// DO NOT modify any parameters in the functions.
 ////////////////////////////////////////////////////////////////////////
+class MovingObject;
+class Position;
+class Configuration;
+class Map;
+
+class Sherlock;
+class Watson;
+class Criminal;
+class Character;
+class Robot;
+class RobotS;
+class RobotW;
+class RobotSW;
+class RobotC;
+
+class ArrayMovingObject;
+class StudyPinkProgram;
+
+class BaseItem;
+class BaseBag;
+class SherlockBag;
+class WatsonBag;
+class Node;
+
+class TestStudyInPink;
 
 enum MovingObjectType{ SHERLOCK, WATSON, CRIMINAL, ROBOT };
 enum ItemType { MAGIC_BOOK, ENERGY_DRINK, FIRST_AID, EXEMPTION_CARD, PASSING_CARD };
@@ -38,12 +63,14 @@ class Path : public MapElement {
     friend class TestStudyInPink;
 public:
     Path();
+    ElementType getType() const override;
 };
 
 class Wall : public MapElement {
     friend class TestStudyInPink;
 public:
     Wall();
+    ElementType getType() const override;
 };
 
 class FakeWall : public MapElement {
@@ -54,6 +81,7 @@ private:
 public:
     FakeWall(int in_req_exp);
     int getReqExp() const;
+    ElementType getType() const override;
 };
 
 class Map {

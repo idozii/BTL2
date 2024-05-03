@@ -157,7 +157,7 @@ private:
     int index_moving_rule;
     int hp;
     int exp;
-    BaseBag* Bag;
+    BaseBag* sherlockBag;
 
 public:
     Sherlock(int index, const string & moving_rule, const Position & init_pos, Map * map, const string &name = "", int init_hp, int init_exp) :Character(index, init_pos, map, name){};
@@ -183,7 +183,7 @@ private:
     int index_moving_rule;
     int hp;
     int exp;
-    BaseBag* Bag;
+    BaseBag* watsonBag;
 
 public:
     Watson(int index, const string & moving_rule, const Position & init_pos, Map * map, const string &name = "", int init_hp, int init_exp) : Character(index, init_pos, map, name){};
@@ -357,6 +357,8 @@ private:
 public:
     SherlockBag(Sherlock* character);
     BaseItem* get();
+    BaseItem* get(ItemType type);
+    string str() const;
 };
 
 class WatsonBag : public BaseBag {
@@ -367,6 +369,8 @@ private:
 public:
     WatsonBag(Watson* character);
     BaseItem* get();
+    BaseItem* get(ItemType type);
+    string str() const;
 };
 
 class Robot : public MovingObject{

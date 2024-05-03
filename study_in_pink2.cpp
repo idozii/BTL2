@@ -229,9 +229,11 @@ int Character::setHp(int init_hp) const{
 };
 //TODO: 3.5.2: SHERLOCK
 Sherlock::Sherlock(int index, const string & moving_rule, const Position & init_pos, Map * map, const string &name = "", int init_hp, int init_exp) : Character(index, init_pos, map, "Sherlock"){
+    this->hp = init_hp;
+    this->exp = init_exp;
     this->moving_rule = moving_rule;
     this->index_moving_rule = index_moving_rule;
-    Bag = new SherlockBag(this);
+    sherlockBag = new SherlockBag(this);
 };
 Position Sherlock::getNextPosition() {
     Position next_pos = pos;
@@ -328,9 +330,11 @@ void Sherlock::meet(Watson* watson){
 
 //TODO: 3.6: WATSON
 Watson::Watson(int index, const string & moving_rule, const Position & init_pos, Map * map, const string &name = "", int init_hp, int init_exp) : Character(index, init_pos, map, "Watson"){
+    this->hp = init_hp;
+    this->exp = init_exp;
     this->moving_rule = moving_rule;
     this->index_moving_rule = index_moving_rule;
-    Bag = new WatsonBag(this);
+    watsonBag = new WatsonBag(this);
 };
 Position Watson::getNextPosition() {
     Position next_pos = pos;
@@ -932,7 +936,7 @@ bool PassingCard::canUse(Character *obj, Robot *robot){
     else return false;
 };
 void PassingCard::use(Character *obj, Robot *robot){
-
+    
 };
 ItemType PassingCard::getType() const{
     return PASSING_CARD;
@@ -1012,28 +1016,99 @@ string BaseBag::str() const{
 SherlockBag::SherlockBag(Sherlock* sherlock) : BaseBag(13){
     this->sherlock = sherlock;
 };
-BaseItem* SherlockBag::get(){
-    if(size==0) return nullptr;
-    BaseItem* item = head->item;
-    Node* temp = head;
-    head = head->next;
-    delete temp;
-    size--;
-    return item;
+BaseItem *SherlockBag::get(){
+    Node *current = head;
+    while (current != NULL)
+    {
+        if (current->item->canUse(sherlock, NULL))
+        {
+            current->next = head;
+            head = current;
+            return current->item;
+        }
+        current = current->next;
+    }
+    return NULL;
+};
+BaseItem* SherlockBag::get(ItemType item_type){
+    Node *current = head;
+    while (current != NULL)
+    {
+        if (current->item->canUse(sherlock, NULL) && current->item->getType() == item_type)
+        {
+            return current->item;
+        }
+        current = current->next;
+    }
+    return NULL;
+};
+string SherlockBag::str() const{
+    string str = "SherlockBag[count=" + to_string(itemNumber) + ';';
+    Node *current = head;
+    while (current != NULL)
+    {
+        if (current->item != NULL)
+        {
+            str += current->item->str();
+        }
+        current = current->next;
+        if (current != NULL)
+        {
+            str += ",";
+        }
+    }
+    str += "]";
+    return str;
 };
 
 //TODO: 3.12.2: WATSON BAG
 WatsonBag::WatsonBag(Watson* watson) : BaseBag(15){
     this->watson = watson;
 };
-BaseItem* WatsonBag::get(){
-    if(size==0) return nullptr;
-    BaseItem* item = head->item;
-    Node* temp = head;
-    head = head->next;
-    delete temp;
-    size--;
-    return item;
+BaseItem *WatsonBag::get(){
+    Node *current = head;
+    while (current != NULL)
+    {
+        if (current->item->canUse(watson, NULL))
+        {
+            current->next = head;
+            head = current;
+            return current->item;
+        }
+        current = current->next;
+    }
+    return NULL;
+};
+BaseItem* WatsonBag::get(ItemType item_type){
+    Node *current = head;
+    while (current != NULL)
+    {
+        if (current->item->canUse(watson, NULL) && current->item->getType() == item_type)
+        {
+            return current->item;
+        }
+        current = current->next;
+    }
+    return NULL;
+};
+string WatsonBag::str() const
+{
+    string str = "WatsonBag[count=" + to_string(itemNumber) + ';';
+    Node *current = head;
+    while (current != NULL)
+    {
+        if (current->item != NULL)
+        {
+            str += current->item->str();
+        }
+        current = current->next;
+        if (current != NULL)
+        {
+            str += ",";
+        }
+    }
+    str += "]";
+    return str;
 };
 
 //TODO: 3.13: StudyPink

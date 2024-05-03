@@ -144,12 +144,13 @@ bool Position::isEqual(const Position &pos) const{
 };
 
 //TODO: 3.4: MOVING OBJECT
-MovingObject::MovingObject(int index, const Position pos, Map * map, const string & name=""){
+MovingObject::MovingObject(int index, const Position pos, Map * map, const string & name){
     this->index = index;
     this->pos = pos;
     this->map = map;
     this->name = name;
 };
+MovingObject::~MovingObject(){};
 Position MovingObject::getNextPosition(){
     Position next_pos = pos;
     if(this->map->isValid(this->pos, this)){
@@ -183,6 +184,12 @@ MovingObjectType MovingObject::getObjectType() const{
 };
 
 //TODO: 3.5.1: CHARACTER
+Character::Character(int index, const Position &init_pos, Map *map, const string &name) : MovingObject(index, pos, map, name){
+    this->pos = init_pos;
+    this->map = map;
+    this->name = name;
+    this->index = index;
+};
 Position Character::getNextPosition() {
     Position next_pos = pos;
     if(map->isValid(next_pos, this)){
@@ -226,7 +233,6 @@ Sherlock::Sherlock(int index, const string & moving_rule, const Position & init_
     this->hp = init_hp;
     this->exp = init_exp;
     this->moving_rule = moving_rule;
-    this->index_moving_rule = index_moving_rule;
     sherlockBag = new SherlockBag(this);
 };
 Position Sherlock::getNextPosition() {
@@ -327,7 +333,6 @@ Watson::Watson(int index, const string & moving_rule, const Position & init_pos,
     this->hp = init_hp;
     this->exp = init_exp;
     this->moving_rule = moving_rule;
-    this->index_moving_rule = index_moving_rule;
     watsonBag = new WatsonBag(this);
 };
 Position Watson::getNextPosition() {

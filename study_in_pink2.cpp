@@ -646,7 +646,7 @@ string Configuration::str() const{
 };
 
 //TODO: 3.10: ROBOT
-Robot::Robot(int index , const Position pos , Map * map , RobotType robot_type, Criminal* criminal, const string &name = "") : MovingObject(index, pos, map, "Robot"){
+Robot::Robot(int index , const Position pos , Map * map , RobotType robot_type, Criminal* criminal, const string &name) : MovingObject(index, pos, map, "Robot"){
     this->robot_type = robot_type;
     this->criminal = criminal;
 };

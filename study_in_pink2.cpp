@@ -292,18 +292,20 @@ int Sherlock::setHp(int init_hp) const{
     else if(init_hp > 500) return 500;
     else return init_hp;
 };
-void Sherlock::meet(RobotS* robotS){
-    if (distance(pos, robotS->getCurrentPosition()) == 1){
+bool Sherlock::meet(RobotS* robotS){
+    if (distance(pos, robotS->getCurrentPosition()) == 0){
         this->meet(robotS);
         if (exp > 400){
             delete robotS;
         }
         else{
-            exp = exp*0.9;
+            exp = exp*90/100;
         }
+        return true;
     }
+    else return false;
 };
-void Sherlock::meet(RobotC* robotC){
+bool Sherlock::meet(RobotC* robotC){
     if (distance(pos, robotC->getCurrentPosition()) == 1){
         this->meet(robotC);
         if (exp > 500){
@@ -326,13 +328,14 @@ void Sherlock::meet(RobotSW* robotSW){
         }
     }
 };
-void Sherlock::meet(RobotW* robotW){
+bool Sherlock::meet(RobotW* robotW){
     if (distance(pos, robotW->getCurrentPosition()) == 1){
         this->meet(robotW);
         delete robotW;
+        return true;
     }
 };
-void Sherlock::meet(Watson* watson){
+bool Sherlock::meet(Watson* watson){
 
 };
 
@@ -728,13 +731,13 @@ RobotS::RobotS(int index, const Position & init_pos, Map* map, RobotType robot_t
     this->sherlock = sherlock;
 };
 Position RobotS::getNextPosition() {
-    Position next_pos = Position::npos;
-    int min_distance = 1000;
+    Position next_pos = pos;
+    int min_distance = 100;
     Position arr[4];
-    arr[0] = Position(pos.getRow() - 1, pos.getCol());
-    arr[1] = Position(pos.getRow(), pos.getCol() - 1);
-    arr[2] = Position(pos.getRow() + 1, pos.getCol());
-    arr[3] = Position(pos.getRow(), pos.getCol() + 1);
+    arr[0] = Position(pos.getRow(), pos.getCol()+1);
+    arr[1] = Position(pos.getRow()+1, pos.getCol());
+    arr[2] = Position(pos.getRow(), pos.getCol()-1);
+    arr[3] = Position(pos.getRow()-1, pos.getCol());
     for (int i = 0; i < 4; i++){
         if (map->isValid(arr[i], this)){
             int distance = abs(arr[i].getRow() - sherlock->getCurrentPosition().getRow()) + abs(arr[i].getCol() - sherlock->getCurrentPosition().getCol());
@@ -746,6 +749,7 @@ Position RobotS::getNextPosition() {
                 continue;
             }
         }
+        else continue;
     }
     return next_pos;
 };
@@ -772,13 +776,13 @@ RobotW::RobotW(int index, const Position & init_pos, Map* map, RobotType robot_t
     this->watson = watson;
 };
 Position RobotW::getNextPosition() {
-    Position next_pos = Position::npos;
-    int min_distance = 1000;
+    Position next_pos = pos;
+    int min_distance = 100;
     Position arr[4];
-    arr[0] = Position(pos.getRow() - 1, pos.getCol());
-    arr[1] = Position(pos.getRow(), pos.getCol() - 1);
-    arr[2] = Position(pos.getRow() + 1, pos.getCol());
-    arr[3] = Position(pos.getRow(), pos.getCol() + 1);
+    arr[0] = Position(pos.getRow(), pos.getCol()+1);
+    arr[1] = Position(pos.getRow()+1, pos.getCol());
+    arr[2] = Position(pos.getRow(), pos.getCol()-1);
+    arr[3] = Position(pos.getRow()-1, pos.getCol());
     for (int i = 0; i < 4; i++){
         if (map->isValid(arr[i], this)){
             int distance = abs(arr[i].getRow() - watson->getCurrentPosition().getRow()) + abs(arr[i].getCol() - watson->getCurrentPosition().getCol());
@@ -790,6 +794,7 @@ Position RobotW::getNextPosition() {
                 continue;
             }
         }
+        else continue;
     }
     return next_pos;
 };
@@ -817,13 +822,13 @@ RobotSW::RobotSW(int index, const Position & init_pos, Map* map, RobotType robot
     this->watson = watson;
 };
 Position RobotSW::getNextPosition() {
-    Position next_pos = Position::npos;
-    int min_distance = 1000;
+    Position next_pos = pos;
+    int min_distance = 100;
     Position arr[4];
-    arr[0] = Position(pos.getRow() - 1, pos.getCol());
-    arr[1] = Position(pos.getRow(), pos.getCol() - 1);
-    arr[2] = Position(pos.getRow() + 1, pos.getCol());
-    arr[3] = Position(pos.getRow(), pos.getCol() + 1);
+    arr[0] = Position(pos.getRow(), pos.getCol()+2);
+    arr[1] = Position(pos.getRow()+2, pos.getCol());
+    arr[2] = Position(pos.getRow(), pos.getCol()-2);
+    arr[3] = Position(pos.getRow()-2, pos.getCol());
     for (int i = 0; i < 4; i++){
         if (map->isValid(arr[i], this)){
             int distance = abs(arr[i].getRow() - sherlock->getCurrentPosition().getRow()) + abs(arr[i].getCol() - sherlock->getCurrentPosition().getCol()) + abs(arr[i].getRow() - watson->getCurrentPosition().getRow()) + abs(arr[i].getCol() - watson->getCurrentPosition().getCol());
@@ -835,6 +840,7 @@ Position RobotSW::getNextPosition() {
                 continue;
             }
         }
+        else continue;
     }
     return next_pos;
 };
@@ -1213,7 +1219,7 @@ void StudyPinkProgram::run(bool verbose){
 };
 
 
-//TODO: CHECK ROBOT, DIEU KIEN PASSING CARD 
+//TODO: CHECK ROBOTC = getpreviousposition, fight
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

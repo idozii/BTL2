@@ -172,11 +172,11 @@ public:
     virtual int getExp() const;
     virtual int setHp(int init_hp) const;
     virtual int setExp(int init_exp) const;
-    void meet(RobotS* robotS);
-    void meet(RobotW* robotW);
-    void meet(RobotSW* robotSW);
-    void meet(RobotC* robotC);
-    void meet(Watson* watson);
+    bool meet(RobotS* robotS);
+    bool meet(RobotW* robotW);
+    bool meet(RobotSW* robotSW);
+    bool meet(RobotC* robotC);
+    bool meet(Watson* watson);
 };
 
 class Watson : public Character {
@@ -199,11 +199,11 @@ public:
     virtual int getHp() const;
     virtual int setHp(int init_hp) const;
     virtual int setExp(int init_exp) const;
-    void meet(Sherlock* sherlock);
-    void meet(RobotS* robotS);
-    void meet(RobotW* robotW);
-    void meet(RobotSW* robotSW);
-    void meet(RobotC* robotC);
+    bool meet(Sherlock* sherlock);
+    bool meet(RobotS* robotS);
+    bool meet(RobotW* robotW);
+    bool meet(RobotSW* robotSW);
+    bool meet(RobotC* robotC);
 };
 
 class Criminal : public Character {

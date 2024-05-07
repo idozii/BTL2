@@ -138,7 +138,7 @@ void Position::setRow(int r){
 void Position::setCol(int c){
     if(c>0) this->c = c;
 };
-string Position::str() {
+string Position::str() const {
     return "(" + to_string(r) + "," + to_string(c) + ")";
 };
 bool Position::isEqual(const Position &pos) const{
@@ -293,50 +293,87 @@ int Sherlock::setHp(int init_hp) const{
     else return init_hp;
 };
 bool Sherlock::meet(RobotS* robotS){
-    if (distance(pos, robotS->getCurrentPosition()) == 0){
-        this->meet(robotS);
-        if (exp > 400){
+    if(pos.isEqual(robotS->getCurrentPosition())) {
+        if(exp > 400){
+            this->meet(robotS);
             delete robotS;
+            return true;
         }
         else{
             exp = exp*90/100;
+            return false;
         }
-        return true;
     }
-    else return false;
 };
 bool Sherlock::meet(RobotC* robotC){
-    if (distance(pos, robotC->getCurrentPosition()) == 1){
+    if (pos.isEqual(robotC->getCurrentPosition())) {
         this->meet(robotC);
         if (exp > 500){
             delete robotC;
+            return true;
         }
         else{
             delete robotC;
+            return false;
         }
     }
 };
-void Sherlock::meet(RobotSW* robotSW){
-    if (distance(pos, robotSW->getCurrentPosition()) == 1){
+bool Sherlock::meet(RobotSW* robotSW){
+    if (pos.isEqual(robotSW->getCurrentPosition())) {
         this->meet(robotSW);
         if (exp > 300 && hp > 335){
             delete robotSW;
+            return true;
         }
         else{
-            hp = hp*0.85;
-            exp = exp*0.85;
+            hp = hp*85/100;
+            exp = exp*85/100;
+            return false;
         }
     }
 };
 bool Sherlock::meet(RobotW* robotW){
-    if (distance(pos, robotW->getCurrentPosition()) == 1){
+    if (pos.isEqual(robotW->getCurrentPosition())) {
         this->meet(robotW);
         delete robotW;
         return true;
     }
 };
 bool Sherlock::meet(Watson* watson){
-
+    if(pos.isEqual(watson->getCurrentPosition())){
+        if(sherlockBag->getCount() == 0 && watsonBag->getCount() == 0) return false;
+        else if(sherlockBag->getCount() == 0 && watson->watsonBag->getCount() != 0){
+            for(int i = 0; i < watson->watsonBag->getCount(); i++){
+                if(watson->watsonBag->get(i)->getType() == PASSING_CARD){
+                    watson->watsonBag->remove(i);
+                    sherlockBag->insert(PassingCard());
+                }
+            }
+        }
+        else if(sherlockBag->getCount() != 0 && watson->watsonBag->size() == 0){
+            for(int i = 0; i < sherlockBag->size(); i++){
+                if(sherlockBag->get(i)->getType() == EXCEPTION_CARD){
+                    sherlockBag->remove(i);
+                    watson->watsonBag->add(new ExceptionCard());
+                }
+            }
+        }
+        else if(sherlockBag->getCount() != 0 && watson->watsonBag->size() != 0){
+            for(int i = 0; i < sherlockBag->size(); i++){
+                if(sherlockBag->get(i)->getType() == EXCEPTION_CARD){
+                    sherlockBag->remove(i);
+                    watson->watsonBag->add(new ExceptionCard());
+                }
+            }
+            for(int i = 0; i < watson->watsonBag->size(); i++){
+                if(watson->watsonBag->get(i)->getType() == PASSING_CARD){
+                    watson->watsonBag->remove(i);
+                    sherlockBag->add(new PassingCard());
+                }
+            }
+        }
+        return true;
+    }
 };
 
 //TODO: 3.6: WATSON
@@ -398,18 +435,18 @@ int Watson::setHp(int init_hp) const{
     else if(init_hp > 500) return 500;
     else return init_hp;
 };
-void Watson::meet(RobotS* robotS){
+bool Watson::meet(RobotS* robotS){
     if(distance(pos, robotS->getCurrentPosition()) == 1){
         ;
     }
 };
-void Watson::meet(RobotC* robotC){
+bool Watson::meet(RobotC* robotC){
     if (distance(pos, robotC->getCurrentPosition()) == 1){
         this->meet(robotC);
         delete robotC;
     }
 };
-void Watson::meet(RobotSW* robotSW){
+bool Watson::meet(RobotSW* robotSW){
     if (distance(pos, robotSW->getCurrentPosition()) == 1){
         this->meet(robotSW);
         if (exp > 600 && hp > 165){
@@ -421,7 +458,7 @@ void Watson::meet(RobotSW* robotSW){
         }
     }
 };
-void Watson::meet(RobotW* robotW){
+bool Watson::meet(RobotW* robotW){
     if (distance(pos, robotW->getCurrentPosition()) == 1){
         this->meet(robotW);
         if (hp > 350){
@@ -432,7 +469,7 @@ void Watson::meet(RobotW* robotW){
         }
     }
 };
-void Watson::meet(Sherlock* sherlock){
+bool Watson::meet(Sherlock* sherlock){
 
 };
 
@@ -1013,6 +1050,7 @@ BaseBag::~BaseBag(){
 bool BaseBag::insert(BaseItem* item){};
 BaseItem* BaseBag::get(){};
 BaseItem* BaseBag::get(ItemType type){};
+int BaseBag::getCount() const{};
 string BaseBag::str() const{};
 
 //TODO: 3.12.1: SHERLOCK BAG

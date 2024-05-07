@@ -113,7 +113,7 @@ public:
     int getCol() const;
     void setRow(int r);
     void setCol(int c);
-    string str();
+    string str() const;
     bool isEqual(const Position &pos) const;
 };
 
@@ -355,6 +355,7 @@ public:
     virtual bool insert(BaseItem* item); 
     virtual BaseItem* get() = 0;
     virtual BaseItem* get(ItemType type);
+    int getCount() const;
     virtual string str() const;
 };
 

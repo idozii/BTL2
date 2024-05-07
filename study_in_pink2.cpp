@@ -138,7 +138,7 @@ void Position::setRow(int r){
 void Position::setCol(int c){
     if(c>0) this->c = c;
 };
-string Position::str() const{
+string Position::str() {
     return "(" + to_string(r) + "," + to_string(c) + ")";
 };
 bool Position::isEqual(const Position &pos) const{

@@ -53,6 +53,7 @@ class MapElement {
     friend class TestStudyInPink;
 protected:
     ElementType type;
+    
 public:
     MapElement(ElementType in_type);
     virtual ~MapElement();
@@ -112,7 +113,7 @@ public:
     int getCol() const;
     void setRow(int r);
     void setCol(int c);
-    string str() const;
+    string str();
     bool isEqual(const Position &pos) const;
 };
 

@@ -32,7 +32,7 @@ public:
         Position arr_fake_walls[] = {Position(2, 0)};
 
         Map * map = new Map(10, 10, num_walls, arr_walls, num_fake_walls, arr_fake_walls);
-        
+
         Sherlock * sherlock = new Sherlock(1, "RUU", Position(1, 3), map, 250, 450);
         cout << sherlock->str() << endl;
 

@@ -134,15 +134,15 @@ public:
     Position getCurrentPosition() const;
     virtual void move() = 0;
     virtual string str() const = 0;
-    int getExp() const;
-    int getHp() const;
+    virtual int getExp() const;
+    virtual int getHp() const;
     virtual MovingObjectType getObjectType() const = 0;
 };
 
 class Character : public MovingObject {
 public:
     Character(int index, const Position &pos, Map* map, const string &name="");
-    virtual ~Character();
+    ~Character();
     virtual Position getNextPosition() = 0;
     virtual void move() = 0;
     virtual string str() const = 0;
@@ -161,10 +161,11 @@ private:
     int hp;
     int exp;
     BaseBag* sherlockBag;
+    BaseBag* watsonBag;
 
 public:
     Sherlock(int index, const string & moving_rule, const Position & init_pos, Map * map, int init_hp, int init_exp);
-    virtual ~Sherlock();
+    ~Sherlock();
     virtual Position getNextPosition();
     virtual void move();
     MovingObjectType getObjectType() const;
@@ -188,10 +189,11 @@ private:
     int hp;
     int exp;
     BaseBag* watsonBag;
+    BaseBag* sherlockBag;
 
 public:
     Watson(int index, const string & moving_rule, const Position & init_pos, Map * map, int init_hp, int init_exp);
-    virtual ~Watson();
+    ~Watson();
     virtual Position getNextPosition();
     virtual void move();
     MovingObjectType getObjectType() const;
@@ -216,7 +218,7 @@ private:
     
 public:
     Criminal(int index, const Position & init_pos, Map * map, Sherlock * sherlock, Watson * watson);
-    virtual ~Criminal();
+    ~Criminal();
     virtual Position getNextPosition();
     virtual void move();
     MovingObjectType getObjectType() const;
@@ -267,6 +269,7 @@ private:
     int watson_init_hp, watson_init_exp;
     Position criminal_init_pos;
     int num_steps;
+    string configString[2][17] = {};
 
 public:
     Configuration(const string & filepath);
@@ -341,7 +344,6 @@ protected:
         Node* next;
     public:
         Node(BaseItem* item, Node* next = nullptr) : item(item), next(next){};
-        ~Node();
     };
 
 protected:
@@ -354,8 +356,10 @@ public:
     virtual ~BaseBag();
     virtual bool insert(BaseItem* item); 
     virtual BaseItem* get() = 0;
+    virtual BaseItem* get(int i) = 0;
     virtual BaseItem* get(ItemType type);
-    int getCount() const;
+    virtual int getCount() const;
+    virtual void remove(ItemType type);
     virtual string str() const;
 };
 
@@ -370,8 +374,10 @@ public:
     ~SherlockBag();
     bool insert(BaseItem* item);
     BaseItem* get();
+    BaseItem* get(int i);
     BaseItem* get(ItemType type);
     int getCount() const;
+    void remove(ItemType type);
     string str() const;
 };
 
@@ -386,8 +392,10 @@ public:
     ~WatsonBag();
     bool insert(BaseItem* item);
     BaseItem* get();
+    BaseItem* get(int i);
     BaseItem* get(ItemType type);
     int getCount() const;
+    void remove(ItemType type);
     string str() const;
 };
 

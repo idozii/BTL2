@@ -146,10 +146,10 @@ public:
     virtual Position getNextPosition() = 0;
     virtual void move() = 0;
     virtual string str() const = 0;
-    virtual int getHp() const = 0;
-    virtual int getExp() const = 0;
-    virtual int setHp(int init_hp) const = 0;
-    virtual int setExp(int init_exp) const = 0;
+    int getHp();
+    int getExp();
+    int setHp(int init_hp);
+    int setExp(int init_exp);
     virtual MovingObjectType getObjectType() const = 0;
 };
 
@@ -223,10 +223,6 @@ public:
     virtual void move();
     MovingObjectType getObjectType() const;
     virtual string str() const;
-    virtual int getExp() const;
-    virtual int getHp() const;
-    virtual int setHp(int init_hp) const;
-    virtual int setExp(int init_exp) const;
     int getCount();
     bool isCreatedRobotNext();
 };

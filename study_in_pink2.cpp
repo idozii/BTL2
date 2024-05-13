@@ -216,18 +216,18 @@ string Character::str() const {
 MovingObjectType Character::getObjectType() const{
     return MovingObjectType();
 };
-int Character::getExp() const{
+int Character::getExp() {
     return this->exp;
 };
-int Character::setExp(int init_exp) const{
+int Character::setExp(int init_exp) {
     if(init_exp < 0) return 0;
     else if(init_exp > 900) return 900;
     else return init_exp;
 };
-int Character::getHp() const{
+int Character::getHp() {
     return this->hp;
 };
-int Character::setHp(int init_hp) const{
+int Character::setHp(int init_hp) {
     if(init_hp < 0) return 0;
     else if(init_hp > 500) return 500;
     else return init_hp;

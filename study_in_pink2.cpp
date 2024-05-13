@@ -641,10 +641,9 @@ bool ArrayMovingObject::checkMeet(int index){
 
 //TODO: 3.9: CONFIGURATION
 Configuration::Configuration(const string & filepath){
-     string line;
+    string line;
     ifstream ifs("sa_tc_02_config");
-    for (int i = 0; i < 15 && !ifs.eof(); i++)
-    {
+    for (int i = 0; i < 15 && !ifs.eof(); i++){
         ifs >> line;
         if (line.find("MAP_NUM_ROWS") == 0)
         {

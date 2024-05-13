@@ -641,8 +641,8 @@ bool ArrayMovingObject::checkMeet(int index){
 
 //TODO: 3.9: CONFIGURATION
 Configuration::Configuration(const string & filepath){
-    string line;
-    ifstream ifs(filepath.c_str());
+     string line;
+    ifstream ifs("sa_tc_02_config");
     for (int i = 0; i < 15 && !ifs.eof(); i++)
     {
         ifs >> line;
@@ -770,7 +770,7 @@ Configuration::Configuration(const string & filepath){
             configString[0][16] = "NUM_STEPS=";
             configString[1][16] = to_string(num_steps);
         }
-    }  
+    }
 };
 Configuration::~Configuration(){
     delete[] arr_fake_walls;

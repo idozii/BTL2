@@ -194,22 +194,8 @@ Character::Character(int index, const Position & init_pos, Map * map, const stri
     this->name = name;
 };
 Character::~Character(){};
-Position Character::getNextPosition() {
-    Position next_pos = pos;
-    if(map->isValid(next_pos, this)){
-        next_pos.setRow(next_pos.getRow() + 1);
-        next_pos.setCol(next_pos.getCol() + 1);
-    }
-    else{
-        next_pos = Position::npos;
-    }
-    return next_pos;
-};
-void Character::move(){
-    Position next_pos = getNextPosition();
-    if (next_pos.isEqual(Position::npos)) return;
-    pos = next_pos;
-};
+Position Character::getNextPosition() {};
+void Character::move(){};
 string Character::str() const {
     return "Character[index="+to_string(index)+";pos="+pos.str()+"]"; 
 };

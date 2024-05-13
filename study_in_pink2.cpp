@@ -342,33 +342,33 @@ bool Sherlock::meet(RobotW* robotW){
 bool Sherlock::meet(Watson* watson){
     if(pos.isEqual(watson->getCurrentPosition())){
         if(sherlockBag->getCount() == 0 && watsonBag->getCount() == 0) return false;
-        else if(sherlockBag->getCount() == 0 && watson->watsonBag->getCount() != 0){
-            for(int i = 0; i < watson->watsonBag->getCount(); i++){
-                if(watson->watsonBag->get(i)->getType() == PASSING_CARD){
-                    watson->watsonBag->remove(i);
-                    sherlockBag->insert(PassingCard());
+        else if(sherlockBag->getCount() == 0 && watsonBag->getCount() != 0){
+            for(int i = 0; i < watsonBag->getCount(); i++){
+                if(watsonBag->get(i)->getType() == PASSING_CARD){
+                    watsonBag->remove(PASSING_CARD);
+                    sherlockBag->insert(sherlockBag->get(PASSING_CARD));
                 }
             }
         }
-        else if(sherlockBag->getCount() != 0 && watson->watsonBag->size() == 0){
-            for(int i = 0; i < sherlockBag->size(); i++){
-                if(sherlockBag->get(i)->getType() == EXCEPTION_CARD){
-                    sherlockBag->remove(i);
-                    watson->watsonBag->add(new ExceptionCard());
+        else if(sherlockBag->getCount() != 0 && watsonBag->getCount() == 0){
+            for(int i = 0; i < sherlockBag->getCount(); i++){
+                if(sherlockBag->get(i)->getType() == EXEMPTION_CARD){
+                    sherlockBag->remove(EXEMPTION_CARD);
+                    watsonBag->insert(watsonBag->get(EXEMPTION_CARD));
                 }
             }
         }
-        else if(sherlockBag->getCount() != 0 && watson->watsonBag->size() != 0){
-            for(int i = 0; i < sherlockBag->size(); i++){
-                if(sherlockBag->get(i)->getType() == EXCEPTION_CARD){
-                    sherlockBag->remove(i);
-                    watson->watsonBag->add(new ExceptionCard());
+        else if(sherlockBag->getCount() != 0 && watsonBag->getCount() != 0){
+            for(int i = 0; i < sherlockBag->getCount(); i++){
+                if(sherlockBag->get(i)->getType() == EXEMPTION_CARD){
+                    sherlockBag->remove(EXEMPTION_CARD);
+                    watsonBag->insert(watsonBag->get(EXEMPTION_CARD));
                 }
             }
-            for(int i = 0; i < watson->watsonBag->size(); i++){
-                if(watson->watsonBag->get(i)->getType() == PASSING_CARD){
-                    watson->watsonBag->remove(i);
-                    sherlockBag->add(new PassingCard());
+            for(int i = 0; i < watsonBag->getCount(); i++){
+                if(watsonBag->get(i)->getType() == PASSING_CARD){
+                    watsonBag->remove(PASSING_CARD);
+                    sherlockBag->insert(sherlockBag->get(PASSING_CARD));
                 }
             }
         }
@@ -470,7 +470,40 @@ bool Watson::meet(RobotW* robotW){
     }
 };
 bool Watson::meet(Sherlock* sherlock){
-
+    if(pos.isEqual(sherlock->getCurrentPosition())){
+        if(sherlockBag->getCount() == 0 && watsonBag->getCount() == 0) return false;
+        else if(sherlockBag->getCount() == 0 && watsonBag->getCount() != 0){
+            for(int i = 0; i < watsonBag->getCount(); i++){
+                if(watsonBag->get(i)->getType() == PASSING_CARD){
+                    watsonBag->remove(PASSING_CARD);
+                    sherlockBag->insert(sherlockBag->get(PASSING_CARD));
+                }
+            }
+        }
+        else if(sherlockBag->getCount() != 0 && watsonBag->getCount() == 0){
+            for(int i = 0; i < sherlockBag->getCount(); i++){
+                if(sherlockBag->get(i)->getType() == EXEMPTION_CARD){
+                    sherlockBag->remove(EXEMPTION_CARD);
+                    watsonBag->insert(watsonBag->get(EXEMPTION_CARD));
+                }
+            }
+        }
+        else if(sherlockBag->getCount() != 0 && watsonBag->getCount() != 0){
+            for(int i = 0; i < sherlockBag->getCount(); i++){
+                if(sherlockBag->get(i)->getType() == EXEMPTION_CARD){
+                    sherlockBag->remove(EXEMPTION_CARD);
+                    watsonBag->insert(watsonBag->get(EXEMPTION_CARD));
+                }
+            }
+            for(int i = 0; i < watsonBag->getCount(); i++){
+                if(watsonBag->get(i)->getType() == PASSING_CARD){
+                    watsonBag->remove(PASSING_CARD);
+                    sherlockBag->insert(sherlockBag->get(PASSING_CARD));
+                }
+            }
+        }
+        return true;
+    }
 };
 
 //TODO: 3.7: CRIMINAL
@@ -608,69 +641,134 @@ bool ArrayMovingObject::checkMeet(int index){
 
 //TODO: 3.9: CONFIGURATION
 Configuration::Configuration(const string & filepath){
-    ifstream infile;
-    infile.open(filepath.c_str());
-    if(infile.is_open()){
-        string line;
-        while(getline(infile, line)){
-            if(line.find("MAP_NUM_ROWS")!= string::npos){
-                map_num_rows = stoi(line.substr(line.find("=")+1));
+    string line;
+    ifstream ifs(filepath.c_str());
+    for (int i = 0; i < 15 && !ifs.eof(); i++)
+    {
+        ifs >> line;
+        if (line.find("MAP_NUM_ROWS") == 0)
+        {
+            map_num_rows = stoi(line.substr(13, line.length() - 13));
+            configString[0][0] = "MAP_NUM_ROWS=";
+            configString[1][0] = to_string(map_num_rows);
+        }
+        else if (line.find("MAP_NUM_COLS") == 0)
+        {
+            map_num_cols = stoi(line.substr(13, line.length() - 13));
+            configString[0][1] = "MAP_NUM_COLS=";
+            configString[1][1] = to_string(map_num_cols);
+        }
+        else if (line.find("MAX_NUM_MOVING_OBJECTS") == 0)
+        {
+            max_num_moving_objects = stoi(line.substr(23, line.length() - 23));
+            configString[0][2] = "MAX_NUM_MOVING_OBJECTS=";
+            configString[1][2] = to_string(max_num_moving_objects);
+        }
+        else if (line.find("ARRAY_WALLS") == 0)
+        {
+            num_walls = (line.length() - 13) / 6;
+            configString[0][3] = "NUM_WALLS=";
+            configString[1][3] = to_string(num_walls);
+            configString[0][4] = "ARRAY_WALLS=";
+            configString[1][4] = line.substr(12, line.length() - 12);
+            arr_walls = new Position[num_walls];
+            for (int k = 0; k < num_walls; k++)
+            {
+                char c;
+                int temp1, temp2;
+                istringstream temp(line.substr(14 + k * 6, 3));
+                temp >> temp1 >> c >> temp2;
+                arr_walls[k] = Position(temp1, temp2);
             }
-            else if(line.find("MAP_NUM_COLS")!= string::npos){
-                map_num_cols = stoi(line.substr(line.find("=")+1));
+        }
+        else if (line.find("ARRAY_FAKE_WALLS") == 0)
+        {
+            num_fake_walls = (line.length() - 18) / 6;
+            configString[0][5] = "NUM_FAKE_WALLS=";
+            configString[1][5] = to_string(num_fake_walls);
+            configString[0][6] = "ARRAY_FAKE_WALLS=";
+            configString[1][6] = line.substr(17, line.length() - 17);
+            arr_fake_walls = new Position[num_fake_walls];
+            for (int k = 0; k < num_fake_walls; k++)
+            {
+                char c;
+                int temp1, temp2;
+                istringstream temp(line.substr(19 + k * 6, 3));
+                temp >> temp1 >> c >> temp2;
+                arr_fake_walls[k] = Position(temp1, temp2);
             }
-            else if(line.find("NUM_STEPS")!= string::npos){
-                num_steps = stoi(line.substr(line.find("=")+1));
-            }
-            else if(line.find("MAX_NUM_MOVING_OBJECTS")!= string::npos){
-                max_num_moving_objects = stoi(line.substr(line.find("=")+1));
-            }
-            else if(line.find("SHERLOCK_MOVING_RULE")!= string::npos){
-                sherlock_moving_rule = line.substr(line.find("=")+1);
-            }
-            else if(line.find("SHERLOCK_INIT_POS")!= string::npos){
-                sherlock_init_pos.setRow(stoi(line.substr(line.find("(")+1, line.find(",")-1)));
-                sherlock_init_pos.setCol(stoi(line.substr(line.find(",")+1, line.find(")")-1)));
-            }
-            else if(line.find("SHERLOCK_INIT_HP")!= string::npos){
-                sherlock_init_hp = stoi(line.substr(line.find("=")+1));
-            }
-            else if(line.find("SHERLOCk_INIT_EXP")!= string::npos){
-                sherlock_init_exp = stoi(line.substr(line.find("=")+1));
-            }
-            else if(line.find("WATSON_MOVING_RULE")!= string::npos){
-                watson_moving_rule = line.substr(line.find("=")+1);
-            }
-            else if(line.find("WATSON_INIT_POS")!= string::npos){
-                watson_init_pos.setRow(stoi(line.substr(line.find("(")+1, line.find(",")-1)));
-                watson_init_pos.setCol(stoi(line.substr(line.find(",")+1, line.find(")")-1)));
-            }
-            else if(line.find("WATSON_INIT_HP")!= string::npos){
-                watson_init_hp = stoi(line.substr(line.find("=")+1));
-            }
-            else if(line.find("WATSON_INIT_EXP")!= string::npos){
-                watson_init_exp = stoi(line.substr(line.find("=")+1));
-            }
-            else if(line.find("CRIMINAL_INIT_POS")!= string::npos){
-                criminal_init_pos.setRow(stoi(line.substr(line.find("(")+1, line.find(",")-1)));
-                criminal_init_pos.setCol(stoi(line.substr(line.find(",")+1, line.find(")")-1)));
-            }
-            else if(line.find("ARRAY_WALLS")!= string::npos) {
-                num_walls = stoi(line.substr(line.find("=")+1));
-                arr_walls = new Position[num_walls];
-                for(int i = 0; i < num_walls; i++){
-                    arr_walls[i].setRow(stoi(line.substr(line.find("(")+1, line.find(",")-1)));
-                    arr_walls[i].setCol(stoi(line.substr(line.find(",")+1, line.find(")")-1)));
-                }
-            }
-            else if(line.find("ARRAY_FAKE_WALLS")!= string::npos){
-                num_fake_walls = stoi(line.substr(line.find("=")+1));
-                arr_fake_walls = new Position[num_fake_walls];
-                for(int i = 0; i < num_fake_walls; i++){
-                    arr_fake_walls[i].setRow(stoi(line.substr(line.find("(")+1, line.find(",")-1)));
-                    arr_fake_walls[i].setCol(stoi(line.substr(line.find(",")+1, line.find(")")-1)));
-                }
-            }
+        }
+        else if (line.find("SHERLOCK_MOVING_RULE") == 0)
+        {
+            sherlock_moving_rule = line.substr(21, line.length() - 21);
+            configString[0][7] = "SHERLOCK_MOVING_RULE=";
+            configString[1][7] = sherlock_moving_rule;
+        }
+        else if (line.find("SHERLOCK_INIT_POS") == 0)
+        {
+            configString[0][8] = "SHERLOCK_INIT_POS=";
+            configString[1][8] = line.substr(18, line.length() - 18);
+            char c;
+            int temp1, temp2;
+            istringstream temp(line.substr(19, 3));
+            temp >> temp1 >> c >> temp2;
+            sherlock_init_pos = Position(temp1, temp2);
+        }
+        else if (line.find("SHERLOCK_INIT_HP") == 0)
+        {
+            sherlock_init_hp = stoi(line.substr(17, line.length() - 17));
+            configString[0][9] = "SHERLOCK_INIT_HP=";
+            configString[1][9] = to_string(sherlock_init_hp);
+        }
+        else if (line.find("SHERLOCK_INIT_EXP") == 0)
+        {
+            sherlock_init_exp = stoi(line.substr(18, line.length() - 18));
+            configString[0][10] = "SHERLOCK_INIT_EXP=";
+            configString[1][10] = to_string(sherlock_init_exp);
+        }
+        else if (line.find("WATSON_MOVING_RULE") == 0)
+        {
+            watson_moving_rule = line.substr(19, line.length() - 19);
+            configString[0][11] = "WATSON_MOVING_RULE=";
+            configString[1][11] = watson_moving_rule;
+        }
+        else if (line.find("WATSON_INIT_POS") == 0)
+        {
+            configString[0][12] = "WATSON_INIT_POS=";
+            configString[1][12] = line.substr(16, line.length() - 16);
+            char c;
+            int temp1, temp2;
+            istringstream temp(line.substr(17, 3));
+            temp >> temp1 >> c >> temp2;
+            watson_init_pos = Position(temp1, temp2);
+        }
+        else if (line.find("WATSON_INIT_HP") == 0)
+        {
+            watson_init_hp = stoi(line.substr(15, line.length() - 15));
+            configString[0][13] = "WATSON_INIT_HP=";
+            configString[1][13] = to_string(watson_init_hp);
+        }
+        else if (line.find("WATSON_INIT_EXP") == 0)
+        {
+            watson_init_exp = stoi(line.substr(16, line.length() - 16));
+            configString[0][14] = "WATSON_INIT_EXP=";
+            configString[1][14] = to_string(watson_init_exp);
+        }
+        else if (line.find("CRIMINAL_INIT_POS") == 0)
+        {
+            configString[0][15] = "CRIMINAL_INIT_POS=";
+            configString[1][15] = line.substr(18, line.length() - 18);
+            char c;
+            int temp1, temp2;
+            istringstream temp(line.substr(19, 3));
+            temp >> temp1 >> c >> temp2;
+            criminal_init_pos = Position(temp1, temp2);
+        }
+        else if (line.find("NUM_STEPS") == 0)
+        {
+            num_steps = stoi(line.substr(10, line.length() - 10));
+            configString[0][16] = "NUM_STEPS=";
+            configString[1][16] = to_string(num_steps);
         }
     }  
 };
@@ -679,25 +777,13 @@ Configuration::~Configuration(){
     delete[] arr_walls;
 };
 string Configuration::str() const{
-    cout<<"Configuration["<<endl;
-    cout<<"MAP_NUM_ROWS="<<map_num_rows<<endl;
-    cout<<"MAP_NUM_COLS="<<map_num_cols<<endl;
-    cout<<"MAX_NUM_MOVING_OBJECTS="<<max_num_moving_objects<<endl;
-    cout<<"NUM_WALLS="<<num_walls<<endl;
-    cout<<"ARRAY_WALLS="<<arr_walls<<endl;
-    cout<<"NUM_FAKE_WALLS="<<num_fake_walls<<endl;
-    cout<<"ARRAY_FAKE_WALLS="<<arr_fake_walls<<endl;
-    cout<<"SHERLOCK_MOVING_RULE="<<sherlock_moving_rule<<endl;
-    cout<<"SHERLOCK_INIT_POS="<<sherlock_init_pos.str()<<endl;
-    cout<<"SHERLOCK_INIT_HP"<<sherlock_init_hp<<endl;
-    cout<<"SHERLOCK_INIT_EXP"<<sherlock_init_exp<<endl;
-    cout<<"WATSON_MOVING_RULE="<<watson_moving_rule<<endl;
-    cout<<"WATSON_INIT_POS="<<watson_init_pos.str()<<endl;
-    cout<<"WATSON_INIT_HP="<<watson_init_hp<<endl;
-    cout<<"WATSON_INIT_EXP="<<watson_init_exp<<endl;
-    cout<<"CRIMINAL_INIT_POS="<<criminal_init_pos.str()<<endl;
-    cout<<"NUM_STEPS="<<num_steps<<endl;
-    cout<<"]";
+    string arr;
+    arr = configString[0][0] + configString[1][0] + "\n";
+    for (int i = 1; i < 17; i++)
+    {
+        arr += configString[0][i] + configString[1][i] + "\n";
+    }
+    return "Configuration[\n" + arr + ']';
 };
 
 //TODO: 3.10: ROBOT
@@ -1049,8 +1135,10 @@ BaseBag::~BaseBag(){
 };
 bool BaseBag::insert(BaseItem* item){};
 BaseItem* BaseBag::get(){};
+BaseItem* BaseBag::get(int i){};
 BaseItem* BaseBag::get(ItemType type){};
 int BaseBag::getCount() const{};
+void BaseBag::remove(ItemType type){};
 string BaseBag::str() const{};
 
 //TODO: 3.12.1: SHERLOCK BAG
@@ -1093,6 +1181,23 @@ BaseItem *SherlockBag::get(){
     }
     return NULL;
 };
+BaseItem* SherlockBag::get(int i){
+    Node *current = head;
+    int count = 0;
+    while (current != NULL)
+    {
+        if (current->item->canUse(sherlock, NULL))
+        {
+            if (count == i)
+            {
+                return current->item;
+            }
+            count++;
+        }
+        current = current->next;
+    }
+    return NULL;
+};
 BaseItem* SherlockBag::get(ItemType item_type){
     Node *current = head;
     while (current != NULL)
@@ -1125,6 +1230,29 @@ string SherlockBag::str() const{
 };
 int SherlockBag::getCount() const{
     return itemNumber;
+};
+void SherlockBag::remove(ItemType type){
+    Node *current = head;
+    Node *prev = nullptr;
+    while (current != NULL)
+    {
+        if (current->item->getType() == type)
+        {
+            if (prev == nullptr)
+            {
+                head = current->next;
+            }
+            else
+            {
+                prev->next = current->next;
+            }
+            delete current;
+            itemNumber--;
+            return;
+        }
+        prev = current;
+        current = current->next;
+    }
 };
 
 //TODO: 3.12.2: WATSON BAG
@@ -1167,6 +1295,23 @@ BaseItem *WatsonBag::get(){
     }
     return NULL;
 };
+BaseItem* WatsonBag::get(int i){
+    Node *current = head;
+    int count = 0;
+    while (current != NULL)
+    {
+        if (current->item->canUse(watson, NULL))
+        {
+            if (count == i)
+            {
+                return current->item;
+            }
+            count++;
+        }
+        current = current->next;
+    }
+    return NULL;
+};
 BaseItem* WatsonBag::get(ItemType item_type){
     Node *current = head;
     while (current != NULL)
@@ -1200,6 +1345,29 @@ string WatsonBag::str() const
 };
 int WatsonBag::getCount() const{
     return itemNumber;
+};
+void WatsonBag::remove(ItemType type){
+    Node *current = head;
+    Node *prev = nullptr;
+    while (current != NULL)
+    {
+        if (current->item->getType() == type)
+        {
+            if (prev == nullptr)
+            {
+                head = current->next;
+            }
+            else
+            {
+                prev->next = current->next;
+            }
+            delete current;
+            itemNumber--;
+            return;
+        }
+        prev = current;
+        current = current->next;
+    }
 };
 
 //TODO: 3.13: StudyPink

@@ -851,7 +851,7 @@ int RobotC::getDistance(Watson* watson) const{
     return distance(pos, watson->getCurrentPosition());
 };
 string RobotC::str() const{
-    return "Robot[pos="+pos.str()+";type="+to_string(robot_type)+";dist="+""+"]";
+    return "Robot[pos="+pos.str()+";type=C;dist="+""+"]";
 };
 
 //TODO:3.10.2: ROBOT S
@@ -896,7 +896,7 @@ int RobotS::getDistance() const{
     return distance(pos, sherlock->getCurrentPosition());
 };
 string RobotS::str() const{
-    return "Robot[pos="+pos.str()+";type="+to_string(robot_type)+";dist="+to_string(getDistance())+"]";
+    return "Robot[pos="+pos.str()+";type=S;dist="+to_string(getDistance())+"]";
 };
 
 //TODO:3.10.3: ROBOT W
@@ -941,7 +941,7 @@ int RobotW::getDistance() const{
     return distance(pos, watson->getCurrentPosition());
 };
 string RobotW::str() const{
-    return "Robot[pos="+pos.str()+";type="+to_string(robot_type)+";dist="+to_string(getDistance())+"]";
+    return "Robot[pos="+pos.str()+";type=W;dist="+to_string(getDistance())+"]";
 };
 
 //TODO:3.10.4: ROBOT SW
@@ -987,7 +987,7 @@ int RobotSW::getDistance() const{
     return distance(pos, sherlock->getCurrentPosition()) + distance(pos, watson->getCurrentPosition());
 };
 string RobotSW::str() const{
-    return "Robot[pos="+pos.str()+";type="+to_string(robot_type)+";dist="+to_string(getDistance())+"]";
+    return "Robot[pos="+pos.str()+";type=SW;dist="+to_string(getDistance())+"]";
 };
 
 //TODO: 3.11: BASE ITEM

@@ -62,21 +62,30 @@ ElementType FakeWall::getType() const{
 };
 
 //TODO: 3.2: MAP
-Map::Map(int num_rows, int num_cols, int num_walls, Position* array_walls, int num_fake_walls, Position* array_fake_walls){
+Map::Map(int num_rows, int num_cols, int num_walls, Position *array_walls, int num_fake_walls, Position *array_fake_walls)
+{
     this->num_rows = num_rows;
     this->num_cols = num_cols;
-    map = new MapElement**[num_rows];
-    for(int i = 0; i < num_rows; i++){
-        map[i] = new MapElement*[num_cols];
-        for(int j = 0; j < num_cols; j++){
+    map = new MapElement **[num_rows];
+    for (int i = 0; i < num_rows; i++){
+        map[i] = new MapElement *[num_cols];
+        for (int j = 0; j < num_cols; j++){
             map[i][j] = new Path();
+            for (int k = 0; k < num_walls; k++){
+                if (array_walls[k].getRow() == i && array_walls[k].getCol() == j){
+                    delete map[i][j];
+                    map[i][j] = NULL;
+                    map[i][j] = new Wall();
+                }
+            }
+            for (int k = 0; k < num_fake_walls; k++){
+                if (array_fake_walls[k].getRow() == i && array_fake_walls[k].getCol() == j){
+                    delete map[i][j];
+                    map[i][j] = NULL;
+                    map[i][j] = new FakeWall((i * 257 + j * 139 + 89) % 900 + 1);
+                }
+            }
         }
-    }
-    for(int i = 0; i < num_walls; i++){
-        map[array_walls[i].getRow()][array_walls[i].getCol()] = new Wall();
-    }
-    for(int i = 0; i < num_fake_walls; i++){
-        map[array_fake_walls[i].getRow()][array_fake_walls[i].getCol()] = new FakeWall((array_fake_walls[i].getRow()*257+array_fake_walls[i].getCol()*139+89)%900+1);
     }
     for(int i = 0; i < num_walls; i++){
         for(int j = 0; j < num_fake_walls; j++){

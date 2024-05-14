@@ -1540,6 +1540,7 @@ void StudyPinkProgram::run(bool verbose){
 
 
 //TODO: passing card, fight
+//TODO: check testcase 1
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

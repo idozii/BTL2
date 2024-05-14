@@ -194,7 +194,9 @@ Character::Character(int index, const Position & init_pos, Map * map, const stri
     this->name = name;
 };
 Character::~Character(){};
-Position Character::getNextPosition() {};
+Position Character::getNextPosition() {
+    return Position::npos;
+};
 void Character::move(){};
 string Character::str() const {
     return "Character[index="+to_string(index)+";pos="+pos.str()+"]"; 
@@ -290,6 +292,7 @@ bool Sherlock::meet(RobotS* robotS){
             return false;
         }
     }
+    return false;
 };
 bool Sherlock::meet(RobotC* robotC){
     if (pos.isEqual(robotC->getCurrentPosition())) {
@@ -303,6 +306,7 @@ bool Sherlock::meet(RobotC* robotC){
             return false;
         }
     }
+    return false;
 };
 bool Sherlock::meet(RobotSW* robotSW){
     if (pos.isEqual(robotSW->getCurrentPosition())) {
@@ -317,6 +321,7 @@ bool Sherlock::meet(RobotSW* robotSW){
             return false;
         }
     }
+    return false;
 };
 bool Sherlock::meet(RobotW* robotW){
     if (pos.isEqual(robotW->getCurrentPosition())) {
@@ -324,6 +329,7 @@ bool Sherlock::meet(RobotW* robotW){
         delete robotW;
         return true;
     }
+    return false;
 };
 bool Sherlock::meet(Watson* watson){
     if(pos.isEqual(watson->getCurrentPosition())){
@@ -360,6 +366,7 @@ bool Sherlock::meet(Watson* watson){
         }
         return true;
     }
+    return false;
 };
 
 //TODO: 3.6: WATSON
@@ -424,36 +431,46 @@ int Watson::setHp(int init_hp) {
 bool Watson::meet(RobotS* robotS){
     if(distance(pos, robotS->getCurrentPosition()) == 1){
         ;
+        return true;
     }
+    else return false;
 };
 bool Watson::meet(RobotC* robotC){
     if (distance(pos, robotC->getCurrentPosition()) == 1){
         this->meet(robotC);
         delete robotC;
+        return true;
     }
+    else return false;
 };
 bool Watson::meet(RobotSW* robotSW){
     if (distance(pos, robotSW->getCurrentPosition()) == 1){
         this->meet(robotSW);
         if (exp > 600 && hp > 165){
             delete robotSW;
+            return true;
         }
         else{
             hp = hp*0.85;
             exp = exp*0.85;
+            return false;
         }
     }
+    return false;
 };
 bool Watson::meet(RobotW* robotW){
     if (distance(pos, robotW->getCurrentPosition()) == 1){
         this->meet(robotW);
         if (hp > 350){
             delete robotW;
+            return true;
         }
         else{
             hp = hp*0.95;
+            return false;
         }
     }
+    return false;
 };
 bool Watson::meet(Sherlock* sherlock){
     if(pos.isEqual(sherlock->getCurrentPosition())){
@@ -490,6 +507,7 @@ bool Watson::meet(Sherlock* sherlock){
         }
         return true;
     }
+    return false;
 };
 
 //TODO: 3.7: CRIMINAL
@@ -498,8 +516,12 @@ Criminal::Criminal(int index, const Position & init_pos, Map * map, Sherlock * s
     this->watson = watson;
 };
 Criminal::~Criminal(){};
+Position Criminal::getPreviousPosition() const {
+    return previous_pos;
+};
 Position Criminal::getNextPosition() {
     Position next_pos = pos;
+    previous_pos = pos;
     int max_distance = -1;
     Position arr[4];
     arr[0] = Position(pos.getRow() - 1, pos.getCol());
@@ -778,17 +800,18 @@ Robot::Robot(int index , const Position pos , Map * map , RobotType robot_type, 
 };
 Robot* Robot::create(int index, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson){
     if(criminal->isCreatedRobotNext()){
-        return new RobotC(index, criminal->getCurrentPosition(), map, C, criminal);
+        return new RobotC(index, criminal->getCurrentPosition(), map, criminal);
     }    
     else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) > distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
-        return new RobotS(index, criminal->getCurrentPosition(), map, S, criminal, sherlock);
+        return new RobotS(index, criminal->getCurrentPosition(), map, criminal, sherlock);
     }
     else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) < distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
-        return new RobotW(index, criminal->getCurrentPosition(), map, W, criminal, watson);
+        return new RobotW(index, criminal->getCurrentPosition(), map, criminal, watson);
     }
     else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) == distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
-        return new RobotSW(index, criminal->getCurrentPosition(), map, SW, criminal, sherlock, watson);
+        return new RobotSW(index, criminal->getCurrentPosition(), map, criminal, sherlock, watson);
     }
+    else return NULL;
 };
 MovingObjectType Robot::getObjectType() const{
     return ROBOT;
@@ -803,13 +826,13 @@ string Robot::str() const{
     return "Robot[pos="+pos.str()+";type="+to_string(robot_type)+";dist="+to_string(getDistance())+"]";
 };
 //TODO: 3.10.1: ROBOTC
-RobotC::RobotC(int index, const Position & init_pos, Map* map, RobotType robot_type, Criminal* criminal) : Robot(index, pos, map, robot_type, criminal, "RobotC"){
-    this->robot_type = robot_type;
+RobotC::RobotC(int index, const Position & init_pos, Map* map, Criminal* criminal) : Robot(index, pos, map, C, criminal, "RobotC"){
+    this->robot_type = C;
     this->pos = init_pos;
     this->criminal = criminal;
 };
 Position RobotC::getNextPosition() {
-    Position next_pos = criminal->getCurrentPosition();
+    Position next_pos = criminal->getPreviousPosition();
     if(map->isValid(next_pos, this)) return next_pos;
     else return Position::npos;
 };
@@ -832,8 +855,8 @@ string RobotC::str() const{
 };
 
 //TODO:3.10.2: ROBOT S
-RobotS::RobotS(int index, const Position & init_pos, Map* map, RobotType robot_type, Criminal* criminal, Sherlock* sherlock) : Robot(index, pos, map, robot_type, criminal, "RobotS"){
-    this->robot_type = robot_type;
+RobotS::RobotS(int index, const Position & init_pos, Map* map, Criminal* criminal, Sherlock* sherlock) : Robot(index, pos, map, S, criminal, "RobotS"){
+    this->robot_type = S;
     this->pos = init_pos;
     this->criminal = criminal;
     this->sherlock = sherlock;
@@ -877,8 +900,8 @@ string RobotS::str() const{
 };
 
 //TODO:3.10.3: ROBOT W
-RobotW::RobotW(int index, const Position & init_pos, Map* map, RobotType robot_type, Criminal* criminal, Watson* watson) : Robot(index, pos, map, robot_type, criminal, "RobotW"){
-    this->robot_type = robot_type;
+RobotW::RobotW(int index, const Position & init_pos, Map* map, Criminal* criminal, Watson* watson) : Robot(index, pos, map, W, criminal, "RobotW"){
+    this->robot_type = W;
     this->pos = init_pos;
     this->criminal = criminal;
     this->watson = watson;
@@ -922,8 +945,8 @@ string RobotW::str() const{
 };
 
 //TODO:3.10.4: ROBOT SW
-RobotSW::RobotSW(int index, const Position & init_pos, Map* map, RobotType robot_type, Criminal* criminal, Sherlock* sherlock, Watson* watson) : Robot(index, pos, map, robot_type, criminal, "RobotSW"){
-    this->robot_type = robot_type;
+RobotSW::RobotSW(int index, const Position & init_pos, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson) : Robot(index, pos, map, SW, criminal, "RobotSW"){
+    this->robot_type = SW;
     this->pos = init_pos;
     this->criminal = criminal;
     this->sherlock = sherlock;
@@ -1118,13 +1141,108 @@ BaseBag::~BaseBag(){
         temp = head;
     }    
 };
-bool BaseBag::insert(BaseItem* item){};
-BaseItem* BaseBag::get(){};
-BaseItem* BaseBag::get(int i){};
-BaseItem* BaseBag::get(ItemType type){};
-int BaseBag::getCount() const{};
-void BaseBag::remove(ItemType type){};
-string BaseBag::str() const{};
+bool BaseBag::insert(BaseItem* item){
+    if(item==NULL) return false;
+    Node* temp = new Node(item);
+    if(temp==NULL) return false;
+    else {
+        if(size<=capacity){
+            temp->item = item;
+            temp->next = head;
+            head = temp;
+            size++;
+        }
+        else return false;
+    }
+    return true;
+};
+BaseItem* BaseBag::get(){
+    Node *current = head;
+    while (current != NULL)
+    {
+        if (current->item->canUse(NULL, NULL))
+        {
+            current->next = head;
+            head = current;
+            return current->item;
+        }
+        current = current->next;
+    }
+    return NULL;
+};
+BaseItem* BaseBag::get(int i){
+    Node *current = head;
+    int count = 0;
+    while (current != NULL)
+    {
+        if (current->item->canUse(NULL, NULL))
+        {
+            if (count == i)
+            {
+                return current->item;
+            }
+            count++;
+        }
+        current = current->next;
+    }
+    return NULL;
+};
+BaseItem* BaseBag::get(ItemType type){
+    Node *current = head;
+    while (current != NULL)
+    {
+        if (current->item->canUse(NULL, NULL) && current->item->getType() == type)
+        {
+            return current->item;
+        }
+        current = current->next;
+    }
+    return NULL;
+};
+int BaseBag::getCount() const{
+    return size;
+};
+void BaseBag::remove(ItemType type){
+    Node *current = head;
+    Node *prev = nullptr;
+    while (current != NULL)
+    {
+        if (current->item->getType() == type)
+        {
+            if (prev == nullptr)
+            {
+                head = current->next;
+            }
+            else
+            {
+                prev->next = current->next;
+            }
+            delete current;
+            size--;
+            return;
+        }
+        prev = current;
+        current = current->next;
+    }
+};
+string BaseBag::str() const{
+    string str = "BaseBag[count=" + to_string(size) + ';';
+    Node *current = head;
+    while (current != NULL)
+    {
+        if (current->item != NULL)
+        {
+            str += current->item->str();
+        }
+        current = current->next;
+        if (current != NULL)
+        {
+            str += ",";
+        }
+    }
+    str += "]";
+    return str;
+};
 
 //TODO: 3.12.1: SHERLOCK BAG
 SherlockBag::SherlockBag(Sherlock* sherlock) : BaseBag(13){
@@ -1151,6 +1269,7 @@ bool SherlockBag::insert(BaseItem* item){
         }
         else return false;
     }
+    return true;
 };
 BaseItem *SherlockBag::get(){
     Node *current = head;
@@ -1265,6 +1384,7 @@ bool WatsonBag::insert(BaseItem* item){
         }
         else return false;
     }
+    return true;
 };
 BaseItem *WatsonBag::get(){
     Node *current = head;
@@ -1410,7 +1530,7 @@ void StudyPinkProgram::run(bool verbose){
 };
 
 
-//TODO: CHECK ROBOTC = getpreviousposition, fight
+//TODO: passing card, fight
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

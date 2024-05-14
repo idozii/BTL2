@@ -215,10 +215,12 @@ private:
     Sherlock* sherlock;
     Watson* watson;
     int moveCount = 0;
+    Position previous_pos;
     
 public:
     Criminal(int index, const Position & init_pos, Map * map, Sherlock * sherlock, Watson * watson);
     ~Criminal();
+    virtual Position getPreviousPosition() const;
     virtual Position getNextPosition();
     virtual void move();
     MovingObjectType getObjectType() const;
@@ -425,7 +427,7 @@ private:
     BaseItem* item;
 
 public:
-    RobotC ( int index , const Position & init_pos , Map * map , RobotType robot_type, Criminal * criminal);
+    RobotC ( int index , const Position & init_pos , Map * map , Criminal * criminal);
     virtual Position getNextPosition();
     virtual void move();
     virtual RobotType getType() const;
@@ -444,7 +446,7 @@ private:
     BaseItem* item;
 
 public:
-    RobotS ( int index , const Position & init_pos , Map * map , RobotType robot_type, Criminal * criminal , Sherlock * Sherlock);
+    RobotS ( int index , const Position & init_pos , Map * map , Criminal * criminal , Sherlock * Sherlock);
     virtual Position getNextPosition();
     virtual void move();
     virtual RobotType getType() const;
@@ -461,7 +463,7 @@ private:
     BaseItem* item;
 
 public:
-    RobotW ( int index , const Position & init_pos , Map * map , RobotType robot_type, Criminal * criminal , Watson * watson);
+    RobotW ( int index , const Position & init_pos , Map * map , Criminal * criminal , Watson * watson);
     virtual Position getNextPosition();
     virtual void move();
     virtual RobotType getType() const;
@@ -479,7 +481,7 @@ private:
     BaseItem* item;
 
 public:
-    RobotSW ( int index , const Position & init_pos , Map * map , RobotType robot_type, Criminal * criminal , Sherlock * sherlock , Watson* watson);
+    RobotSW ( int index , const Position & init_pos , Map * map , Criminal * criminal , Sherlock * sherlock , Watson* watson);
     virtual Position getNextPosition();
     virtual void move();
     virtual RobotType getType() const;

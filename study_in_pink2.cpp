@@ -213,7 +213,7 @@ string Character::str() const {
 MovingObjectType Character::getObjectType() const{
     return MovingObjectType();
 };
-int Character::getExp() {
+int Character::getExp() const{
     return this->exp;
 };
 int Character::setExp(int init_exp) {
@@ -221,7 +221,7 @@ int Character::setExp(int init_exp) {
     else if(init_exp > 900) return 900;
     else return init_exp;
 };
-int Character::getHp() {
+int Character::getHp() const{
     return this->hp;
 };
 int Character::setHp(int init_hp) {
@@ -273,10 +273,10 @@ MovingObjectType Sherlock::getObjectType()const{
 string Sherlock::str() const {
     return "Sherlock[index="+to_string(index)+";pos="+pos.str()+";moving_rule="+moving_rule+"]";
 };
-int Sherlock::getHp() {
+int Sherlock::getHp() const {
     return this->hp;
 };
-int Sherlock::getExp() {
+int Sherlock::getExp() const {
     return this->exp;
 };
 int Sherlock::setExp(int init_exp) {
@@ -421,10 +421,10 @@ MovingObjectType Watson::getObjectType() const {
 string Watson::str() const {
     return "Watson[index="+to_string(index)+";pos="+pos.str()+";moving_rule="+moving_rule+"]";
 };
-int Watson::getExp() {
+int Watson::getExp() const {
     return this->exp;
 };
-int Watson::getHp() {
+int Watson::getHp() const {
     return this->hp;
 };
 int Watson::setExp(int init_exp) {

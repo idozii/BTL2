@@ -62,8 +62,7 @@ ElementType FakeWall::getType() const{
 };
 
 //TODO: 3.2: MAP
-Map::Map(int num_rows, int num_cols, int num_walls, Position *array_walls, int num_fake_walls, Position *array_fake_walls)
-{
+Map::Map(int num_rows, int num_cols, int num_walls, Position *array_walls, int num_fake_walls, Position *array_fake_walls){
     this->num_rows = num_rows;
     this->num_cols = num_cols;
     map = new MapElement **[num_rows];
@@ -74,14 +73,12 @@ Map::Map(int num_rows, int num_cols, int num_walls, Position *array_walls, int n
             for (int k = 0; k < num_walls; k++){
                 if (array_walls[k].getRow() == i && array_walls[k].getCol() == j){
                     delete map[i][j];
-                    map[i][j] = NULL;
                     map[i][j] = new Wall();
                 }
             }
             for (int k = 0; k < num_fake_walls; k++){
                 if (array_fake_walls[k].getRow() == i && array_fake_walls[k].getCol() == j){
                     delete map[i][j];
-                    map[i][j] = NULL;
                     map[i][j] = new FakeWall((i * 257 + j * 139 + 89) % 900 + 1);
                 }
             }
@@ -112,12 +109,14 @@ bool Map::isValid ( const Position & pos , MovingObject * mv_obj ) const {
         return false;
     }
     if ( getElementType(pos) == FAKE_WALL ) {
-        if(mv_obj->getObjectType() == SHERLOCK || mv_obj->getObjectType() == CRIMINAL || mv_obj->getObjectType() == ROBOT) return true;
-        else if(mv_obj->getObjectType() == WATSON){
-            if(mv_obj->getExp()>((pos.getRow()*257+pos.getCol()*139+89)%900+1)) return true;
-            else return false;
+        if(mv_obj != NULL) {
+            if(mv_obj->getObjectType() == SHERLOCK || mv_obj->getObjectType() == CRIMINAL || mv_obj->getObjectType() == ROBOT) return true;
+            else if(mv_obj->getObjectType() == WATSON){
+                if(mv_obj->getExp()>((pos.getRow()*257+pos.getCol()*139+89)%900+1)) return true;
+                else return false;
+            }
         }
-        else return false;
+        return false;
     }
     if (getElementType(pos) == PATH) {
         return true;
@@ -604,30 +603,31 @@ bool ArrayMovingObject::isFull() const {
     if(count==capacity) return true;
     return false;
 };
-bool ArrayMovingObject::add(MovingObject* mv_obj){
-    if(isFull()) return false;
-    for(int i = 0; i < capacity; i++){
-        if(arr_mv_objs[i]==NULL){
-            arr_mv_objs[i] = mv_obj;
-            count++;
-            return true;
-        }
-    }
-    return false;
-};
 void ArrayMovingObject::remove(int index){
-    if(arr_mv_objs[index]!=NULL){
+    if(arr_mv_objs != NULL && index >= 0 && index < capacity && arr_mv_objs[index]!=NULL){
         delete arr_mv_objs[index];
         arr_mv_objs[index] = NULL;
         count--;
     }
 };
-int ArrayMovingObject::size() const{
-    return count;
+bool ArrayMovingObject::add(MovingObject* mv_obj){
+    if(arr_mv_objs != NULL && !isFull()) {
+        for(int i = 0; i < capacity; i++){
+            if(arr_mv_objs[i]==NULL){
+                arr_mv_objs[i] = mv_obj;
+                count++;
+                return true;
+            }
+        }
+    }
+    return false;
 };
 MovingObject* ArrayMovingObject::get(int index) const{
-    if(arr_mv_objs[index]!=NULL) return arr_mv_objs[index];
+    if(index >= 0 && index < size() && arr_mv_objs[index]!=NULL) return arr_mv_objs[index];
     return NULL;
+};
+int ArrayMovingObject::size() const{
+    return count;
 };
 string ArrayMovingObject::str() const{
     string arraymovingobject;
@@ -696,35 +696,39 @@ Configuration::Configuration(const string & filepath){
         else if (line.find("ARRAY_WALLS") == 0)
         {
             num_walls = (line.length() - 13) / 6;
-            configString[0][3] = "NUM_WALLS=";
-            configString[1][3] = to_string(num_walls);
-            configString[0][4] = "ARRAY_WALLS=";
-            configString[1][4] = line.substr(12, line.length() - 12);
-            arr_walls = new Position[num_walls];
-            for (int k = 0; k < num_walls; k++)
-            {
-                char c;
-                int temp1, temp2;
-                istringstream temp(line.substr(14 + k * 6, 3));
-                temp >> temp1 >> c >> temp2;
-                arr_walls[k] = Position(temp1, temp2);
+            if(num_walls > 0){
+                configString[0][3] = "NUM_WALLS=";
+                configString[1][3] = to_string(num_walls);
+                configString[0][4] = "ARRAY_WALLS=";
+                configString[1][4] = line.substr(12, line.length() - 12);
+                arr_walls = new Position[num_walls];
+                for (int k = 0; k < num_walls; k++)
+                {
+                    char c;
+                    int temp1, temp2;
+                    istringstream temp(line.substr(14 + k * 6, 3));
+                    temp >> temp1 >> c >> temp2;
+                    arr_walls[k] = Position(temp1, temp2);
+                }
             }
         }
         else if (line.find("ARRAY_FAKE_WALLS") == 0)
         {
             num_fake_walls = (line.length() - 18) / 6;
-            configString[0][5] = "NUM_FAKE_WALLS=";
-            configString[1][5] = to_string(num_fake_walls);
-            configString[0][6] = "ARRAY_FAKE_WALLS=";
-            configString[1][6] = line.substr(17, line.length() - 17);
-            arr_fake_walls = new Position[num_fake_walls];
-            for (int k = 0; k < num_fake_walls; k++)
-            {
-                char c;
-                int temp1, temp2;
-                istringstream temp(line.substr(19 + k * 6, 3));
-                temp >> temp1 >> c >> temp2;
-                arr_fake_walls[k] = Position(temp1, temp2);
+            if(num_fake_walls > 0){
+                configString[0][5] = "NUM_FAKE_WALLS=";
+                configString[1][5] = to_string(num_fake_walls);
+                configString[0][6] = "ARRAY_FAKE_WALLS=";
+                configString[1][6] = line.substr(17, line.length() - 17);
+                arr_fake_walls = new Position[num_fake_walls];
+                for (int k = 0; k < num_fake_walls; k++)
+                {
+                    char c;
+                    int temp1, temp2;
+                    istringstream temp(line.substr(19 + k * 6, 3));
+                    temp >> temp1 >> c >> temp2;
+                    arr_fake_walls[k] = Position(temp1, temp2);
+                }
             }
         }
         else if (line.find("SHERLOCK_MOVING_RULE") == 0)

@@ -586,21 +586,23 @@ bool Criminal::isCreatedRobotNext(){
 //TODO: 3.8: ARRAY MOVING OBJECT
 ArrayMovingObject::ArrayMovingObject(int capacity){
     this->capacity = capacity;
-    this->count = 0;
+    count = 0;
     arr_mv_objs = new MovingObject*[capacity];
     for(int i = 0; i < capacity; i++){
-        arr_mv_objs[i] = NULL;
+        arr_mv_objs[i] = nullptr;
     }
 };
 ArrayMovingObject::~ArrayMovingObject(){
     for(int i = 0; i < capacity; i++){
-        delete arr_mv_objs[i];
+        if(arr_mv_objs[i]!=NULL){
+            delete arr_mv_objs[i];
+        }
     }
     delete[] arr_mv_objs;
 };
 bool ArrayMovingObject::isFull() const {
     if(count==capacity) return true;
-    else return false;
+    return false;
 };
 bool ArrayMovingObject::add(MovingObject* mv_obj){
     if(isFull()) return false;
@@ -625,19 +627,18 @@ int ArrayMovingObject::size() const{
 };
 MovingObject* ArrayMovingObject::get(int index) const{
     if(arr_mv_objs[index]!=NULL) return arr_mv_objs[index];
-    else return NULL;
+    return NULL;
 };
 string ArrayMovingObject::str() const{
     string arraymovingobject;
     int i = 0;
     arraymovingobject = "ArrayMovingObject[count="+to_string(count)+";capacity="+to_string(capacity)+";";
-    while ((i+1)==count){
-        if(arr_mv_objs[i]!=NULL){
-            arraymovingobject += arr_mv_objs[i]->str();
-            arraymovingobject += ";";
-            i++;
-        }
+    for (int i = 0; i < count; i++){
+        arraymovingobject += get(i)->str();
+        if (i < count - 1)
+            arraymovingobject += ';';
     }
+    arraymovingobject += ']';
     return arraymovingobject;
 };
 bool ArrayMovingObject::checkMeet(int index){

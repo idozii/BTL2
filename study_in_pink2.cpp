@@ -1570,10 +1570,24 @@ void StudyPinkProgram::run(bool verbose){
         }
     }
 };
-
+void StudyPinkProgram::printStep(int si) const {
+    cout << "Step: " << setw(4) << setfill('0') << si
+         << "--"
+         << sherlock->str() << "--|--" << watson->str() << "--|--" << criminal->str() << endl;
+};
+void StudyPinkProgram::printResult() const {
+    if (sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition())) {
+        cout << "Sherlock caught the criminal" << endl;
+    }
+    else if (watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())) {
+        cout << "Watson caught the criminal" << endl;
+    }
+    else {
+        cout << "The criminal escaped" << endl;
+    }
+};
 
 //TODO: passing card
-//TODO: segfault fixing
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

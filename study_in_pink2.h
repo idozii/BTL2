@@ -510,24 +510,8 @@ public:
     StudyPinkProgram(const string & config_file_path);
     ~StudyPinkProgram();
     bool isStop() const;
-    void printResult() const {
-        if (sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition())) {
-            cout << "Sherlock caught the criminal" << endl;
-        }
-        else if (watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())) {
-            cout << "Watson caught the criminal" << endl;
-        }
-        else {
-            cout << "The criminal escaped" << endl;
-        }
-    }
-
-    void printStep(int si) const {
-        cout << "Step: " << setw(4) << setfill('0') << si
-            << "--"
-            << sherlock->str() << "--|--" << watson->str() << "--|--" << criminal->str() << endl;
-    }
-
+    void printResult() const;
+    void printStep(int si) const;
     void run(bool verbose);
 };
 

@@ -163,7 +163,7 @@ MovingObject::MovingObject(int index, const Position pos, Map * map, const strin
     this->name = name;
 };
 MovingObject::~MovingObject(){};
-Position MovingObject::getNextPosition(){
+Position MovingObject::getNextPosition() {
     Position next_pos = pos;
     if(this->map->isValid(this->pos, this)){
         next_pos.setRow(next_pos.getRow() + 1);
@@ -203,6 +203,9 @@ Character::Character(int index, const Position & init_pos, Map * map, const stri
     this->name = name;
 };
 Character::~Character(){};
+Position Character::getCurrentPosition() const{
+    return this->pos;
+};
 Position Character::getNextPosition() {
     return Position::npos;
 };
@@ -239,6 +242,9 @@ Sherlock::Sherlock(int index, const string & moving_rule, const Position & init_
 };
 Sherlock::~Sherlock(){
     delete sherlockBag;
+};
+Position Sherlock::getCurrentPosition() const{
+    return this->pos;
 };
 Position Sherlock::getNextPosition() {
     Position next_pos = pos;
@@ -388,6 +394,9 @@ Watson::Watson(int index, const string & moving_rule, const Position & init_pos,
 Watson::~Watson(){
     delete watsonBag;
 };
+Position Watson::getCurrentPosition() const {
+    return this->pos;
+};
 Position Watson::getNextPosition() {
     Position next_pos = pos;
     if(moving_rule.length() == 0) return Position::npos;
@@ -527,6 +536,9 @@ Criminal::Criminal(int index, const Position & init_pos, Map * map, Sherlock * s
 Criminal::~Criminal(){};
 Position Criminal::getPreviousPosition() const {
     return previous_pos;
+};
+Position Criminal::getCurrentPosition() const {
+    return this->pos;
 };
 Position Criminal::getNextPosition() {
     Position next_pos = pos;

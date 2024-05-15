@@ -131,7 +131,7 @@ public:
     MovingObject(int index, const Position pos, Map * map, const string & name="");
     virtual ~MovingObject();
     virtual Position getNextPosition() = 0;
-    Position getCurrentPosition() const;
+    virtual Position getCurrentPosition() const;
     virtual void move() = 0;
     virtual string str() const = 0;
     virtual int getExp() const;
@@ -143,6 +143,7 @@ class Character : public MovingObject {
 public:
     Character(int index, const Position &pos, Map* map, const string &name="");
     ~Character();
+    virtual Position getCurrentPosition() const;
     virtual Position getNextPosition() = 0;
     virtual void move() = 0;
     virtual string str() const = 0;
@@ -166,6 +167,7 @@ private:
 public:
     Sherlock(int index, const string & moving_rule, const Position & init_pos, Map * map, int init_hp, int init_exp);
     ~Sherlock();
+    Position getCurrentPosition() const;
     Position getNextPosition();
     void move();
     MovingObjectType getObjectType() const;
@@ -194,6 +196,7 @@ private:
 public:
     Watson(int index, const string & moving_rule, const Position & init_pos, Map * map, int init_hp, int init_exp);
     ~Watson();
+    Position getCurrentPosition() const;
     Position getNextPosition();
     void move();
     MovingObjectType getObjectType() const;
@@ -221,6 +224,7 @@ public:
     Criminal(int index, const Position & init_pos, Map * map, Sherlock * sherlock, Watson * watson);
     ~Criminal();
     Position getPreviousPosition() const;
+    Position getCurrentPosition() const;
     Position getNextPosition();
     void move();
     MovingObjectType getObjectType() const;

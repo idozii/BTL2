@@ -563,7 +563,7 @@ MovingObjectType Criminal::getObjectType() const{
 string Criminal::str() const {
     return "Criminal[index="+to_string(index)+";pos="+pos.str()+"]";
 };
-int Criminal::getCount(){
+int Criminal::getCount() const {
     return this->moveCount;
 };
 bool Criminal::isCreatedRobotNext(){

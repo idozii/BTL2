@@ -225,7 +225,7 @@ public:
     void move();
     MovingObjectType getObjectType() const;
     string str() const;
-    int getCount();
+    int getCount() const;
     bool isCreatedRobotNext();
 };
 

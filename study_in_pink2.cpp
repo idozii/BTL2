@@ -164,7 +164,7 @@ MovingObject::MovingObject(int index, const Position pos, Map * map, const strin
 MovingObject::~MovingObject(){};
 Position MovingObject::getNextPosition() {
     Position next_pos = pos;
-    if(this->map->isValid(this->pos, this)){
+    if(this->map != NULL && this->map->isValid(this->pos, this)){
         next_pos.setRow(next_pos.getRow() + 1);
         next_pos.setCol(next_pos.getCol() + 1);
     }
@@ -240,7 +240,10 @@ Sherlock::Sherlock(int index, const string & moving_rule, const Position & init_
     sherlockBag = new SherlockBag(this);
 };
 Sherlock::~Sherlock(){
-    delete sherlockBag;
+    if (sherlockBag != NULL) {
+        delete sherlockBag;
+        sherlockBag = NULL;
+    }
 };
 Position Sherlock::getCurrentPosition() const{
     return this->pos;
@@ -264,7 +267,7 @@ Position Sherlock::getNextPosition() {
     if (index_moving_rule == moving_rule.length()){
         index_moving_rule = 0;
     }
-    if (map->isValid(next_pos, this)) return next_pos;
+    if (map != NULL && map->isValid(next_pos, this)) return next_pos;
     else return Position::npos;
 };
 void Sherlock::move(){
@@ -391,7 +394,10 @@ Watson::Watson(int index, const string & moving_rule, const Position & init_pos,
     watsonBag = new WatsonBag(this);
 };
 Watson::~Watson(){
-    delete watsonBag;
+    if(watsonBag != NULL){
+        delete watsonBag;
+        watsonBag = NULL;
+    }
 };
 Position Watson::getCurrentPosition() const {
     return this->pos;
@@ -415,7 +421,7 @@ Position Watson::getNextPosition() {
     if (index_moving_rule == moving_rule.length()){
         index_moving_rule = 0;
     }
-    if (map->isValid(next_pos, this)) return next_pos;
+    if (map != NULL && map->isValid(next_pos, this)) return next_pos;
     else return Position::npos;
 };
 void Watson::move(){
@@ -549,14 +555,16 @@ Position Criminal::getNextPosition() {
     arr[2] = Position(pos.getRow() + 1, pos.getCol());
     arr[3] = Position(pos.getRow(), pos.getCol() + 1);
     for (int i = 0; i < 4; i++){
-        if (map->isValid(arr[i], this)){
-            int distance = abs(arr[i].getRow() - sherlock->getCurrentPosition().getRow()) + abs(arr[i].getCol() - sherlock->getCurrentPosition().getCol()) + abs(arr[i].getRow() - watson->getCurrentPosition().getRow()) + abs(arr[i].getCol() - watson->getCurrentPosition().getCol());
-            if (distance > max_distance){
-                max_distance = distance;
-                next_pos = arr[i];
-            }
-            else if (distance == max_distance){
-                continue;
+        if (map != NULL && map->isValid(arr[i], this)){
+            if(sherlock != NULL && watson != NULL) {
+                int distance = abs(arr[i].getRow() - sherlock->getCurrentPosition().getRow()) + abs(arr[i].getCol() - sherlock->getCurrentPosition().getCol()) + abs(arr[i].getRow() - watson->getCurrentPosition().getRow()) + abs(arr[i].getCol() - watson->getCurrentPosition().getCol());
+                if (distance > max_distance){
+                    max_distance = distance;
+                    next_pos = arr[i];
+                }
+                else if (distance == max_distance){
+                    continue;
+                }
             }
         }
     }
@@ -1556,8 +1564,8 @@ void StudyPinkProgram::run(bool verbose){
 };
 
 
-//TODO: passing card, fight
-//TODO: check testcase 1
+//TODO: passing card
+//TODO: segfault fixing
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

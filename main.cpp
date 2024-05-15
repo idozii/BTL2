@@ -106,8 +106,8 @@ public:
 };
 
 int main(int argc, const char * argv[]) {
-    //TestStudyInPink::satc_01();
-    TestStudyInPink::satc_02();
+    TestStudyInPink::satc_01();
+    //TestStudyInPink::satc_02();
     //TestStudyInPink::satc_03();
     return 0;
 }

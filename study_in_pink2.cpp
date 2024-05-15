@@ -93,6 +93,12 @@ Map::Map(int num_rows, int num_cols, int num_walls, Position *array_walls, int n
     }
 };
 Map::~Map(){
+    for (int i = 0; i < num_rows; i++){
+        for (int j = 0; j < num_cols; j++){
+            delete map[i][j];
+        }
+        delete[] map[i];
+    }
     delete[] map;
 };
 int Map::getNumRows() const{

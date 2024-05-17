@@ -1509,13 +1509,11 @@ StudyPinkProgram::StudyPinkProgram(const string &config_file_path){
     arr_mv_objs->add(criminal);
 };
 StudyPinkProgram::~StudyPinkProgram(){
-    delete[] map;
-    delete[] arr_mv_objs;
-    delete[] config->arr_walls;
-    delete[] config->arr_fake_walls;
-    delete[] sherlock;
-    delete[] watson;
-    delete[] criminal;
+    delete map;
+    delete arr_mv_objs;
+    delete sherlock;
+    delete watson;
+    delete criminal;
 };
 bool StudyPinkProgram::isStop() const{
     if(sherlock->getHp() == 0 || watson->getHp() == 0 || sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition()) || watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())){

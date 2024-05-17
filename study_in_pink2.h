@@ -129,7 +129,6 @@ protected:
     
 public:
     MovingObject(int index, const Position pos, Map * map, const string & name="");
-    virtual ~MovingObject();
     virtual Position getNextPosition() = 0;
     virtual Position getCurrentPosition() const;
     virtual void move() = 0;
@@ -142,7 +141,6 @@ public:
 class Character : public MovingObject {
 public:
     Character(int index, const Position &pos, Map* map, const string &name="");
-    ~Character();
     virtual Position getCurrentPosition() const;
     virtual Position getNextPosition() = 0;
     virtual void move() = 0;
@@ -166,7 +164,6 @@ private:
 
 public:
     Sherlock(int index, const string & moving_rule, const Position & init_pos, Map * map, int init_hp, int init_exp);
-    ~Sherlock();
     Position getCurrentPosition() const;
     Position getNextPosition();
     void move();
@@ -195,7 +192,6 @@ private:
 
 public:
     Watson(int index, const string & moving_rule, const Position & init_pos, Map * map, int init_hp, int init_exp);
-    ~Watson();
     Position getCurrentPosition() const;
     Position getNextPosition();
     void move();
@@ -222,7 +218,6 @@ private:
     
 public:
     Criminal(int index, const Position & init_pos, Map * map, Sherlock * sherlock, Watson * watson);
-    ~Criminal();
     Position getPreviousPosition() const;
     Position getCurrentPosition() const;
     Position getNextPosition();

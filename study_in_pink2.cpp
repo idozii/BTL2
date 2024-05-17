@@ -72,13 +72,11 @@ Map::Map(int num_rows, int num_cols, int num_walls, Position *array_walls, int n
             map[i][j] = new Path();
             for (int k = 0; k < num_walls; k++){
                 if (array_walls[k].getRow() == i && array_walls[k].getCol() == j){
-                    delete map[i][j];
                     map[i][j] = new Wall();
                 }
             }
             for (int k = 0; k < num_fake_walls; k++){
                 if (array_fake_walls[k].getRow() == i && array_fake_walls[k].getCol() == j){
-                    delete map[i][j];
                     map[i][j] = new FakeWall((i * 257 + j * 139 + 89) % 900 + 1);
                 }
             }
@@ -93,6 +91,12 @@ Map::Map(int num_rows, int num_cols, int num_walls, Position *array_walls, int n
     }
 };
 Map::~Map(){
+    for (int i = 0; i < num_rows; i++){
+        for (int j = 0; j < num_cols; j++){
+            delete map[i][j];
+        }
+        delete[] map[i];
+    }
     delete[] map;
 };
 int Map::getNumRows() const{
@@ -161,7 +165,6 @@ MovingObject::MovingObject(int index, const Position pos, Map * map, const strin
     this->map = map;
     this->name = name;
 };
-MovingObject::~MovingObject(){};
 Position MovingObject::getNextPosition() {
     Position next_pos = pos;
     if(this->map != NULL && this->map->isValid(this->pos, this)){
@@ -201,7 +204,6 @@ Character::Character(int index, const Position & init_pos, Map * map, const stri
     this->map = map;
     this->name = name;
 };
-Character::~Character(){};
 Position Character::getCurrentPosition() const{
     return this->pos;
 };
@@ -238,12 +240,6 @@ Sherlock::Sherlock(int index, const string & moving_rule, const Position & init_
     this->exp = init_exp;
     this->moving_rule = moving_rule;
     sherlockBag = new SherlockBag(this);
-};
-Sherlock::~Sherlock(){
-    if (sherlockBag != NULL) {
-        delete sherlockBag;
-        sherlockBag = NULL;
-    }
 };
 Position Sherlock::getCurrentPosition() const{
     return this->pos;
@@ -393,12 +389,6 @@ Watson::Watson(int index, const string & moving_rule, const Position & init_pos,
     this->moving_rule = moving_rule;
     watsonBag = new WatsonBag(this);
 };
-Watson::~Watson(){
-    if(watsonBag != NULL){
-        delete watsonBag;
-        watsonBag = NULL;
-    }
-};
 Position Watson::getCurrentPosition() const {
     return this->pos;
 };
@@ -538,7 +528,6 @@ Criminal::Criminal(int index, const Position & init_pos, Map * map, Sherlock * s
     this->sherlock = sherlock;
     this->watson = watson;
 };
-Criminal::~Criminal(){};
 Position Criminal::getPreviousPosition() const {
     return previous_pos;
 };
@@ -600,12 +589,10 @@ ArrayMovingObject::ArrayMovingObject(int capacity){
     }
 };
 ArrayMovingObject::~ArrayMovingObject(){
-    for(int i = 0; i < capacity; i++){
-        if(arr_mv_objs[i]!=NULL){
-            delete arr_mv_objs[i];
-        }
+    if(arr_mv_objs!=NULL){
+        delete arr_mv_objs;
+        arr_mv_objs = NULL;
     }
-    delete[] arr_mv_objs;
 };
 bool ArrayMovingObject::isFull() const {
     if(count==capacity) return true;
@@ -1565,7 +1552,6 @@ void StudyPinkProgram::run(bool verbose){
 
 
 //TODO: passing card
-//TODO: segfault fixing
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

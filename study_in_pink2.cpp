@@ -1547,8 +1547,6 @@ void StudyPinkProgram::run(bool verbose){
         }
     }
 };
-
-
 //TODO: passing card
 
 ////////////////////////////////////////////////

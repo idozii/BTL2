@@ -44,7 +44,7 @@ class Node;
 
 class TestStudyInPink;
 
-enum MovingObjectType{ SHERLOCK, WATSON, CRIMINAL, ROBOT };
+enum Type{ SHERLOCK, WATSON, CRIMINAL, ROBOT };
 enum ItemType { MAGIC_BOOK, ENERGY_DRINK, FIRST_AID, EXEMPTION_CARD, PASSING_CARD };
 enum ElementType { PATH, WALL, FAKE_WALL };
 enum RobotType { C=0, S, W, SW };
@@ -141,7 +141,7 @@ public:
     virtual string str() const = 0;
     virtual int getExp() const;
     virtual int getHp() const;
-    virtual MovingObjectType getObjectType() const = 0;
+    virtual Type getObjectType() const = 0;
 };
 
 class Character : public MovingObject {
@@ -156,7 +156,7 @@ public:
     virtual int getExp() const;
     virtual void setHp(int init_hp);
     virtual void setExp(int init_exp);
-    virtual MovingObjectType getObjectType() const = 0;
+    virtual Type getObjectType() const = 0;
 };
 
 class Sherlock : public Character {
@@ -175,7 +175,7 @@ public:
     ~Sherlock();
     Position getNextPosition();
     void move();
-    MovingObjectType getObjectType() const;
+    Type getObjectType() const;
     BaseBag* getSherlockBag() const;
     string str() const;
     int getHp() const;
@@ -206,7 +206,7 @@ public:
     ~Watson();
     Position getNextPosition();
     void move();
-    MovingObjectType getObjectType() const;
+    Type getObjectType() const;
     BaseBag* getWatsonBag() const;
     string str() const;
     int getExp() const;
@@ -233,7 +233,7 @@ public:
     Criminal(int index, const Position & init_pos, Map * map, Sherlock * sherlock, Watson * watson);
     Position getNextPosition();
     void move();
-    MovingObjectType getObjectType() const;
+    Type getObjectType() const;
     string str() const;
     int getCount() const;
     bool isCreatedRobotNext() const;
@@ -434,7 +434,7 @@ protected:
 public:
     Robot(int index , const Position &pos , Map * map , Criminal* criminal, const string &name = "");
     ~Robot();
-    MovingObjectType getObjectType() const;
+    Type getObjectType() const;
     static Robot* create(int index, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson);
     virtual Position getNextPosition() = 0;
     virtual void move() = 0;

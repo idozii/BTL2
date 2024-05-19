@@ -233,8 +233,8 @@ void Sherlock::move(){
     if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;    
 };
-MovingObjectType Sherlock::getObjectType()const{
-    return MovingObjectType::SHERLOCK;
+Type Sherlock::getObjectType()const{
+    return Type::SHERLOCK;
 };
 BaseBag* Sherlock::getSherlockBag() const{
     return sherlockBag;
@@ -389,8 +389,8 @@ void Watson::move(){
     if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;
 };
-MovingObjectType Watson::getObjectType() const {
-    return MovingObjectType::WATSON;
+Type Watson::getObjectType() const {
+    return Type::WATSON;
 };
 BaseBag* Watson::getWatsonBag() const{
     return watsonBag;
@@ -537,8 +537,8 @@ void Criminal::move(){
     pos = next_pos;
     count++;
 };
-MovingObjectType Criminal::getObjectType() const{
-    return MovingObjectType::CRIMINAL;
+Type Criminal::getObjectType() const{
+    return Type::CRIMINAL;
 }
 string Criminal::str() const {
     return "Criminal[index="+to_string(index)+";pos="+pos.str()+"]";
@@ -799,8 +799,8 @@ Robot* Robot::create(int index, Map* map, Criminal* criminal, Sherlock* sherlock
     }
     else return NULL;
 };
-MovingObjectType Robot::getObjectType() const{
-    return MovingObjectType::ROBOT;
+Type Robot::getObjectType() const{
+    return Type::ROBOT;
 };
 RobotType Robot::getType(){
     return robot_type;
@@ -1496,7 +1496,7 @@ void StudyPinkProgram::run(bool verbose){
         for (int i = 0; i < arr_mv_objs->size(); ++i)
         {
             Robot *robot = nullptr;
-            if (arr_mv_objs->get(i)->getObjectType() == MovingObjectType::CRIMINAL)
+            if (arr_mv_objs->get(i)->getObjectType() == Type::CRIMINAL)
             {
                 robot = Robot::create(arr_mv_objs->size(), map, criminal, sherlock, watson);
             }

@@ -797,24 +797,10 @@ string Robot::str() const{
 //TODO: 3.10.1: ROBOTC
 RobotC::RobotC(int index, const Position & init_pos, Map* map, Criminal* criminal) 
       : Robot(index, init_pos, map, C, criminal, "RobotC"){
-    nextPosition = criminal->getNextPosition();
+    nextPosition = criminal->getCurrentPosition();
 };
 Position RobotC::getNextPosition() {
-    Position next_pos = pos;
-    if (nextPosition.isEqual(Position::npos)) return next_pos;
-    if (nextPosition.getRow() == pos.getRow() - 1){
-        next_pos.setRow(next_pos.getRow() + 1);
-    }
-    else if (nextPosition.getCol() == pos.getCol() - 1){
-        next_pos.setCol(next_pos.getCol() + 1);
-    }
-    else if (nextPosition.getRow() == pos.getRow() + 1){
-        next_pos.setRow(next_pos.getRow() - 1);
-    }
-    else if (nextPosition.getCol() == pos.getCol() + 1){
-        next_pos.setCol(next_pos.getCol() - 1);
-    }
-    return next_pos;
+    return nextPosition;
 };
 void RobotC::move(){
     Position next_pos = getNextPosition();

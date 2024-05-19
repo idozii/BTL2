@@ -150,6 +150,10 @@ bool Position::isEqual(Position pos) const{
     if(r == pos.getRow() && c == pos.getCol()) return true;
     return false;
 };
+bool Position::isEqual(int in_r, int in_c) const{
+    if(r == in_r && c == in_c) return true;
+    return false;
+};
 
 //TODO: 3.4: MOVING OBJECT
 MovingObject::MovingObject(int index, const Position pos, Map * map, const string & name){
@@ -158,6 +162,7 @@ MovingObject::MovingObject(int index, const Position pos, Map * map, const strin
     this->map = map;
     this->name = name;
 };
+MovingObject::~MovingObject(){};
 Position MovingObject::getCurrentPosition() const{
     return this->pos;
 };
@@ -192,12 +197,15 @@ void Character::setHp(int init_hp) {
 //TODO: 3.5.2: SHERLOCK
 Sherlock::Sherlock(int index, const string & moving_rule, const Position & init_pos, Map * map, int init_hp, int init_exp) 
         : Character(index, init_pos, map, "Sherlock"){
-    this->HP = init_hp;
-    this->EXP = init_exp;
+    this->hp = init_hp;
+    this->exp = init_exp;
     this->index_moving_rule = 0;
     this->moving_rule = moving_rule;
     sherlockBag = new SherlockBag(this);
 }; 
+Sherlock::~Sherlock(){
+    delete sherlockBag;
+};
 Position Sherlock::getNextPosition() {
     Position next_pos = pos;
     if(moving_rule.length() == 0) return Position::npos;
@@ -228,6 +236,9 @@ void Sherlock::move(){
 MovingObjectType Sherlock::getObjectType()const{
     return MovingObjectType::SHERLOCK;
 };
+BaseBag* Sherlock::getSherlockBag() const{
+    return sherlockBag;
+};
 string Sherlock::str() const {
     return "Sherlock[index="+to_string(index)+";pos="+pos.str()+";moving_rule="+moving_rule+"]";
 };
@@ -246,6 +257,9 @@ void Sherlock::setHp(int hp) {
     if(hp < 0) this->hp = 0;
     else if(hp > 500) this->hp = 500;
     else this->hp = hp;
+};
+void Sherlock::setPos(Position pos){
+    this->pos = pos;
 };
 bool Sherlock::meet(RobotS* robotS){
     if(pos.isEqual(robotS->getCurrentPosition())) {
@@ -345,6 +359,9 @@ Watson::Watson(int index, const string & moving_rule, const Position & init_pos,
     this->moving_rule = moving_rule;
     watsonBag = new WatsonBag(this);
 };
+Watson::~Watson(){
+    delete watsonBag;
+};
 Position Watson::getNextPosition() {
     Position next_pos = pos;
     if(moving_rule.length() == 0) return Position::npos;
@@ -374,6 +391,9 @@ void Watson::move(){
 };
 MovingObjectType Watson::getObjectType() const {
     return MovingObjectType::WATSON;
+};
+BaseBag* Watson::getWatsonBag() const{
+    return watsonBag;
 };
 string Watson::str() const {
     return "Watson[index="+to_string(index)+";pos="+pos.str()+";moving_rule="+moving_rule+"]";
@@ -483,8 +503,12 @@ Criminal::Criminal(int index, const Position & init_pos, Map * map, Sherlock * s
     this->watson = watson;
     this->count = 0;
 };
+Position Criminal::getPrevPos() const{
+    return this->prev_pos;
+};
 Position Criminal::getNextPosition() {
     Position next_pos = pos;
+    prev_pos = pos;
     int max_distance = -1;
     Position arr[4];
     arr[0] = Position(pos.getRow() - 1, pos.getCol());
@@ -546,13 +570,6 @@ bool ArrayMovingObject::isFull() const {
     if(count==capacity) return true;
     return false;
 };
-void ArrayMovingObject::remove(int index){
-    if(arr_mv_objs != NULL && index >= 0 && index < capacity && arr_mv_objs[index]!=NULL){
-        delete arr_mv_objs[index];
-        arr_mv_objs[index] = NULL;
-        count--;
-    }
-};
 bool ArrayMovingObject::add(MovingObject* mv_obj){
     if(arr_mv_objs != NULL && !isFull()) {
         for(int i = 0; i < capacity; i++){
@@ -584,7 +601,7 @@ string ArrayMovingObject::str() const{
     arraymovingobject += ']';
     return arraymovingobject;
 };
-bool ArrayMovingObject::checkMeet(int index){
+bool ArrayMovingObject::checkMeet(int index) const {
     if(arr_mv_objs[index]->getObjectType() == SHERLOCK){
         if(arr_mv_objs[index]->getCurrentPosition().isEqual(arr_mv_objs[index]->getNextPosition())){
             return true;
@@ -763,10 +780,10 @@ string Configuration::str() const{
 };
 
 //TODO: 3.10: ROBOT
-Robot::Robot(int index , const Position pos , Map * map , RobotType robot_type, Criminal* criminal, const string &name) : MovingObject(index, pos, map, "Robot"){
-    this->robot_type = robot_type;
+Robot::Robot(int index , const Position &pos , Map * map , Criminal* criminal, const string &name) : MovingObject(index, pos, map, "Robot"){
     this->criminal = criminal;
 };
+Robot::~Robot(){};
 Robot* Robot::create(int index, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson){
     if(criminal->isCreatedRobotNext()){
         return new RobotC(index, criminal->getCurrentPosition(), map, criminal);
@@ -785,7 +802,7 @@ Robot* Robot::create(int index, Map* map, Criminal* criminal, Sherlock* sherlock
 MovingObjectType Robot::getObjectType() const{
     return MovingObjectType::ROBOT;
 };
-RobotType Robot::getType() const {
+RobotType Robot::getType(){
     return robot_type;
 };
 int Robot::getDistance() const{
@@ -794,13 +811,16 @@ int Robot::getDistance() const{
 string Robot::str() const{
     return "Robot[pos="+pos.str()+";type="+to_string(robot_type)+";dist="+to_string(getDistance())+"]";
 };
+BaseItem* Robot::NewItem(){
+    return NULL;
+};
+
 //TODO: 3.10.1: ROBOTC
 RobotC::RobotC(int index, const Position & init_pos, Map* map, Criminal* criminal) 
-      : Robot(index, init_pos, map, C, criminal, "RobotC"){
-    nextPosition = criminal->getCurrentPosition();
+      : Robot(index, init_pos, map, criminal, "RobotC"){
 };
 Position RobotC::getNextPosition() {
-    return nextPosition;
+    return criminal->getPrevPos();
 };
 void RobotC::move(){
     Position next_pos = getNextPosition();
@@ -819,12 +839,10 @@ int RobotC::getDistance(Watson* watson){
 string RobotC::str() const{
     return "Robot[pos="+pos.str()+";type=C;dist="+""+"]";
 };
-int RobotC::getDistance() const{
-    return distance(pos, criminal->getCurrentPosition());
-};
 
 //TODO:3.10.2: ROBOT S
-RobotS::RobotS(int index, const Position & init_pos, Map* map, Criminal* criminal, Sherlock* sherlock) : Robot(index, pos, map, S, criminal, "RobotS"){
+RobotS::RobotS(int index, const Position & init_pos, Map* map, Criminal* criminal, Sherlock* sherlock) 
+      : Robot(index, pos, map, criminal, "RobotS"){
     this->robot_type = S;
     this->pos = init_pos;
     this->criminal = criminal;
@@ -869,7 +887,8 @@ string RobotS::str() const{
 };
 
 //TODO:3.10.3: ROBOT W
-RobotW::RobotW(int index, const Position & init_pos, Map* map, Criminal* criminal, Watson* watson) : Robot(index, pos, map, W, criminal, "RobotW"){
+RobotW::RobotW(int index, const Position & init_pos, Map* map, Criminal* criminal, Watson* watson) 
+      : Robot(index, pos, map, criminal, "RobotW"){
     this->robot_type = W;
     this->pos = init_pos;
     this->criminal = criminal;
@@ -915,7 +934,7 @@ string RobotW::str() const{
 
 //TODO:3.10.4: ROBOT SW
 RobotSW::RobotSW(int index, const Position & init_pos, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson) 
-       : Robot(index, pos, map, SW, criminal, "RobotSW"){
+       : Robot(index, pos, map, criminal, "RobotSW"){
     this->robot_type = SW;
     this->pos = init_pos;
     this->criminal = criminal;
@@ -961,6 +980,7 @@ string RobotSW::str() const{
 };
 
 //TODO: 3.11: BASE ITEM
+BaseItem::BaseItem(){};
 BaseItem::~BaseItem(){};
 
 //TODO: 3.11.1: MAGIC BOOK
@@ -1475,7 +1495,7 @@ void StudyPinkProgram::run(bool verbose){
     {
         for (int i = 0; i < arr_mv_objs->size(); ++i)
         {
-            MovingObject *robot = nullptr;
+            Robot *robot = nullptr;
             if (arr_mv_objs->get(i)->getObjectType() == MovingObjectType::CRIMINAL)
             {
                 robot = Robot::create(arr_mv_objs->size(), map, criminal, sherlock, watson);
@@ -1485,6 +1505,7 @@ void StudyPinkProgram::run(bool verbose){
             {
                 if (criminal->isCreatedRobotNext())
                 {
+
                     arr_mv_objs->add(robot);
                 }
                 else

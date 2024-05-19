@@ -64,14 +64,12 @@ class Path : public MapElement {
     friend class TestStudyInPink;
 public:
     Path();
-    ElementType getType() const override;
 };
 
 class Wall : public MapElement {
     friend class TestStudyInPink;
 public:
     Wall();
-    ElementType getType() const override;
 };
 
 class FakeWall : public MapElement {
@@ -82,7 +80,6 @@ private:
 public:
     FakeWall(int in_req_exp);
     int getReqExp() const;
-    ElementType getType() const override;
 };
 
 class Map {
@@ -96,7 +93,7 @@ public:
     ~Map();
     int getNumRows() const;
     int getNumCols() const;
-    ElementType getElementType(const Position &pos) const;
+    ElementType getElementType(Position pos) const;
     bool isValid(const Position &pos, MovingObject *mv_obj) const;
 };
 
@@ -114,7 +111,7 @@ public:
     void setRow(int r);
     void setCol(int c);
     string str() const;
-    bool isEqual(const Position &pos) const;
+    bool isEqual(Position pos) const;
 };
 
 class MovingObject {
@@ -129,9 +126,8 @@ protected:
     
 public:
     MovingObject(int index, const Position pos, Map * map, const string & name="");
-    virtual ~MovingObject();
     virtual Position getNextPosition() = 0;
-    virtual Position getCurrentPosition() const;
+    Position getCurrentPosition() const;
     virtual void move() = 0;
     virtual string str() const = 0;
     virtual int getExp() const;
@@ -142,15 +138,13 @@ public:
 class Character : public MovingObject {
 public:
     Character(int index, const Position &pos, Map* map, const string &name="");
-    ~Character();
-    virtual Position getCurrentPosition() const;
     virtual Position getNextPosition() = 0;
     virtual void move() = 0;
     virtual string str() const = 0;
     virtual int getHp() const;
     virtual int getExp() const;
-    virtual int setHp(int init_hp);
-    virtual int setExp(int init_exp);
+    virtual void setHp(int init_hp);
+    virtual void setExp(int init_exp);
     virtual MovingObjectType getObjectType() const = 0;
 };
 
@@ -159,23 +153,21 @@ class Sherlock : public Character {
 private:
     string moving_rule;
     int index_moving_rule;
-    int hp;
-    int exp;
+    int HP;
+    int EXP;
     BaseBag* sherlockBag;
     BaseBag* watsonBag;
 
 public:
     Sherlock(int index, const string & moving_rule, const Position & init_pos, Map * map, int init_hp, int init_exp);
-    ~Sherlock();
-    Position getCurrentPosition() const;
-    Position getNextPosition();
+    Position getNextPosition() override;
     void move();
-    MovingObjectType getObjectType() const;
+    MovingObjectType getObjectType() const override;
     string str() const;
     int getHp() const;
     int getExp() const;
-    int setHp(int init_hp);
-    int setExp(int init_exp);
+    void setHp(int hp);
+    void setExp(int exp);
     bool meet(RobotS* robotS);
     bool meet(RobotW* robotW);
     bool meet(RobotSW* robotSW);
@@ -188,23 +180,21 @@ class Watson : public Character {
 private:
     string moving_rule;
     int index_moving_rule;
-    int hp;
-    int exp;
+    int HP;
+    int EXP;
     BaseBag* watsonBag;
     BaseBag* sherlockBag;
 
 public:
     Watson(int index, const string & moving_rule, const Position & init_pos, Map * map, int init_hp, int init_exp);
-    ~Watson();
-    Position getCurrentPosition() const;
-    Position getNextPosition();
+    Position getNextPosition() override;
     void move();
-    MovingObjectType getObjectType() const;
+    MovingObjectType getObjectType() const override;
     string str() const;
     int getExp() const;
     int getHp() const;
-    int setHp(int init_hp);
-    int setExp(int init_exp);
+    void setHp(int hp);
+    void setExp(int exp);
     bool meet(Sherlock* sherlock);
     bool meet(RobotS* robotS);
     bool meet(RobotW* robotW);
@@ -217,20 +207,16 @@ class Criminal : public Character {
 private:
     Sherlock* sherlock;
     Watson* watson;
-    int moveCount = 0;
-    Position previous_pos;
+    int count;
     
 public:
     Criminal(int index, const Position & init_pos, Map * map, Sherlock * sherlock, Watson * watson);
-    ~Criminal();
-    Position getPreviousPosition() const;
-    Position getCurrentPosition() const;
-    Position getNextPosition();
+    Position getNextPosition() override;
     void move();
-    MovingObjectType getObjectType() const;
+    MovingObjectType getObjectType() const override;
     string str() const;
     int getCount() const;
-    bool isCreatedRobotNext();
+    bool isCreatedRobotNext() const;
 };
 
 class ArrayMovingObject {
@@ -419,78 +405,66 @@ public:
     virtual void move() = 0;
     virtual string str() const = 0;
     virtual RobotType getType() const = 0;
-    virtual int getDistance() const;
+    virtual int getDistance() const = 0;
 };
 
 class RobotC : public Robot {
     friend class TestStudyInPink;
 private:
-    Criminal* criminal;
-    Sherlock* sherlock;
-    Watson* watson;
-    RobotType robot_type;
-    BaseItem* item;
+    Position nextPosition;
 
 public:
     RobotC ( int index , const Position & init_pos , Map * map , Criminal * criminal);
-    Position getNextPosition();
+    Position getNextPosition() override;
     void move();
-    RobotType getType() const;
-    int getDistance(Sherlock* sherlock) const;
-    int getDistance(Watson* watson) const;
-    string str() const;
+    RobotType getType() const override;
+    int getDistance(Sherlock* sherlock);
+    int getDistance(Watson* watson);
+    int getDistance() const override;
+    string str() const override;
 
 };
 
 class RobotS : public Robot {
     friend class TestStudyInPink;
 private:
-    Criminal* criminal;
     Sherlock* sherlock;
-    RobotType robot_type;
-    BaseItem* item;
 
 public:
     RobotS ( int index , const Position & init_pos , Map * map , Criminal * criminal , Sherlock * Sherlock);
-    Position getNextPosition();
-    void move();
-    RobotType getType() const;
-    int getDistance() const;
-    string str() const;
+    Position getNextPosition() override;
+    void move() override;
+    RobotType getType() const override;
+    int getDistance() const override;
+    string str() const override;
 };
 
 class RobotW : public Robot {
     friend class TestStudyInPink;
 private:
-    RobotType robot_type;
-    Criminal* criminal;
     Watson* watson;
-    BaseItem* item;
 
 public:
     RobotW ( int index , const Position & init_pos , Map * map , Criminal * criminal , Watson * watson);
-    Position getNextPosition();
-    void move();
-    RobotType getType() const;
-    int getDistance() const;
-    string str() const;
+    Position getNextPosition() override;
+    void move() override;
+    RobotType getType() const override;
+    int getDistance() const override;
+    string str() const override;
 };
 
 class RobotSW : public Robot {
     friend class TestStudyInPink;
 private:
-    RobotType robot_type;
-    Criminal* criminal;
     Sherlock* sherlock;
     Watson* watson;
-    BaseItem* item;
 
 public:
     RobotSW ( int index , const Position & init_pos , Map * map , Criminal * criminal , Sherlock * sherlock , Watson* watson);
-    Position getNextPosition();
-    void move();
-    RobotType getType() const;
-    int getDistance() const;
+    Position getNextPosition() override;
+    void move() override;
+    RobotType getType() const override;
+    int getDistance() const override;
     string str() const;
 };
 
@@ -510,8 +484,24 @@ public:
     StudyPinkProgram(const string & config_file_path);
     ~StudyPinkProgram();
     bool isStop() const;
-    void printResult() const;
-    void printStep(int si) const;
+    void printResult() const {
+        if (sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition())) {
+            cout << "Sherlock caught the criminal" << endl;
+        }
+        else if (watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())) {
+            cout << "Watson caught the criminal" << endl;
+        }
+        else {
+            cout << "The criminal escaped" << endl;
+        }
+    }
+
+    void printStep(int si) const {
+        cout << "Step: " << setw(4) << setfill('0') << si
+            << "--"
+            << sherlock->str() << "--|--" << watson->str() << "--|--" << criminal->str() << endl;
+    }
+
     void run(bool verbose);
 };
 

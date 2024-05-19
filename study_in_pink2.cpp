@@ -996,7 +996,7 @@ void MagicBook::use(Character *obj, Robot *robot){
     }
 };
 ItemType MagicBook::getType() const{
-    return MAGIC_BOOK;
+    return ItemType::MAGIC_BOOK;
 };
 string MagicBook::str() const{
     return "MagicBook";
@@ -1015,7 +1015,7 @@ void EnergyDrink::use(Character *obj, Robot *robot){
     }
 };
 ItemType EnergyDrink::getType() const{
-    return ENERGY_DRINK;
+    return ItemType::ENERGY_DRINK;
 };
 string EnergyDrink::str() const{
     return "EnergyDrink";
@@ -1034,7 +1034,7 @@ void FirstAid::use(Character *obj, Robot *robot){
     }
 };
 ItemType FirstAid::getType() const{
-    return FIRST_AID;
+    return ItemType::FIRST_AID;
 };
 string FirstAid::str() const{
     return "FirstAid";
@@ -1054,7 +1054,7 @@ void ExemptionCard::use(Character *obj, Robot *robot){
     }
 };
 ItemType ExemptionCard::getType() const{
-    return EXEMPTION_CARD;
+    return ItemType::EXEMPTION_CARD;
 };
 string ExemptionCard::str() const{
     return "ExemptionCard";
@@ -1075,6 +1075,7 @@ PassingCard::PassingCard(int i, int j){
     else if(t==3){
         challenge == "all";
     }
+    else challenge == "none";
 };
 bool PassingCard::canUse(Character *obj, Robot *robot){
     if(obj->getObjectType() == WATSON && obj->getExp()%2==0 && robot!=nullptr){
@@ -1106,12 +1107,11 @@ void PassingCard::use(Character *obj, Robot *robot){
             obj->setExp(obj->getExp());
             obj->setHp(obj->getHp());
         }
-        else 
-            obj->setHp(obj->getHp()-50);
+        else obj->setHp(obj->getHp()-50);
     }
 };
 ItemType PassingCard::getType() const{
-    return PASSING_CARD;
+    return ItemType::PASSING_CARD;
 };
 string PassingCard::str() const{
     return "PassingCard";
@@ -1122,6 +1122,7 @@ BaseBag::BaseBag(int capacity){
     this->capacity = capacity;
     this->size = 0;
     head = nullptr;
+    obj = nullptr;
 };
 BaseBag::~BaseBag(){
     Node* temp = head;
@@ -1129,14 +1130,16 @@ BaseBag::~BaseBag(){
         head = head->next;
         delete temp;
         temp = head;
-    }    
+    }
+    delete obj;
+    obj = nullptr;
 };
 bool BaseBag::insert(BaseItem* item){
     if(item==NULL) return false;
     Node* temp = new Node(item);
     if(temp==NULL) return false;
     else {
-        if(size<=capacity){
+        if(size<capacity){
             temp->item = item;
             temp->next = head;
             head = temp;
@@ -1154,35 +1157,6 @@ BaseItem* BaseBag::get(){
         {
             current->next = head;
             head = current;
-            return current->item;
-        }
-        current = current->next;
-    }
-    return NULL;
-};
-BaseItem* BaseBag::get(int i){
-    Node *current = head;
-    int count = 0;
-    while (current != NULL)
-    {
-        if (current->item->canUse(NULL, NULL))
-        {
-            if (count == i)
-            {
-                return current->item;
-            }
-            count++;
-        }
-        current = current->next;
-    }
-    return NULL;
-};
-BaseItem* BaseBag::get(ItemType type){
-    Node *current = head;
-    while (current != NULL)
-    {
-        if (current->item->canUse(NULL, NULL) && current->item->getType() == type)
-        {
             return current->item;
         }
         current = current->next;
@@ -1235,7 +1209,8 @@ string BaseBag::str() const{
 };
 
 //TODO: 3.12.1: SHERLOCK BAG
-SherlockBag::SherlockBag(Sherlock* sherlock) : BaseBag(13){
+SherlockBag::SherlockBag(Sherlock* sherlock) 
+           : BaseBag(13){
     this->sherlock = sherlock;
 };
 SherlockBag::~SherlockBag(){
@@ -1350,7 +1325,8 @@ void SherlockBag::remove(ItemType type){
 };
 
 //TODO: 3.12.2: WATSON BAG
-WatsonBag::WatsonBag(Watson* watson) : BaseBag(15){
+WatsonBag::WatsonBag(Watson* watson) 
+         : BaseBag(15){
     this->watson = watson;
 };
 WatsonBag::~WatsonBag(){

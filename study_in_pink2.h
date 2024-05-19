@@ -377,7 +377,7 @@ public:
     BaseBag(int capacity);
     virtual ~BaseBag();
     virtual bool insert(BaseItem* item); 
-    virtual BaseItem* get();
+    virtual BaseItem* get() = 0;
     virtual BaseItem* get(int i) = 0;
     virtual BaseItem* get(ItemType type);
     virtual int getCount() const;

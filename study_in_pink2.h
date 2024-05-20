@@ -388,7 +388,6 @@ class SherlockBag : public BaseBag {
 
 private:
     Sherlock* sherlock;
-    int itemNumber;
 
 public:
     SherlockBag(Sherlock* sherlock);
@@ -400,7 +399,6 @@ class WatsonBag : public BaseBag {
 
 private:
     Watson* watson;
-    int itemNumber;
 
 public:
     WatsonBag(Watson* watson);

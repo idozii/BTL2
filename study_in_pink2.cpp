@@ -259,12 +259,13 @@ void Sherlock::setHp(int hp) {
     else this->hp = hp;
 };
 void Sherlock::setPos(Position pos){
-    this->pos = pos;
+    /*Sử dụng trong trường hợp thắng RobotC sẽ dịch chuyển đến vị trí Criminal*/
+
 };
 bool Sherlock::meet(RobotS* robotS){
-    if(pos.isEqual(robotS->getCurrentPosition())) {
-        if(exp > 400){
-            this->meet(robotS);
+    if (pos.isEqual(robotS->getCurrentPosition())) {
+        if (exp > 400){
+            sherlockBag->get(robotS->getItemType());
             delete robotS;
             return true;
         }
@@ -277,13 +278,13 @@ bool Sherlock::meet(RobotS* robotS){
 };
 bool Sherlock::meet(RobotC* robotC){
     if (pos.isEqual(robotC->getCurrentPosition())) {
-        this->meet(robotC);
         if (exp > 500){
+            sherlockBag->get(robotC->getItemType());
             delete robotC;
             return true;
         }
         else{
-            delete robotC;
+            exp = exp*0.9;
             return false;
         }
     }
@@ -291,14 +292,14 @@ bool Sherlock::meet(RobotC* robotC){
 };
 bool Sherlock::meet(RobotSW* robotSW){
     if (pos.isEqual(robotSW->getCurrentPosition())) {
-        this->meet(robotSW);
         if (exp > 300 && hp > 335){
+            sherlockBag->get(robotSW->getItemType());
             delete robotSW;
             return true;
         }
         else{
-            hp = hp*85/100;
-            exp = exp*85/100;
+            hp = hp*0.85;
+            exp = exp*0.85;
             return false;
         }
     }
@@ -306,14 +307,23 @@ bool Sherlock::meet(RobotSW* robotSW){
 };
 bool Sherlock::meet(RobotW* robotW){
     if (pos.isEqual(robotW->getCurrentPosition())) {
-        this->meet(robotW);
+        sherlockBag->get(robotW->getItemType());
         delete robotW;
         return true;
     }
     return false;
 };
 bool Sherlock::meet(Watson* watson){
-    
+    // TODO: Xử lý trao đổi thẻ ExcemptionCard
+    // TODO: KHI CẢ 2 ĐỀU CÓ THỂ TRAO ĐỔI && ĐỔI TOÀN BỘ NẾU NHIỀU HƠN 1 (KỂ CẢ KHI ĐỐI PHƯƠNG)
+    if(pos.isEqual(watson->getCurrentPosition())){
+        if(sherlockBag->get(EXEMPTION_CARD) > 0 && watson->getWatsonBag()->get(EXEMPTION_CARD) > 0){
+            sherlockBag->get(EXEMPTION_CARD);
+            watson->getWatsonBag()->remove(EXEMPTION_CARD);
+            return true;
+        }
+    }
+    return false;
 };
 
 //TODO: 3.6: WATSON
@@ -381,24 +391,25 @@ void Watson::setHp(int hp) {
     else this->hp = hp;
 };
 bool Watson::meet(RobotS* robotS){
-    if(distance(pos, robotS->getCurrentPosition()) == 1){
-        ;
+    if (pos.isEqual(robotS->getCurrentPosition())){
+        watsonBag->get(robotS->getItemType());
+        delete robotS;
         return true;
     }
-    else return false;
+    return false;
 };
 bool Watson::meet(RobotC* robotC){
-    if (distance(pos, robotC->getCurrentPosition()) == 1){
-        this->meet(robotC);
+    if (pos.isEqual(robotC->getCurrentPosition())){
+        watsonBag->get(robotC->getItemType());
         delete robotC;
         return true;
     }
-    else return false;
+    return false;
 };
 bool Watson::meet(RobotSW* robotSW){
-    if (distance(pos, robotSW->getCurrentPosition()) == 1){
-        this->meet(robotSW);
-        if (exp > 600 && hp > 165){
+    if (pos.isEqual(robotSW->getCurrentPosition())){
+        if(exp > 600 && hp > 165){
+            watsonBag->get(robotSW->getItemType());
             delete robotSW;
             return true;
         }
@@ -411,9 +422,9 @@ bool Watson::meet(RobotSW* robotSW){
     return false;
 };
 bool Watson::meet(RobotW* robotW){
-    if (distance(pos, robotW->getCurrentPosition()) == 1){
-        this->meet(robotW);
+    if (pos.isEqual(robotW->getCurrentPosition())){
         if (hp > 350){
+            watsonBag->get(robotW->getItemType());
             delete robotW;
             return true;
         }
@@ -425,7 +436,16 @@ bool Watson::meet(RobotW* robotW){
     return false;
 };
 bool Watson::meet(Sherlock* sherlock){
-    
+    // TODO: Xử lý trao đổi thẻ PassingCard
+    // TODO: KHI CẢ 2 ĐỀU CÓ THỂ TRAO ĐỔI && ĐỔI TOÀN BỘ NẾU NHIỀU HƠN 1 (KỂ CẢ KHI ĐỐI PHƯƠNG)
+    if(pos.isEqual(sherlock->getCurrentPosition())){
+        if(watsonBag->get(PASSING_CARD) > 0 && sherlock->getSherlockBag()->get(PASSING_CARD) > 0){
+            watsonBag->get(PASSING_CARD);
+            sherlock->getSherlockBag()->remove(PASSING_CARD);
+            return true;
+        }
+    }
+    return false;
 };
 
 //TODO: 3.7: CRIMINAL
@@ -533,32 +553,66 @@ string ArrayMovingObject::str() const{
     arraymovingobject += ']';
     return arraymovingobject;
 };
-bool ArrayMovingObject::checkMeet(int index) const {
-    if(arr_mv_objs[index]->getObjectType() == SHERLOCK){
-        if(arr_mv_objs[index]->getCurrentPosition().isEqual(arr_mv_objs[index]->getNextPosition())){
-            return true;
+bool ArrayMovingObject::checkMeet(int index) {
+    // TODO: Xét va chạm của nhân vật (theo index) với các nhân vật khác trong array
+    // TODO: Thực hiện xử lý các sự kiện xảy ra (thử thách, thêm item, bắt Criminal)
+    if(arr_mv_objs[index]->getObjectType() == Type::SHERLOCK){
+        for(int i = 0; i < count; i++){
+            if(arr_mv_objs[i]->getObjectType() == Type::CRIMINAL){
+                if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
+                    return true;
+                }
+            }
+            else if(arr_mv_objs[i]->getObjectType() == Type::ROBOT){
+                if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
+                    return true;
+                }
+            }
         }
-        else return false;
     }
-    else if(arr_mv_objs[index]->getObjectType() == WATSON){
-        if(arr_mv_objs[index]->getCurrentPosition().isEqual(arr_mv_objs[index]->getNextPosition())){
-            return true;
+    else if(arr_mv_objs[index]->getObjectType() == Type::WATSON){
+        for(int i = 0; i < count; i++){
+            if(arr_mv_objs[i]->getObjectType() == Type::CRIMINAL){
+                if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
+                    return true;
+                }
+            }
+            else if(arr_mv_objs[i]->getObjectType() == Type::ROBOT){
+                if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
+                    return true;
+                }
+            }
+        } 
+    }
+    else if(arr_mv_objs[index]->getObjectType() == Type::CRIMINAL){
+        for(int i = 0; i < count; i++){
+            if(arr_mv_objs[i]->getObjectType() == Type::SHERLOCK){
+                if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
+                    return true;
+                }
+            }
+            else if(arr_mv_objs[i]->getObjectType() == Type::WATSON){
+                if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
+                    return true;
+                }
+            }
         }
-        else return false;
     }
-    else if(arr_mv_objs[index]->getObjectType() == CRIMINAL){
-        if(arr_mv_objs[index]->getCurrentPosition().isEqual(arr_mv_objs[index]->getNextPosition())){
-            return true;
+    else if(arr_mv_objs[index]->getObjectType() == Type::ROBOT){
+        for(int i = 0; i < count; i++){
+            if(arr_mv_objs[i]->getObjectType() == Type::SHERLOCK){
+                if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
+                    return true;
+                }
+            }
+            else if(arr_mv_objs[i]->getObjectType() == Type::WATSON){
+                if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
+                    return true;
+                }
+            }
         }
-        else return false;
     }
-    else if(arr_mv_objs[index]->getObjectType() == ROBOT){
-        if(arr_mv_objs[index]->getCurrentPosition().isEqual(arr_mv_objs[index]->getNextPosition())){
-            return true;
-        }
-        else return false;
-    }
-    else return false;
+    return false;
 };
 
 //TODO: 3.9: CONFIGURATION
@@ -1175,6 +1229,7 @@ SherlockBag::SherlockBag(Sherlock* sherlock)
     this->sherlock = sherlock;
 };
 BaseItem *SherlockBag::get(){
+    if(isFull()) return NULL;
     Node *current = head;
     while (current != NULL)
     {
@@ -1195,6 +1250,7 @@ WatsonBag::WatsonBag(Watson* watson)
     this->watson = watson;
 };
 BaseItem *WatsonBag::get(){
+    if(isFull()) return NULL;
     Node *current = head;
     while (current != NULL)
     {

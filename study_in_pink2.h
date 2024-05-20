@@ -256,7 +256,7 @@ public:
     MovingObject * get(int index) const;
     int size() const;
     string str() const;
-    bool checkMeet(int index) const;
+    bool checkMeet(int index);
 };
 
 class Configuration {

@@ -229,6 +229,7 @@ Position Sherlock::getNextPosition() {
     else return Position::npos;
 };
 void Sherlock::move(){
+    if(this->getExp()==0) return;  
     Position next_pos = getNextPosition();
     if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;    
@@ -259,19 +260,25 @@ void Sherlock::setHp(int hp) {
     else this->hp = hp;
 };
 void Sherlock::setPos(Position pos){
-    /*Sử dụng trong trường hợp thắng RobotC sẽ dịch chuyển đến vị trí Criminal*/
-
+    this->pos = pos;
 };
 bool Sherlock::meet(RobotS* robotS){
     if (pos.isEqual(robotS->getCurrentPosition())) {
         if (exp > 400){
-            sherlockBag->get(robotS->getItemType());
+            sherlockBag->insert(robotS->NewItem());
             delete robotS;
             return true;
         }
         else{
-            exp = exp*90/100;
-            return false;
+            if(sherlockBag->checkItem(EXEMPTION_CARD) > 0){
+                sherlockBag->insert(robotS->NewItem());
+                sherlockBag->get(EXEMPTION_CARD);
+                return false;
+            }
+            else{
+                exp = exp*90/100;
+                return false;
+            }
         }
     }
     return false;
@@ -279,13 +286,21 @@ bool Sherlock::meet(RobotS* robotS){
 bool Sherlock::meet(RobotC* robotC){
     if (pos.isEqual(robotC->getCurrentPosition())) {
         if (exp > 500){
-            sherlockBag->get(robotC->getItemType());
+            sherlockBag->insert(robotC->NewItem());
             delete robotC;
+            this->setPos(CRIMINAL);
             return true;
         }
         else{
-            exp = exp*0.9;
-            return false;
+            if(sherlockBag->checkItem(EXEMPTION_CARD) > 0){
+                sherlockBag->insert(robotC->NewItem());
+                sherlockBag->get(EXEMPTION_CARD);
+                return false;
+            }
+            else{
+                exp = exp*90/100;
+                return false;
+            }
         }
     }
     return false;
@@ -293,21 +308,28 @@ bool Sherlock::meet(RobotC* robotC){
 bool Sherlock::meet(RobotSW* robotSW){
     if (pos.isEqual(robotSW->getCurrentPosition())) {
         if (exp > 300 && hp > 335){
-            sherlockBag->get(robotSW->getItemType());
+            sherlockBag->insert(robotSW->NewItem());
             delete robotSW;
             return true;
         }
         else{
-            hp = hp*0.85;
-            exp = exp*0.85;
-            return false;
+            if(sherlockBag->checkItem(EXEMPTION_CARD) > 0){
+                sherlockBag->insert(robotSW->NewItem());
+                sherlockBag->get(EXEMPTION_CARD);
+                return false;
+            }
+            else{
+                exp = exp*0.85;
+                hp = hp*0.85;
+                return false;
+            }
         }
     }
     return false;
 };
 bool Sherlock::meet(RobotW* robotW){
     if (pos.isEqual(robotW->getCurrentPosition())) {
-        sherlockBag->get(robotW->getItemType());
+        sherlockBag->insert(robotW->NewItem());
         delete robotW;
         return true;
     }
@@ -361,6 +383,7 @@ Position Watson::getNextPosition() {
     else return Position::npos;
 };
 void Watson::move(){
+    if(this->getExp()==0) return;
     Position next_pos = getNextPosition();
     if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;
@@ -392,7 +415,10 @@ void Watson::setHp(int hp) {
 };
 bool Watson::meet(RobotS* robotS){
     if (pos.isEqual(robotS->getCurrentPosition())){
-        watsonBag->get(robotS->getItemType());
+        if(watsonBag->checkItem(PASSING_CARD) > 0){
+            watsonBag->get(PASSING_CARD);
+            return true;
+        }
         delete robotS;
         return true;
     }
@@ -400,7 +426,12 @@ bool Watson::meet(RobotS* robotS){
 };
 bool Watson::meet(RobotC* robotC){
     if (pos.isEqual(robotC->getCurrentPosition())){
-        watsonBag->get(robotC->getItemType());
+        if(watsonBag->checkItem(PASSING_CARD) > 0){
+            watsonBag->insert(robotC->NewItem());
+            watsonBag->get(PASSING_CARD);
+            return true;
+        }
+        watsonBag->insert(robotC->NewItem());
         delete robotC;
         return true;
     }
@@ -408,29 +439,43 @@ bool Watson::meet(RobotC* robotC){
 };
 bool Watson::meet(RobotSW* robotSW){
     if (pos.isEqual(robotSW->getCurrentPosition())){
-        if(exp > 600 && hp > 165){
-            watsonBag->get(robotSW->getItemType());
-            delete robotSW;
+        if(watsonBag->checkItem(PASSING_CARD) > 0){
+            watsonBag->insert(robotSW->NewItem());
+            watsonBag->get(PASSING_CARD);
             return true;
         }
         else{
-            hp = hp*0.85;
-            exp = exp*0.85;
-            return false;
+            if(exp > 600 && hp > 165){
+                watsonBag->insert(robotSW->NewItem());
+                delete robotSW;
+                return true;
+            }
+            else{
+                hp = hp*0.85;
+                exp = exp*0.85;
+                return false;
+            }
         }
     }
     return false;
 };
 bool Watson::meet(RobotW* robotW){
     if (pos.isEqual(robotW->getCurrentPosition())){
-        if (hp > 350){
-            watsonBag->get(robotW->getItemType());
-            delete robotW;
+        if(watsonBag->checkItem(PASSING_CARD) > 0){
+            watsonBag->insert(robotW->NewItem());
+            watsonBag->get(PASSING_CARD);
             return true;
         }
         else{
-            hp = hp*0.95;
-            return false;
+            if (hp > 350){
+                watsonBag->insert(robotW->NewItem());
+                delete robotW;
+                return true;
+            }
+            else{
+                hp = hp*0.95;
+                return false;
+            }
         }
     }
     return false;
@@ -769,8 +814,34 @@ string Configuration::str() const{
 Robot::Robot(int index , const Position &pos , Map * map , Criminal* criminal, const string &name) : MovingObject(index, pos, map, "Robot"){
     this->criminal = criminal;
     this->robot_type = robot_type;
-    // TODO: tính toán loại item
-
+    int p = this->getCurrentPosition().getRow() * this->getCurrentPosition().getCol();
+    while(p > 9){
+        int sum = 0;
+        while(p > 0){
+            sum += p % 10;
+            p /= 10;
+        }
+        p = sum;
+    }  
+    if(p == 0 || p == 1){
+        item = new MagicBook();
+    }
+    else if(p == 2 || p == 3){
+        item = new EnergyDrink();
+    }
+    else if(p == 4 || p == 5){
+        item = new FirstAid();
+    }
+    else if(p == 6 || p == 7){
+        item = new ExemptionCard();
+    }
+    else if(p == 8 || p == 9){
+        item = new PassingCard(this->getCurrentPosition().getRow(), this->getCurrentPosition().getCol());
+    }
+    else item = NULL;
+};
+Robot::~Robot(){
+    delete item;
 };
 Robot* Robot::create(int index, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson){
     if(criminal->isCreatedRobotNext()){
@@ -793,13 +864,8 @@ Type Robot::getObjectType() const{
 RobotType Robot::getType(){
     return robot_type;
 };
-string Robot::str() const{
-    return "Robot[pos="+pos.str()+";type="+to_string(robot_type)+";dist="+to_string(getDistance())+"]";
-};
 BaseItem* Robot::NewItem(){
-};
-ItemType Robot::getItemType() {
-    return item_type;
+    return item;
 };
 
 //TODO: 3.10.1: ROBOTC
@@ -970,6 +1036,7 @@ string RobotSW::str() const{
 };
 
 //TODO: 3.11: BASE ITEM
+BaseItem::BaseItem(){};
 BaseItem::~BaseItem(){};
 
 //TODO: 3.11.1: MAGIC BOOK
@@ -1126,6 +1193,7 @@ BaseBag::~BaseBag(){
     head = nullptr;
 };
 bool BaseBag::insert(BaseItem* item){
+    if(isFull()) return false;
     if(item==NULL) return false;
     Node* temp = new Node(item);
     if(temp==NULL) return false;
@@ -1229,7 +1297,6 @@ SherlockBag::SherlockBag(Sherlock* sherlock)
     this->sherlock = sherlock;
 };
 BaseItem *SherlockBag::get(){
-    if(isFull()) return NULL;
     Node *current = head;
     while (current != NULL)
     {
@@ -1250,7 +1317,6 @@ WatsonBag::WatsonBag(Watson* watson)
     this->watson = watson;
 };
 BaseItem *WatsonBag::get(){
-    if(isFull()) return NULL;
     Node *current = head;
     while (current != NULL)
     {
@@ -1289,6 +1355,17 @@ bool StudyPinkProgram::isStop() const{
     return false;
 };
 void StudyPinkProgram::run(bool verbose){
+    /*Phương thức run có 1 tham số là verbose. Nếu verbose bằng true thì cần in ra
+thông tin của mỗi MovingObject trong ArrayMovingObject sau khi thực hiện một
+bước di chuyển và các cập nhật sau đó nếu có (ví dụ như Watson gặp một Robot và
+thực hiện thử thách với Robot). SV tham khảo thêm initial code về vị trí của hàm
+printStep trong run. Phương thức run chạy tối đa num_steps (lấy từ tập tin
+cấu hình). Sau mỗi step nếu chương trình thỏa điều kiện dừng nêu trong phương
+thức isStop thì chương trình sẽ dừng lại. Mỗi step, chương trình sẽ lần lượt chạy
+từ đầu đến cuối một ArrayMovingObject và gọi move. Sau mỗi lần thực hiện di
+chuyển của một phần tử, tiến hành các thao tác sau theo thứ tự: thực hiện hành
+động nếu có các đối tượng gặp nhau, kiểm tra điều kiện dừng (stop), kiểm tra điều
+kiện tạo robot và tạo robot nếu cần.*/
     for (int istep = 0; istep < config->num_steps; ++istep)
     {
         for (int i = 0; i < arr_mv_objs->size(); ++i)

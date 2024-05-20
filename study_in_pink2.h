@@ -168,7 +168,6 @@ private:
     int hp;
     int exp;
     BaseBag* sherlockBag;
-    BaseBag* watsonBag;
 
 public:
     Sherlock(int index, const string & moving_rule, const Position & init_pos, Map * map, int init_hp, int init_exp);
@@ -199,7 +198,6 @@ private:
     int HP;
     int EXP;
     BaseBag* watsonBag;
-    BaseBag* sherlockBag;
 
 public:
     Watson(int index, const string & moving_rule, const Position & init_pos, Map * map, int init_hp, int init_exp);
@@ -293,6 +291,7 @@ class BaseItem {
     friend class TestStudyInPink;
 
 public:
+    BaseItem();
     ~BaseItem();
     virtual bool canUse(Character *obj, Robot *robot) = 0;
     virtual void use(Character *obj, Robot *robot) = 0;
@@ -413,11 +412,11 @@ class Robot : public MovingObject{
 protected:
     RobotType robot_type;
     Criminal* criminal;
-    ItemType item_type;
-    Position head;
+    BaseItem* item;
 
 public:
     Robot(int index , const Position &pos , Map * map , Criminal* criminal, const string &name = "");
+    ~Robot();
     Type getObjectType() const;
     static Robot* create(int index, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson);
     virtual Position getNextPosition() = 0;
@@ -426,7 +425,6 @@ public:
     virtual RobotType getType();
     virtual int getDistance() const = 0;
     BaseItem* NewItem();
-    ItemType getItemType();
 };
 
 class RobotC : public Robot {

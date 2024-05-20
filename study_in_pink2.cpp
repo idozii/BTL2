@@ -672,12 +672,14 @@ bool ArrayMovingObject::checkMeet(int index) {
         for(int i = 0; i < count; i++){
             if(arr_mv_objs[i]->getObjectType() == Type::SHERLOCK){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
-                    return true;
+                    
+                    return false;
                 }
             }
             else if(arr_mv_objs[i]->getObjectType() == Type::WATSON){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
-                    return true;
+
+                    return false;
                 }
             }
             else if(arr_mv_objs[i]->getObjectType() == Type::CRIMINAL){

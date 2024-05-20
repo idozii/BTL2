@@ -313,41 +313,7 @@ bool Sherlock::meet(RobotW* robotW){
     return false;
 };
 bool Sherlock::meet(Watson* watson){
-    if(pos.isEqual(watson->getCurrentPosition())){
-        if(sherlockBag->getCount() == 0 && watsonBag->getCount() == 0) return false;
-        else if(sherlockBag->getCount() == 0 && watsonBag->getCount() != 0){
-            for(int i = 0; i < watsonBag->getCount(); i++){
-                if(watsonBag->get(i)->getType() == PASSING_CARD){
-                    watsonBag->remove(PASSING_CARD);
-                    sherlockBag->insert(sherlockBag->get(PASSING_CARD));
-                }
-            }
-        }
-        else if(sherlockBag->getCount() != 0 && watsonBag->getCount() == 0){
-            for(int i = 0; i < sherlockBag->getCount(); i++){
-                if(sherlockBag->get(i)->getType() == EXEMPTION_CARD){
-                    sherlockBag->remove(EXEMPTION_CARD);
-                    watsonBag->insert(watsonBag->get(EXEMPTION_CARD));
-                }
-            }
-        }
-        else if(sherlockBag->getCount() != 0 && watsonBag->getCount() != 0){
-            for(int i = 0; i < sherlockBag->getCount(); i++){
-                if(sherlockBag->get(i)->getType() == EXEMPTION_CARD){
-                    sherlockBag->remove(EXEMPTION_CARD);
-                    watsonBag->insert(watsonBag->get(EXEMPTION_CARD));
-                }
-            }
-            for(int i = 0; i < watsonBag->getCount(); i++){
-                if(watsonBag->get(i)->getType() == PASSING_CARD){
-                    watsonBag->remove(PASSING_CARD);
-                    sherlockBag->insert(sherlockBag->get(PASSING_CARD));
-                }
-            }
-        }
-        return true;
-    }
-    return false;
+    
 };
 
 //TODO: 3.6: WATSON
@@ -459,41 +425,7 @@ bool Watson::meet(RobotW* robotW){
     return false;
 };
 bool Watson::meet(Sherlock* sherlock){
-    if(pos.isEqual(sherlock->getCurrentPosition())){
-        if(sherlockBag->getCount() == 0 && watsonBag->getCount() == 0) return false;
-        else if(sherlockBag->getCount() == 0 && watsonBag->getCount() != 0){
-            for(int i = 0; i < watsonBag->getCount(); i++){
-                if(watsonBag->get(i)->getType() == PASSING_CARD){
-                    watsonBag->remove(PASSING_CARD);
-                    sherlockBag->insert(sherlockBag->get(PASSING_CARD));
-                }
-            }
-        }
-        else if(sherlockBag->getCount() != 0 && watsonBag->getCount() == 0){
-            for(int i = 0; i < sherlockBag->getCount(); i++){
-                if(sherlockBag->get(i)->getType() == EXEMPTION_CARD){
-                    sherlockBag->remove(EXEMPTION_CARD);
-                    watsonBag->insert(watsonBag->get(EXEMPTION_CARD));
-                }
-            }
-        }
-        else if(sherlockBag->getCount() != 0 && watsonBag->getCount() != 0){
-            for(int i = 0; i < sherlockBag->getCount(); i++){
-                if(sherlockBag->get(i)->getType() == EXEMPTION_CARD){
-                    sherlockBag->remove(EXEMPTION_CARD);
-                    watsonBag->insert(watsonBag->get(EXEMPTION_CARD));
-                }
-            }
-            for(int i = 0; i < watsonBag->getCount(); i++){
-                if(watsonBag->get(i)->getType() == PASSING_CARD){
-                    watsonBag->remove(PASSING_CARD);
-                    sherlockBag->insert(sherlockBag->get(PASSING_CARD));
-                }
-            }
-        }
-        return true;
-    }
-    return false;
+    
 };
 
 //TODO: 3.7: CRIMINAL
@@ -1177,22 +1109,19 @@ void BaseBag::remove(ItemType type){
     }
 };
 string BaseBag::str() const{
-    string str = "BaseBag[count=" + to_string(size) + ';';
+    string bag = "Bag[count=" + to_string(size) + ";";
     Node *current = head;
     while (current != NULL)
     {
-        if (current->item != NULL)
+        bag += current->item->str();
+        if (current->next != NULL)
         {
-            str += current->item->str();
+            bag += ',';
         }
         current = current->next;
-        if (current != NULL)
-        {
-            str += ",";
-        }
     }
-    str += "]";
-    return str;
+    bag += "]";
+    return bag;
 };
 BaseItem* BaseBag::get(ItemType type){
     Node *current = head;
@@ -1239,41 +1168,6 @@ BaseItem *SherlockBag::get(){
     }
     return NULL;
 };
-BaseItem* SherlockBag::get(int i){
-    Node *current = head;
-    int count = 0;
-    while (current != NULL)
-    {
-        if (current->item->canUse(sherlock, NULL))
-        {
-            if (count == i)
-            {
-                return current->item;
-            }
-            count++;
-        }
-        current = current->next;
-    }
-    return NULL;
-};
-string SherlockBag::str() const{
-    string str = "SherlockBag[count=" + to_string(itemNumber) + ';';
-    Node *current = head;
-    while (current != NULL)
-    {
-        if (current->item != NULL)
-        {
-            str += current->item->str();
-        }
-        current = current->next;
-        if (current != NULL)
-        {
-            str += ",";
-        }
-    }
-    str += "]";
-    return str;
-};
 
 //TODO: 3.12.2: WATSON BAG
 WatsonBag::WatsonBag(Watson* watson) 
@@ -1294,61 +1188,23 @@ BaseItem *WatsonBag::get(){
     }
     return NULL;
 };
-BaseItem* WatsonBag::get(int i){
-    Node *current = head;
-    int count = 0;
-    while (current != NULL)
-    {
-        if (current->item->canUse(watson, NULL))
-        {
-            if (count == i)
-            {
-                return current->item;
-            }
-            count++;
-        }
-        current = current->next;
-    }
-    return NULL;
-};
-string WatsonBag::str() const
-{
-    string str = "WatsonBag[count=" + to_string(itemNumber) + ';';
-    Node *current = head;
-    while (current != NULL)
-    {
-        if (current->item != NULL)
-        {
-            str += current->item->str();
-        }
-        current = current->next;
-        if (current != NULL)
-        {
-            str += ",";
-        }
-    }
-    str += "]";
-    return str;
-};
 
 //TODO: 3.13: StudyPink
 StudyPinkProgram::StudyPinkProgram(const string &config_file_path){
-    Configuration config(config_file_path);
-    map = new Map(config.map_num_rows, config.map_num_cols, config.num_walls, config.arr_walls, config.num_fake_walls, config.arr_fake_walls);
-    arr_mv_objs = new ArrayMovingObject(config.max_num_moving_objects);
-    sherlock = new Sherlock(1, config.sherlock_moving_rule, config.sherlock_init_pos, map, config.sherlock_init_hp, config.sherlock_init_exp);
-    watson = new Watson(2, config.watson_moving_rule, config.watson_init_pos, map, config.watson_init_hp, config.watson_init_exp);
-    criminal = new Criminal(0, config.criminal_init_pos, map, sherlock, watson);
+    config = new Configuration(config_file_path);
+    map = new Map(config->map_num_rows, config->map_num_cols, config->num_walls, config->arr_walls, config->num_fake_walls, config->arr_fake_walls);
+    arr_mv_objs = new ArrayMovingObject(config->max_num_moving_objects);
+    sherlock = new Sherlock(1, config->sherlock_moving_rule, config->sherlock_init_pos, map, config->sherlock_init_hp, config->sherlock_init_exp);
+    watson = new Watson(2, config->watson_moving_rule, config->watson_init_pos, map, config->watson_init_hp, config->watson_init_exp);
+    criminal = new Criminal(0, config->criminal_init_pos, map, sherlock, watson);
+    arr_mv_objs->add(criminal);
     arr_mv_objs->add(sherlock);
     arr_mv_objs->add(watson);
-    arr_mv_objs->add(criminal);
 };
 StudyPinkProgram::~StudyPinkProgram(){
     delete map;
     delete arr_mv_objs;
-    delete sherlock;
-    delete watson;
-    delete criminal;
+    delete config;
 };
 bool StudyPinkProgram::isStop() const{
     if(sherlock->getHp() == 0 || watson->getHp() == 0 || sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition()) || watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())){

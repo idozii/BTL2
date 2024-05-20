@@ -377,7 +377,6 @@ public:
     virtual ~BaseBag();
     virtual bool insert(BaseItem* item); 
     virtual BaseItem* get() = 0;
-    virtual BaseItem* get(int i) = 0;
     virtual BaseItem* get(ItemType type);
     virtual int getCount() const;
     virtual void remove(ItemType type);
@@ -394,8 +393,6 @@ private:
 public:
     SherlockBag(Sherlock* sherlock);
     BaseItem* get();
-    BaseItem* get(int i);
-    string str() const;
 };
 
 class WatsonBag : public BaseBag {
@@ -408,8 +405,6 @@ private:
 public:
     WatsonBag(Watson* watson);
     BaseItem* get();
-    BaseItem* get(int i);
-    string str() const;
 };
 
 class Robot : public MovingObject{

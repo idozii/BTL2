@@ -960,7 +960,7 @@ void RobotC::move(){
     pos = next_pos;
 };
 RobotType RobotC::getType() const{
-    return robot_type;
+    return C;
 }
 int RobotC::getDistance(Sherlock* sherlock){
     return distance(pos, sherlock->getCurrentPosition());
@@ -1473,7 +1473,7 @@ kiện tạo robot và tạo robot nếu cần.*/
 };
 
 
-//TODO: checkmeet and trao doi vat pham
+//TODO: trao doi vat pham
 //TODO: void run
 
 ////////////////////////////////////////////////

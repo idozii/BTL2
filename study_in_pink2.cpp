@@ -1323,32 +1323,6 @@ bool BaseBag::insert(BaseItem* item){
     }
     return true;
 };
-int BaseBag::getCount() const{
-    return size;
-};
-void BaseBag::remove(ItemType type){
-    Node *current = head;
-    Node *prev = nullptr;
-    while (current != NULL)
-    {
-        if (current->item->getType() == type)
-        {
-            if (prev == nullptr)
-            {
-                head = current->next;
-            }
-            else
-            {
-                prev->next = current->next;
-            }
-            delete current;
-            size--;
-            return;
-        }
-        prev = current;
-        current = current->next;
-    }
-};
 string BaseBag::str() const{
     string bag = "Bag[count=" + to_string(size) + ";";
     Node *current = head;

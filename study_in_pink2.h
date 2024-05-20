@@ -377,8 +377,6 @@ public:
     virtual bool insert(BaseItem* item); 
     virtual BaseItem* get() = 0;
     virtual BaseItem* get(ItemType type);
-    virtual int getCount() const;
-    virtual void remove(ItemType type);
     virtual string str() const;
     bool isFull() const;
     bool checkItem(ItemType type);

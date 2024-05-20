@@ -336,14 +336,23 @@ bool Sherlock::meet(RobotW* robotW){
     return false;
 };
 bool Sherlock::meet(Watson* watson){
-    // TODO: Xử lý trao đổi thẻ ExcemptionCard
-    // TODO: KHI CẢ 2 ĐỀU CÓ THỂ TRAO ĐỔI && ĐỔI TOÀN BỘ NẾU NHIỀU HƠN 1 (KỂ CẢ KHI ĐỐI PHƯƠNG)
+    /*Sherlock gặp Watson Sherlock tặng Watson thẻ PassingCard nếu có và
+ngược lại Watson sẽ tặng thẻ ExcepmtionCard nếu có. Nếu có nhiều hơn một thẻ trong túi đồ, họ
+sẽ tặng cho đối phương tất cả. Hành động tặng tức là việc xoá các thẻ ấy ở túi đồ của mình và
+thêm vào đầu của túi đồ người kia. Hành động trao đổi này sẽ diễn ra theo thứ tự Sherlock trước
+rồi mới đến Watson. Trong trường hợp một trong hai không có hoặc cả hai đều không có loại vật
+phẩm ấy thì hành động trao đổi sẽ không diễn ra. Thứ tự nhân vật tặng ật phẩm là Sherlock tặng
+Watson trước rồi mới đến Watson tặng Sherlock. Thứ tự việc tặng vật phẩm của một nhân vật là
+nhân vật sẽ tìm từ đầu đến cuối của túi thông qua phương thức get. Mỗi lần tìm thấy 1 vật phẩm
+có thể tặng được, nhân vật sẽ xóa (thao tác xóa như mô tả trong phần sử dụng một món đồ ) vật
+phẩm khỏi túi của mình và thêm (thông qua phương thức insert) vào túi của nhân vật kia.*/
     if(pos.isEqual(watson->getCurrentPosition())){
-        if(sherlockBag->get(EXEMPTION_CARD) > 0 && watson->getWatsonBag()->get(EXEMPTION_CARD) > 0){
-            sherlockBag->get(EXEMPTION_CARD);
-            watson->getWatsonBag()->remove(EXEMPTION_CARD);
+        if(sherlockBag->checkItem(PASSING_CARD) > 0){
+            sherlockBag->get(PASSING_CARD);
+            watson->getWatsonBag()->insert(new PassingCard(watson->getCurrentPosition().getRow(), watson->getCurrentPosition().getCol()));
             return true;
         }
+        return false;
     }
     return false;
 };
@@ -481,14 +490,13 @@ bool Watson::meet(RobotW* robotW){
     return false;
 };
 bool Watson::meet(Sherlock* sherlock){
-    // TODO: Xử lý trao đổi thẻ PassingCard
-    // TODO: KHI CẢ 2 ĐỀU CÓ THỂ TRAO ĐỔI && ĐỔI TOÀN BỘ NẾU NHIỀU HƠN 1 (KỂ CẢ KHI ĐỐI PHƯƠNG)
     if(pos.isEqual(sherlock->getCurrentPosition())){
-        if(watsonBag->get(PASSING_CARD) > 0 && sherlock->getSherlockBag()->get(PASSING_CARD) > 0){
-            watsonBag->get(PASSING_CARD);
-            sherlock->getSherlockBag()->remove(PASSING_CARD);
+        if(watsonBag->checkItem(EXEMPTION_CARD) > 0){
+            watsonBag->get(EXEMPTION_CARD);
+            sherlock->getSherlockBag()->insert(new ExemptionCard());
             return true;
         }
+        return false;
     }
     return false;
 };
@@ -599,8 +607,6 @@ string ArrayMovingObject::str() const{
     return arraymovingobject;
 };
 bool ArrayMovingObject::checkMeet(int index) {
-    // TODO: Xét va chạm của nhân vật (theo index) với các nhân vật khác trong array
-    // TODO: Thực hiện xử lý các sự kiện xảy ra (thử thách, thêm item, bắt Criminal)
     if(arr_mv_objs[index]->getObjectType() == Type::SHERLOCK){
         for(int i = 0; i < count; i++){
             if(arr_mv_objs[i]->getObjectType() == Type::CRIMINAL){
@@ -610,7 +616,14 @@ bool ArrayMovingObject::checkMeet(int index) {
             }
             else if(arr_mv_objs[i]->getObjectType() == Type::ROBOT){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
-                    return true;
+                    
+                    return false;
+                }
+            }
+            else if(arr_mv_objs[i]->getObjectType() == Type::WATSON){
+                if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
+                    
+                    return false;
                 }
             }
         }
@@ -624,7 +637,14 @@ bool ArrayMovingObject::checkMeet(int index) {
             }
             else if(arr_mv_objs[i]->getObjectType() == Type::ROBOT){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
-                    return true;
+                    
+                    return false;
+                }
+            }
+            else if(arr_mv_objs[i]->getObjectType() == Type::SHERLOCK){
+                if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
+                    
+                    return false;
                 }
             }
         } 
@@ -641,6 +661,11 @@ bool ArrayMovingObject::checkMeet(int index) {
                     return true;
                 }
             }
+            else if(arr_mv_objs[i]->getObjectType() == Type::ROBOT){
+                if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
+                    return false;
+                }
+            }
         }
     }
     else if(arr_mv_objs[index]->getObjectType() == Type::ROBOT){
@@ -653,6 +678,16 @@ bool ArrayMovingObject::checkMeet(int index) {
             else if(arr_mv_objs[i]->getObjectType() == Type::WATSON){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
                     return true;
+                }
+            }
+            else if(arr_mv_objs[i]->getObjectType() == Type::CRIMINAL){
+                if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
+                    return false;
+                }
+            }
+            else if(arr_mv_objs[i]->getObjectType() == Type::ROBOT){
+                if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
+                    return false;
                 }
             }
         }
@@ -1392,8 +1427,10 @@ kiện tạo robot và tạo robot nếu cần.*/
         }
     }
 };
-//TODO: passing card condition in Robot
-//TODO: Robot newItem
+
+
+//TODO: checkmeet and trao doi vat pham
+//TODO: void run
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

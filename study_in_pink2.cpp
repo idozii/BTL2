@@ -616,13 +616,34 @@ bool ArrayMovingObject::checkMeet(int index) {
             }
             else if(arr_mv_objs[i]->getObjectType() == Type::ROBOT){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
-                    
-                    return false;
+                    Sherlock* sherlock = dynamic_cast<Sherlock*>(arr_mv_objs[index]);
+                    if(dynamic_cast<RobotC*>(arr_mv_objs[i]) != NULL){
+                        RobotC* robotC = dynamic_cast<RobotC*>(arr_mv_objs[i]);
+                        sherlock->meet(robotC);
+                        return false;
+                    }
+                    else if(dynamic_cast<RobotS*>(arr_mv_objs[i]) != NULL){
+                        RobotS* robotS = dynamic_cast<RobotS*>(arr_mv_objs[i]);
+                        sherlock->meet(robotS);
+                        return false;
+                    }
+                    else if(dynamic_cast<RobotSW*>(arr_mv_objs[i]) != NULL){
+                        RobotSW* robotSW = dynamic_cast<RobotSW*>(arr_mv_objs[i]);
+                        sherlock->meet(robotSW);
+                        return false;
+                    }
+                    else if(dynamic_cast<RobotW*>(arr_mv_objs[i]) != NULL){
+                        RobotW* robotW = dynamic_cast<RobotW*>(arr_mv_objs[i]);
+                        sherlock->meet(robotW);
+                        return false;
+                    }
                 }
             }
             else if(arr_mv_objs[i]->getObjectType() == Type::WATSON){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
-                    
+                    Sherlock* sherlock = dynamic_cast<Sherlock*>(arr_mv_objs[index]);
+                    Watson* watson = dynamic_cast<Watson*>(arr_mv_objs[i]);
+                    sherlock->meet(watson);
                     return false;
                 }
             }
@@ -637,13 +658,34 @@ bool ArrayMovingObject::checkMeet(int index) {
             }
             else if(arr_mv_objs[i]->getObjectType() == Type::ROBOT){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
-                    
-                    return false;
+                    Watson* watson = dynamic_cast<Watson*>(arr_mv_objs[index]);
+                    if(dynamic_cast<RobotC*>(arr_mv_objs[i]) != NULL){
+                        RobotC* robotC = dynamic_cast<RobotC*>(arr_mv_objs[i]);
+                        watson->meet(robotC);
+                        return false;
+                    }
+                    else if(dynamic_cast<RobotS*>(arr_mv_objs[i]) != NULL){
+                        RobotS* robotS = dynamic_cast<RobotS*>(arr_mv_objs[i]);
+                        watson->meet(robotS);
+                        return false;
+                    }
+                    else if(dynamic_cast<RobotSW*>(arr_mv_objs[i]) != NULL){
+                        RobotSW* robotSW = dynamic_cast<RobotSW*>(arr_mv_objs[i]);
+                        watson->meet(robotSW);
+                        return false;
+                    }
+                    else if(dynamic_cast<RobotW*>(arr_mv_objs[i]) != NULL){
+                        RobotW* robotW = dynamic_cast<RobotW*>(arr_mv_objs[i]);
+                        watson->meet(robotW);
+                        return false;
+                    }
                 }
             }
             else if(arr_mv_objs[i]->getObjectType() == Type::SHERLOCK){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
-                    
+                    Watson* watson = dynamic_cast<Watson*>(arr_mv_objs[index]);
+                    Sherlock* sherlock = dynamic_cast<Sherlock*>(arr_mv_objs[i]);
+                    watson->meet(sherlock);
                     return false;
                 }
             }

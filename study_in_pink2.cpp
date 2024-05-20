@@ -1293,7 +1293,6 @@ BaseBag::BaseBag(int capacity){
     this->capacity = capacity;
     size = 0;
     head = nullptr;
-    obj = nullptr;
 };
 BaseBag::~BaseBag(){
     Node* temp = head;
@@ -1303,8 +1302,6 @@ BaseBag::~BaseBag(){
         delete temp;
         temp = head;
     }
-    delete obj;
-    obj = nullptr;
     head = nullptr;
 };
 bool BaseBag::insert(BaseItem* item){

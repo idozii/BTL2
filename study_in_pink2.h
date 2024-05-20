@@ -366,7 +366,6 @@ protected:
     };
 
 protected:
-    Character *obj;
     int size;
     int capacity;
     Node* head;

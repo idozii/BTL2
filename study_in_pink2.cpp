@@ -980,7 +980,6 @@ string RobotSW::str() const{
 };
 
 //TODO: 3.11: BASE ITEM
-BaseItem::BaseItem(){};
 BaseItem::~BaseItem(){};
 
 //TODO: 3.11.1: MAGIC BOOK
@@ -1120,7 +1119,7 @@ string PassingCard::str() const{
 //TODO: 3.12: BASE BAG
 BaseBag::BaseBag(int capacity){
     this->capacity = capacity;
-    this->size = 0;
+    size = 0;
     head = nullptr;
     obj = nullptr;
 };
@@ -1128,11 +1127,13 @@ BaseBag::~BaseBag(){
     Node* temp = head;
     while (temp != nullptr){
         head = head->next;
+        delete temp->item;
         delete temp;
         temp = head;
     }
     delete obj;
     obj = nullptr;
+    head = nullptr;
 };
 bool BaseBag::insert(BaseItem* item){
     if(item==NULL) return false;
@@ -1148,20 +1149,6 @@ bool BaseBag::insert(BaseItem* item){
         else return false;
     }
     return true;
-};
-BaseItem* BaseBag::get(){
-    Node *current = head;
-    while (current != NULL)
-    {
-        if (current->item->canUse(NULL, NULL))
-        {
-            current->next = head;
-            head = current;
-            return current->item;
-        }
-        current = current->next;
-    }
-    return NULL;
 };
 int BaseBag::getCount() const{
     return size;
@@ -1207,34 +1194,36 @@ string BaseBag::str() const{
     str += "]";
     return str;
 };
+BaseItem* BaseBag::get(ItemType type){
+    Node *current = head;
+    Node *prev = nullptr;
+    while (current != NULL)
+    {
+        if (current->item->getType() == type)
+        {
+            if (prev == nullptr)
+            {
+                head = current->next;
+            }
+            else
+            {
+                prev->next = current->next;
+            }
+            BaseItem *temp = current->item;
+            delete current;
+            size--;
+            return temp;
+        }
+        prev = current;
+        current = current->next;
+    }
+    return nullptr;
+};
 
 //TODO: 3.12.1: SHERLOCK BAG
 SherlockBag::SherlockBag(Sherlock* sherlock) 
            : BaseBag(13){
     this->sherlock = sherlock;
-};
-SherlockBag::~SherlockBag(){
-    Node* temp = head;
-    while (temp != nullptr){
-        head = head->next;
-        delete temp;
-        temp = head;
-    }    
-};
-bool SherlockBag::insert(BaseItem* item){
-    if(item==NULL) return false;
-    Node* temp = new Node(item);
-    if(temp==NULL) return false;
-    else {
-        if(itemNumber<=13){
-            temp->item = item;
-            temp->next = head;
-            head = temp;
-            itemNumber++;
-        }
-        else return false;
-    }
-    return true;
 };
 BaseItem *SherlockBag::get(){
     Node *current = head;
@@ -1267,18 +1256,6 @@ BaseItem* SherlockBag::get(int i){
     }
     return NULL;
 };
-BaseItem* SherlockBag::get(ItemType item_type){
-    Node *current = head;
-    while (current != NULL)
-    {
-        if (current->item->canUse(sherlock, NULL) && current->item->getType() == item_type)
-        {
-            return current->item;
-        }
-        current = current->next;
-    }
-    return NULL;
-};
 string SherlockBag::str() const{
     string str = "SherlockBag[count=" + to_string(itemNumber) + ';';
     Node *current = head;
@@ -1297,60 +1274,11 @@ string SherlockBag::str() const{
     str += "]";
     return str;
 };
-int SherlockBag::getCount() const{
-    return itemNumber;
-};
-void SherlockBag::remove(ItemType type){
-    Node *current = head;
-    Node *prev = nullptr;
-    while (current != NULL)
-    {
-        if (current->item->getType() == type)
-        {
-            if (prev == nullptr)
-            {
-                head = current->next;
-            }
-            else
-            {
-                prev->next = current->next;
-            }
-            delete current;
-            itemNumber--;
-            return;
-        }
-        prev = current;
-        current = current->next;
-    }
-};
 
 //TODO: 3.12.2: WATSON BAG
 WatsonBag::WatsonBag(Watson* watson) 
          : BaseBag(15){
     this->watson = watson;
-};
-WatsonBag::~WatsonBag(){
-    Node* temp = head;
-    while (temp != nullptr){
-        head = head->next;
-        delete temp;
-        temp = head;
-    }    
-};
-bool WatsonBag::insert(BaseItem* item){
-    if(item==NULL) return false;
-    Node* temp = new Node(item);
-    if(temp==NULL) return false;
-    else {
-        if(itemNumber<=15){
-            temp->item = item;
-            temp->next = head;
-            head = temp;
-            itemNumber++;
-        }
-        else return false;
-    }
-    return true;
 };
 BaseItem *WatsonBag::get(){
     Node *current = head;
@@ -1383,18 +1311,6 @@ BaseItem* WatsonBag::get(int i){
     }
     return NULL;
 };
-BaseItem* WatsonBag::get(ItemType item_type){
-    Node *current = head;
-    while (current != NULL)
-    {
-        if (current->item->canUse(watson, NULL) && current->item->getType() == item_type)
-        {
-            return current->item;
-        }
-        current = current->next;
-    }
-    return NULL;
-};
 string WatsonBag::str() const
 {
     string str = "WatsonBag[count=" + to_string(itemNumber) + ';';
@@ -1413,32 +1329,6 @@ string WatsonBag::str() const
     }
     str += "]";
     return str;
-};
-int WatsonBag::getCount() const{
-    return itemNumber;
-};
-void WatsonBag::remove(ItemType type){
-    Node *current = head;
-    Node *prev = nullptr;
-    while (current != NULL)
-    {
-        if (current->item->getType() == type)
-        {
-            if (prev == nullptr)
-            {
-                head = current->next;
-            }
-            else
-            {
-                prev->next = current->next;
-            }
-            delete current;
-            itemNumber--;
-            return;
-        }
-        prev = current;
-        current = current->next;
-    }
 };
 
 //TODO: 3.13: StudyPink

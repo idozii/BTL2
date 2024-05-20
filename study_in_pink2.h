@@ -293,7 +293,6 @@ class BaseItem {
     friend class TestStudyInPink;
 
 public:
-    BaseItem();
     ~BaseItem();
     virtual bool canUse(Character *obj, Robot *robot) = 0;
     virtual void use(Character *obj, Robot *robot) = 0;
@@ -394,13 +393,8 @@ private:
 
 public:
     SherlockBag(Sherlock* sherlock);
-    ~SherlockBag();
-    bool insert(BaseItem* item);
     BaseItem* get();
     BaseItem* get(int i);
-    BaseItem* get(ItemType type);
-    int getCount() const;
-    void remove(ItemType type);
     string str() const;
 };
 
@@ -413,13 +407,8 @@ private:
 
 public:
     WatsonBag(Watson* watson);
-    ~WatsonBag();
-    bool insert(BaseItem* item);
     BaseItem* get();
     BaseItem* get(int i);
-    BaseItem* get(ItemType type);
-    int getCount() const;
-    void remove(ItemType type);
     string str() const;
 };
 

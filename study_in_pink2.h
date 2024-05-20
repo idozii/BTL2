@@ -381,6 +381,8 @@ public:
     virtual int getCount() const;
     virtual void remove(ItemType type);
     virtual string str() const;
+    bool isFull() const;
+    bool checkItem(ItemType type);
 };
 
 class SherlockBag : public BaseBag {
@@ -411,19 +413,20 @@ class Robot : public MovingObject{
 protected:
     RobotType robot_type;
     Criminal* criminal;
-    BaseItem* item;
+    ItemType item_type;
+    Position head;
 
 public:
     Robot(int index , const Position &pos , Map * map , Criminal* criminal, const string &name = "");
-    ~Robot();
     Type getObjectType() const;
     static Robot* create(int index, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson);
     virtual Position getNextPosition() = 0;
     virtual void move() = 0;
     virtual string str() const = 0;
     virtual RobotType getType();
-    virtual int getDistance() const;
+    virtual int getDistance() const = 0;
     BaseItem* NewItem();
+    ItemType getItemType();
 };
 
 class RobotC : public Robot {
@@ -436,6 +439,7 @@ public:
     RobotType getType() const;
     int getDistance(Sherlock* sherlock);
     int getDistance(Watson* watson);
+    int getDistance() const;
     string str() const;
 
 };
@@ -464,7 +468,7 @@ private:
 public:
     RobotW ( int index , const Position & init_pos , Map * map , Criminal * criminal , Watson * watson);
     Position getNextPosition();
-    void move() override;
+    void move();
     RobotType getType() const;
     int getDistance() const;
     string str() const;

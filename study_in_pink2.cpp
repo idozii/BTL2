@@ -322,7 +322,7 @@ Watson::Watson(int index, const string & moving_rule, const Position & init_pos,
     this->HP = init_hp;
     this->EXP = init_exp;
     this->index_moving_rule = 0;
-    this->moving_rule = moving_rule;
+    this->moving_rule = moving_rule; 
     watsonBag = new WatsonBag(this);
 };
 Watson::~Watson(){
@@ -714,8 +714,10 @@ string Configuration::str() const{
 //TODO: 3.10: ROBOT
 Robot::Robot(int index , const Position &pos , Map * map , Criminal* criminal, const string &name) : MovingObject(index, pos, map, "Robot"){
     this->criminal = criminal;
+    this->robot_type = robot_type;
+    // TODO: tính toán loại item
+
 };
-Robot::~Robot(){};
 Robot* Robot::create(int index, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson){
     if(criminal->isCreatedRobotNext()){
         return new RobotC(index, criminal->getCurrentPosition(), map, criminal);
@@ -737,14 +739,13 @@ Type Robot::getObjectType() const{
 RobotType Robot::getType(){
     return robot_type;
 };
-int Robot::getDistance() const{
-    return 0;
-};
 string Robot::str() const{
     return "Robot[pos="+pos.str()+";type="+to_string(robot_type)+";dist="+to_string(getDistance())+"]";
 };
 BaseItem* Robot::NewItem(){
-    return NULL;
+};
+ItemType Robot::getItemType() {
+    return item_type;
 };
 
 //TODO: 3.10.1: ROBOTC
@@ -767,6 +768,9 @@ int RobotC::getDistance(Sherlock* sherlock){
 };
 int RobotC::getDistance(Watson* watson){
     return distance(pos, watson->getCurrentPosition());
+};
+int RobotC::getDistance() const{
+    return distance(pos, criminal->getCurrentPosition());
 };
 string RobotC::str() const{
     return "Robot[pos="+pos.str()+";type=C;dist="+""+"]";
@@ -1148,6 +1152,22 @@ BaseItem* BaseBag::get(ItemType type){
     }
     return nullptr;
 };
+bool BaseBag::isFull() const{
+    if(size==capacity) return true;
+    return false;
+};
+bool BaseBag::checkItem(ItemType type) {
+    Node *current = head;
+    while (current != NULL)
+    {
+        if (current->item->getType() == type)
+        {
+            return true;
+        }
+        current = current->next;
+    }
+    return false;
+};
 
 //TODO: 3.12.1: SHERLOCK BAG
 SherlockBag::SherlockBag(Sherlock* sherlock) 
@@ -1239,7 +1259,8 @@ void StudyPinkProgram::run(bool verbose){
         }
     }
 };
-//TODO: passing card
+//TODO: passing card condition in Robot
+//TODO: Robot newItem
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

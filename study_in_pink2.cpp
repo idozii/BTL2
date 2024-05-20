@@ -267,7 +267,7 @@ bool Sherlock::meet(RobotS* robotS){
         if (exp > 400){
             sherlockBag->insert(robotS->NewItem());
             delete robotS;
-            return true;
+            return false;
         }
         else{
             if(sherlockBag->checkItem(EXEMPTION_CARD) > 0){
@@ -277,7 +277,18 @@ bool Sherlock::meet(RobotS* robotS){
             }
             else{
                 exp = exp*90/100;
-                return false;
+                if(sherlockBag->checkItem(ENERGY_DRINK) > 0) {
+                    sherlockBag->get(ENERGY_DRINK);
+                    return false;
+                }
+                else if(sherlockBag->checkItem(FIRST_AID) > 0) {
+                    sherlockBag->get(FIRST_AID);
+                    return false;
+                }
+                else if(sherlockBag->checkItem(MAGIC_BOOK) > 0) {
+                    sherlockBag->get(MAGIC_BOOK);
+                    return false;
+                }
             }
         }
     }
@@ -286,21 +297,14 @@ bool Sherlock::meet(RobotS* robotS){
 bool Sherlock::meet(RobotC* robotC){
     if (pos.isEqual(robotC->getCurrentPosition())) {
         if (exp > 500){
-            sherlockBag->insert(robotC->NewItem());
+            this->setPos(robotC->getCrimePosition());
             delete robotC;
-            this->setPos(CRIMINAL);
             return true;
         }
-        else{
-            if(sherlockBag->checkItem(EXEMPTION_CARD) > 0){
-                sherlockBag->insert(robotC->NewItem());
-                sherlockBag->get(EXEMPTION_CARD);
-                return false;
-            }
-            else{
-                exp = exp*90/100;
-                return false;
-            }
+        else {
+            sherlockBag->insert(robotC->NewItem());
+            delete robotC;
+            return false;
         }
     }
     return false;
@@ -310,7 +314,7 @@ bool Sherlock::meet(RobotSW* robotSW){
         if (exp > 300 && hp > 335){
             sherlockBag->insert(robotSW->NewItem());
             delete robotSW;
-            return true;
+            return false;
         }
         else{
             if(sherlockBag->checkItem(EXEMPTION_CARD) > 0){
@@ -321,7 +325,18 @@ bool Sherlock::meet(RobotSW* robotSW){
             else{
                 exp = exp*0.85;
                 hp = hp*0.85;
-                return false;
+                if(sherlockBag->checkItem(ENERGY_DRINK) > 0) {
+                    sherlockBag->get(ENERGY_DRINK);
+                    return false;
+                }
+                else if(sherlockBag->checkItem(FIRST_AID) > 0) {
+                    sherlockBag->get(FIRST_AID);
+                    return false;
+                }
+                else if(sherlockBag->checkItem(MAGIC_BOOK) > 0) {
+                    sherlockBag->get(MAGIC_BOOK);
+                    return false;
+                }
             }
         }
     }
@@ -331,7 +346,7 @@ bool Sherlock::meet(RobotW* robotW){
     if (pos.isEqual(robotW->getCurrentPosition())) {
         sherlockBag->insert(robotW->NewItem());
         delete robotW;
-        return true;
+        return false;
     }
     return false;
 };
@@ -350,7 +365,7 @@ phẩm khỏi túi của mình và thêm (thông qua phương thức insert) và
         if(sherlockBag->checkItem(PASSING_CARD) > 0){
             sherlockBag->get(PASSING_CARD);
             watson->getWatsonBag()->insert(new PassingCard(watson->getCurrentPosition().getRow(), watson->getCurrentPosition().getCol()));
-            return true;
+            return false;
         }
         return false;
     }
@@ -424,12 +439,8 @@ void Watson::setHp(int hp) {
 };
 bool Watson::meet(RobotS* robotS){
     if (pos.isEqual(robotS->getCurrentPosition())){
-        if(watsonBag->checkItem(PASSING_CARD) > 0){
-            watsonBag->get(PASSING_CARD);
-            return true;
-        }
         delete robotS;
-        return true;
+        return false;
     }
     return false;
 };
@@ -438,11 +449,11 @@ bool Watson::meet(RobotC* robotC){
         if(watsonBag->checkItem(PASSING_CARD) > 0){
             watsonBag->insert(robotC->NewItem());
             watsonBag->get(PASSING_CARD);
-            return true;
+            return false;
         }
         watsonBag->insert(robotC->NewItem());
         delete robotC;
-        return true;
+        return false;
     }
     return false;
 };
@@ -451,18 +462,29 @@ bool Watson::meet(RobotSW* robotSW){
         if(watsonBag->checkItem(PASSING_CARD) > 0){
             watsonBag->insert(robotSW->NewItem());
             watsonBag->get(PASSING_CARD);
-            return true;
+            return false;
         }
         else{
             if(exp > 600 && hp > 165){
                 watsonBag->insert(robotSW->NewItem());
                 delete robotSW;
-                return true;
+                return false;
             }
             else{
                 hp = hp*0.85;
                 exp = exp*0.85;
-                return false;
+                if(watsonBag->checkItem(ENERGY_DRINK) > 0) {
+                    watsonBag->get(ENERGY_DRINK);
+                    return false;
+                }
+                else if(watsonBag->checkItem(FIRST_AID) > 0) {
+                    watsonBag->get(FIRST_AID);
+                    return false;
+                }
+                else if(watsonBag->checkItem(MAGIC_BOOK) > 0) {
+                    watsonBag->get(MAGIC_BOOK);
+                    return false;
+                }
             }
         }
     }
@@ -473,17 +495,28 @@ bool Watson::meet(RobotW* robotW){
         if(watsonBag->checkItem(PASSING_CARD) > 0){
             watsonBag->insert(robotW->NewItem());
             watsonBag->get(PASSING_CARD);
-            return true;
+            return false;
         }
         else{
             if (hp > 350){
                 watsonBag->insert(robotW->NewItem());
                 delete robotW;
-                return true;
+                return false;
             }
             else{
                 hp = hp*0.95;
-                return false;
+                if(watsonBag->checkItem(ENERGY_DRINK) > 0) {
+                    watsonBag->get(ENERGY_DRINK);
+                    return false;
+                }
+                else if(watsonBag->checkItem(FIRST_AID) > 0) {
+                    watsonBag->get(FIRST_AID);
+                    return false;
+                }
+                else if(watsonBag->checkItem(MAGIC_BOOK) > 0) {
+                    watsonBag->get(MAGIC_BOOK);
+                    return false;
+                }
             }
         }
     }
@@ -494,7 +527,7 @@ bool Watson::meet(Sherlock* sherlock){
         if(watsonBag->checkItem(EXEMPTION_CARD) > 0){
             watsonBag->get(EXEMPTION_CARD);
             sherlock->getSherlockBag()->insert(new ExemptionCard());
-            return true;
+            return false;
         }
         return false;
     }
@@ -954,6 +987,9 @@ RobotC::RobotC(int index, const Position & init_pos, Map* map, Criminal* crimina
 Position RobotC::getNextPosition() {
     return criminal->getPrevPos();
 };
+Position RobotC::getCrimePosition() {
+    return criminal->getCurrentPosition();
+};
 void RobotC::move(){
     Position next_pos = getNextPosition();
     if (next_pos.isEqual(Position::npos)) return;
@@ -1383,7 +1419,10 @@ BaseItem *SherlockBag::get(){
         {
             current->next = head;
             head = current;
-            return current->item;
+            BaseItem *temp = current->item;
+            delete current;
+            size--;
+            return temp;
         }
         current = current->next;
     }
@@ -1403,7 +1442,10 @@ BaseItem *WatsonBag::get(){
         {
             current->next = head;
             head = current;
-            return current->item;
+            BaseItem *temp = current->item;
+            delete current;
+            size--;
+            return temp;
         }
         current = current->next;
     }
@@ -1434,47 +1476,51 @@ bool StudyPinkProgram::isStop() const{
     return false;
 };
 void StudyPinkProgram::run(bool verbose){
-    /*Phương thức run có 1 tham số là verbose. Nếu verbose bằng true thì cần in ra
-thông tin của mỗi MovingObject trong ArrayMovingObject sau khi thực hiện một
-bước di chuyển và các cập nhật sau đó nếu có (ví dụ như Watson gặp một Robot và
-thực hiện thử thách với Robot). SV tham khảo thêm initial code về vị trí của hàm
-printStep trong run. Phương thức run chạy tối đa num_steps (lấy từ tập tin
-cấu hình). Sau mỗi step nếu chương trình thỏa điều kiện dừng nêu trong phương
-thức isStop thì chương trình sẽ dừng lại. Mỗi step, chương trình sẽ lần lượt chạy
-từ đầu đến cuối một ArrayMovingObject và gọi move. Sau mỗi lần thực hiện di
-chuyển của một phần tử, tiến hành các thao tác sau theo thứ tự: thực hiện hành
-động nếu có các đối tượng gặp nhau, kiểm tra điều kiện dừng (stop), kiểm tra điều
-kiện tạo robot và tạo robot nếu cần.*/
-    for (int istep = 0; istep < config->num_steps; ++istep)
-    {
-        for (int i = 0; i < arr_mv_objs->size(); ++i)
-        {
-            Robot *robot = nullptr;
-            if (arr_mv_objs->get(i)->getObjectType() == Type::CRIMINAL)
-            {
-                robot = Robot::create(arr_mv_objs->size(), map, criminal, sherlock, watson);
-            }
+    for (int istep = 0; istep < config->num_steps; ++istep) {
+        for (int i = 0; i < arr_mv_objs->size(); ++i) {
             arr_mv_objs->get(i)->move();
-            if (robot != nullptr)
-            {
-                if (criminal->isCreatedRobotNext())
-                {
-
+            if (arr_mv_objs->checkMeet(i)) {
+                printStep(istep);
+                break;
+            }
+            if (isStop()) {
+                printStep(istep);
+                break;
+            }
+            if(criminal->isCreatedRobotNext()){
+                Robot *robot = Robot::create(arr_mv_objs->size(), map, criminal, sherlock, watson);
+                if (robot != NULL) {
                     arr_mv_objs->add(robot);
                 }
-                else
-                {
-                    delete robot;
-                }
             }
-            printResult();
+            if (verbose) {
+                printStep(istep);
+            }
+        }
+        if (isStop()) {
+            break;
         }
     }
+    printResult();
+};
+void StudyPinkProgram::printResult() const {
+    if (sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition())) {
+        cout << "Sherlock caught the criminal" << endl;
+    }
+    else if (watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())) {
+        cout << "Watson caught the criminal" << endl;
+    }
+    else {
+        cout << "The criminal escaped" << endl;
+    }
+};
+void StudyPinkProgram::printStep(int si) const {
+    cout << "Step: " << setw(4) << setfill('0') << si
+        << "--"
+        << sherlock->str() << "--|--" << watson->str() << "--|--" << criminal->str() << endl;
 };
 
-
 //TODO: trao doi vat pham
-//TODO: void run
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

@@ -205,6 +205,7 @@ Sherlock::Sherlock(int index, const string & moving_rule, const Position & init_
 }; 
 Sherlock::~Sherlock(){
     delete sherlockBag;
+    sherlockBag = nullptr;
 };
 Position Sherlock::getNextPosition() {
     Position next_pos = pos;
@@ -372,6 +373,7 @@ Watson::Watson(int index, const string & moving_rule, const Position & init_pos,
 };
 Watson::~Watson(){
     delete watsonBag;
+    watsonBag = nullptr;
 };
 Position Watson::getNextPosition() {
     Position next_pos = pos;
@@ -589,7 +591,7 @@ ArrayMovingObject::ArrayMovingObject(int capacity){
 ArrayMovingObject::~ArrayMovingObject(){
     if(arr_mv_objs!=NULL){
         delete arr_mv_objs;
-        arr_mv_objs = NULL;
+        arr_mv_objs = nullptr;
     }
 };
 bool ArrayMovingObject::isFull() const {
@@ -919,6 +921,8 @@ Configuration::Configuration(const string & filepath){
 Configuration::~Configuration(){
     delete[] arr_fake_walls;
     delete[] arr_walls;
+    arr_fake_walls = nullptr;
+    arr_walls = nullptr;
 };
 string Configuration::str() const{
     string arr;
@@ -962,6 +966,7 @@ Robot::Robot(int index , const Position &pos , Map * map , Criminal* criminal, c
 };
 Robot::~Robot(){
     delete item;
+    item = nullptr;
 };
 Robot* Robot::create(int index, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson){
     if(criminal->isCreatedRobotNext()){
@@ -1461,9 +1466,12 @@ StudyPinkProgram::StudyPinkProgram(const string &config_file_path){
     arr_mv_objs->add(watson);
 };
 StudyPinkProgram::~StudyPinkProgram(){
-    delete map;
-    delete arr_mv_objs;
-    delete config;
+    delete[] map;
+    delete[] arr_mv_objs;
+    delete[] config;
+    map = nullptr;
+    arr_mv_objs = nullptr;
+    config = nullptr;
 };
 bool StudyPinkProgram::isStop() const{
     if(sherlock->getHp() == 0 || watson->getHp() == 0 || sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition()) || watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())){

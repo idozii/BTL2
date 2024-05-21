@@ -351,21 +351,10 @@ bool Sherlock::meet(RobotW* robotW){
     return false;
 };
 bool Sherlock::meet(Watson* watson){
-    /*Sherlock gặp Watson Sherlock tặng Watson thẻ PassingCard nếu có và
-ngược lại Watson sẽ tặng thẻ ExcepmtionCard nếu có. Nếu có nhiều hơn một thẻ trong túi đồ, họ
-sẽ tặng cho đối phương tất cả. Hành động tặng tức là việc xoá các thẻ ấy ở túi đồ của mình và
-thêm vào đầu của túi đồ người kia. Hành động trao đổi này sẽ diễn ra theo thứ tự Sherlock trước
-rồi mới đến Watson. Trong trường hợp một trong hai không có hoặc cả hai đều không có loại vật
-phẩm ấy thì hành động trao đổi sẽ không diễn ra. Thứ tự nhân vật tặng ật phẩm là Sherlock tặng
-Watson trước rồi mới đến Watson tặng Sherlock. Thứ tự việc tặng vật phẩm của một nhân vật là
-nhân vật sẽ tìm từ đầu đến cuối của túi thông qua phương thức get. Mỗi lần tìm thấy 1 vật phẩm
-có thể tặng được, nhân vật sẽ xóa (thao tác xóa như mô tả trong phần sử dụng một món đồ ) vật
-phẩm khỏi túi của mình và thêm (thông qua phương thức insert) vào túi của nhân vật kia.*/
     if(pos.isEqual(watson->getCurrentPosition())){
-        if(sherlockBag->checkItem(PASSING_CARD) > 0){
-            sherlockBag->get(PASSING_CARD);
-            watson->getWatsonBag()->insert(new PassingCard(watson->getCurrentPosition().getRow(), watson->getCurrentPosition().getCol()));
-            return false;
+        while(watson->getWatsonBag()->checkItem(EXEMPTION_CARD) > 0 && sherlockBag->checkItem(PASSING_CARD) > 0) {
+            watson->getWatsonBag()->insert(sherlockBag->get(PASSING_CARD));
+            sherlockBag->insert(watson->getWatsonBag()->get(EXEMPTION_CARD));
         }
         return false;
     }
@@ -524,10 +513,9 @@ bool Watson::meet(RobotW* robotW){
 };
 bool Watson::meet(Sherlock* sherlock){
     if(pos.isEqual(sherlock->getCurrentPosition())){
-        if(watsonBag->checkItem(EXEMPTION_CARD) > 0){
-            watsonBag->get(EXEMPTION_CARD);
-            sherlock->getSherlockBag()->insert(new ExemptionCard());
-            return false;
+        while(watsonBag->checkItem(EXEMPTION_CARD) > 0 && sherlock->getSherlockBag()->checkItem(PASSING_CARD) > 0) {
+            watsonBag->insert(sherlock->getSherlockBag()->get(PASSING_CARD));
+            sherlock->getSherlockBag()->insert(watsonBag->get(EXEMPTION_CARD));
         }
         return false;
     }
@@ -653,22 +641,18 @@ bool ArrayMovingObject::checkMeet(int index) {
                     if(dynamic_cast<RobotC*>(arr_mv_objs[i]) != NULL){
                         RobotC* robotC = dynamic_cast<RobotC*>(arr_mv_objs[i]);
                         sherlock->meet(robotC);
-                        return false;
                     }
                     else if(dynamic_cast<RobotS*>(arr_mv_objs[i]) != NULL){
                         RobotS* robotS = dynamic_cast<RobotS*>(arr_mv_objs[i]);
                         sherlock->meet(robotS);
-                        return false;
                     }
                     else if(dynamic_cast<RobotSW*>(arr_mv_objs[i]) != NULL){
                         RobotSW* robotSW = dynamic_cast<RobotSW*>(arr_mv_objs[i]);
                         sherlock->meet(robotSW);
-                        return false;
                     }
                     else if(dynamic_cast<RobotW*>(arr_mv_objs[i]) != NULL){
                         RobotW* robotW = dynamic_cast<RobotW*>(arr_mv_objs[i]);
                         sherlock->meet(robotW);
-                        return false;
                     }
                 }
             }
@@ -677,7 +661,6 @@ bool ArrayMovingObject::checkMeet(int index) {
                     Sherlock* sherlock = dynamic_cast<Sherlock*>(arr_mv_objs[index]);
                     Watson* watson = dynamic_cast<Watson*>(arr_mv_objs[i]);
                     sherlock->meet(watson);
-                    return false;
                 }
             }
         }
@@ -695,22 +678,18 @@ bool ArrayMovingObject::checkMeet(int index) {
                     if(dynamic_cast<RobotC*>(arr_mv_objs[i]) != NULL){
                         RobotC* robotC = dynamic_cast<RobotC*>(arr_mv_objs[i]);
                         watson->meet(robotC);
-                        return false;
                     }
                     else if(dynamic_cast<RobotS*>(arr_mv_objs[i]) != NULL){
                         RobotS* robotS = dynamic_cast<RobotS*>(arr_mv_objs[i]);
                         watson->meet(robotS);
-                        return false;
                     }
                     else if(dynamic_cast<RobotSW*>(arr_mv_objs[i]) != NULL){
                         RobotSW* robotSW = dynamic_cast<RobotSW*>(arr_mv_objs[i]);
                         watson->meet(robotSW);
-                        return false;
                     }
                     else if(dynamic_cast<RobotW*>(arr_mv_objs[i]) != NULL){
                         RobotW* robotW = dynamic_cast<RobotW*>(arr_mv_objs[i]);
                         watson->meet(robotW);
-                        return false;
                     }
                 }
             }
@@ -719,7 +698,6 @@ bool ArrayMovingObject::checkMeet(int index) {
                     Watson* watson = dynamic_cast<Watson*>(arr_mv_objs[index]);
                     Sherlock* sherlock = dynamic_cast<Sherlock*>(arr_mv_objs[i]);
                     watson->meet(sherlock);
-                    return false;
                 }
             }
         } 
@@ -747,14 +725,44 @@ bool ArrayMovingObject::checkMeet(int index) {
         for(int i = 0; i < count; i++){
             if(arr_mv_objs[i]->getObjectType() == Type::SHERLOCK){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
-                    
-                    return false;
+                    Sherlock* sherlock = dynamic_cast<Sherlock*>(arr_mv_objs[index]); 
+                    if(dynamic_cast<RobotC*>(arr_mv_objs[i]) != NULL){
+                        RobotC* robotC = dynamic_cast<RobotC*>(arr_mv_objs[i]);
+                        sherlock->meet(robotC);
+                    }
+                    else if(dynamic_cast<RobotS*>(arr_mv_objs[i]) != NULL){
+                        RobotS* robotS = dynamic_cast<RobotS*>(arr_mv_objs[i]);
+                        sherlock->meet(robotS);
+                    }
+                    else if(dynamic_cast<RobotSW*>(arr_mv_objs[i]) != NULL){
+                        RobotSW* robotSW = dynamic_cast<RobotSW*>(arr_mv_objs[i]);
+                        sherlock->meet(robotSW);
+                    }
+                    else if(dynamic_cast<RobotW*>(arr_mv_objs[i]) != NULL){
+                        RobotW* robotW = dynamic_cast<RobotW*>(arr_mv_objs[i]);
+                        sherlock->meet(robotW);
+                    }
                 }
             }
             else if(arr_mv_objs[i]->getObjectType() == Type::WATSON){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
-
-                    return false;
+                    Watson* watson = dynamic_cast<Watson*>(arr_mv_objs[index]);
+                    if(dynamic_cast<RobotC*>(arr_mv_objs[i]) != NULL){
+                        RobotC* robotC = dynamic_cast<RobotC*>(arr_mv_objs[i]);
+                        watson->meet(robotC);
+                    }
+                    else if(dynamic_cast<RobotS*>(arr_mv_objs[i]) != NULL){
+                        RobotS* robotS = dynamic_cast<RobotS*>(arr_mv_objs[i]);
+                        watson->meet(robotS);
+                    }
+                    else if(dynamic_cast<RobotSW*>(arr_mv_objs[i]) != NULL){
+                        RobotSW* robotSW = dynamic_cast<RobotSW*>(arr_mv_objs[i]);
+                        watson->meet(robotSW);
+                    }
+                    else if(dynamic_cast<RobotW*>(arr_mv_objs[i]) != NULL){
+                        RobotW* robotW = dynamic_cast<RobotW*>(arr_mv_objs[i]);
+                        watson->meet(robotW);
+                    }
                 }
             }
             else if(arr_mv_objs[i]->getObjectType() == Type::CRIMINAL){
@@ -977,7 +985,24 @@ RobotType Robot::getType(){
     return robot_type;
 };
 BaseItem* Robot::NewItem(){
-    return item;
+    if(item == NULL) return NULL;
+    if(dynamic_cast<MagicBook*>(item) != NULL){
+        return new MagicBook();
+    }
+    else if(dynamic_cast<EnergyDrink*>(item) != NULL){
+        return new EnergyDrink();
+    }
+    else if(dynamic_cast<FirstAid*>(item) != NULL){
+        return new FirstAid();
+    }
+    else if(dynamic_cast<ExemptionCard*>(item) != NULL){
+        return new ExemptionCard();
+    }
+    else if(dynamic_cast<PassingCard*>(item) != NULL){
+        PassingCard* passingCard = dynamic_cast<PassingCard*>(item);
+        return new PassingCard(this->getCurrentPosition().getRow(), this->getCurrentPosition().getCol());
+    }
+    else return NULL;
 };
 
 //TODO: 3.10.1: ROBOTC
@@ -1491,7 +1516,7 @@ void StudyPinkProgram::printStep(int si) const {
         << sherlock->str() << "--|--" << watson->str() << "--|--" << criminal->str() << endl;
 };
 
-//TODO: trao doi vat pham
+//TODO: check 1000 tc
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

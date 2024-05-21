@@ -979,7 +979,7 @@ Robot* Robot::create(int index, Map* map, Criminal* criminal, Sherlock* sherlock
     else return NULL;
 };
 Type Robot::getObjectType() const{
-    return Type::ROBOT;
+    return ROBOT;
 };
 RobotType Robot::getType(){
     return robot_type;
@@ -1192,7 +1192,7 @@ void MagicBook::use(Character *obj, Robot *robot){
     }
 };
 ItemType MagicBook::getType() const{
-    return ItemType::MAGIC_BOOK;
+    return MAGIC_BOOK;
 };
 string MagicBook::str() const{
     return "MagicBook";
@@ -1211,7 +1211,7 @@ void EnergyDrink::use(Character *obj, Robot *robot){
     }
 };
 ItemType EnergyDrink::getType() const{
-    return ItemType::ENERGY_DRINK;
+    return ENERGY_DRINK;
 };
 string EnergyDrink::str() const{
     return "EnergyDrink";
@@ -1230,7 +1230,7 @@ void FirstAid::use(Character *obj, Robot *robot){
     }
 };
 ItemType FirstAid::getType() const{
-    return ItemType::FIRST_AID;
+    return FIRST_AID;
 };
 string FirstAid::str() const{
     return "FirstAid";
@@ -1250,7 +1250,7 @@ void ExemptionCard::use(Character *obj, Robot *robot){
     }
 };
 ItemType ExemptionCard::getType() const{
-    return ItemType::EXEMPTION_CARD;
+    return EXEMPTION_CARD;
 };
 string ExemptionCard::str() const{
     return "ExemptionCard";
@@ -1307,7 +1307,7 @@ void PassingCard::use(Character *obj, Robot *robot){
     }
 };
 ItemType PassingCard::getType() const{
-    return ItemType::PASSING_CARD;
+    return PASSING_CARD;
 };
 string PassingCard::str() const{
     return "PassingCard";

@@ -271,9 +271,9 @@ bool Sherlock::meet(RobotS* robotS){
             return false;
         }
         else{
-            if(sherlockBag->checkItem(EXEMPTION_CARD) > 0){
+            if(sherlockBag->checkItem(EXCEMPTION_CARD) > 0){
                 sherlockBag->insert(robotS->NewItem());
-                sherlockBag->get(EXEMPTION_CARD);
+                sherlockBag->get(EXCEMPTION_CARD);
                 return false;
             }
             else{
@@ -318,9 +318,9 @@ bool Sherlock::meet(RobotSW* robotSW){
             return false;
         }
         else{
-            if(sherlockBag->checkItem(EXEMPTION_CARD) > 0){
+            if(sherlockBag->checkItem(EXCEMPTION_CARD) > 0){
                 sherlockBag->insert(robotSW->NewItem());
-                sherlockBag->get(EXEMPTION_CARD);
+                sherlockBag->get(EXCEMPTION_CARD);
                 return false;
             }
             else{
@@ -353,9 +353,9 @@ bool Sherlock::meet(RobotW* robotW){
 };
 bool Sherlock::meet(Watson* watson){
     if(pos.isEqual(watson->getCurrentPosition())){
-        while(watson->getWatsonBag()->checkItem(EXEMPTION_CARD) > 0 && sherlockBag->checkItem(PASSING_CARD) > 0) {
+        while(watson->getWatsonBag()->checkItem(EXCEMPTION_CARD) > 0 && sherlockBag->checkItem(PASSING_CARD) > 0) {
             watson->getWatsonBag()->insert(sherlockBag->get(PASSING_CARD));
-            sherlockBag->insert(watson->getWatsonBag()->get(EXEMPTION_CARD));
+            sherlockBag->insert(watson->getWatsonBag()->get(EXCEMPTION_CARD));
         }
         return false;
     }
@@ -515,9 +515,9 @@ bool Watson::meet(RobotW* robotW){
 };
 bool Watson::meet(Sherlock* sherlock){
     if(pos.isEqual(sherlock->getCurrentPosition())){
-        while(watsonBag->checkItem(EXEMPTION_CARD) > 0 && sherlock->getSherlockBag()->checkItem(PASSING_CARD) > 0) {
+        while(watsonBag->checkItem(EXCEMPTION_CARD) > 0 && sherlock->getSherlockBag()->checkItem(PASSING_CARD) > 0) {
             watsonBag->insert(sherlock->getSherlockBag()->get(PASSING_CARD));
-            sherlock->getSherlockBag()->insert(watsonBag->get(EXEMPTION_CARD));
+            sherlock->getSherlockBag()->insert(watsonBag->get(EXCEMPTION_CARD));
         }
         return false;
     }
@@ -957,10 +957,23 @@ Robot::Robot(int index , const Position &pos , Map * map , Criminal* criminal, c
         item = new FirstAid();
     }
     else if(p == 6 || p == 7){
-        item = new ExemptionCard();
+        item = new ExcemptionCard();
     }
     else if(p == 8 || p == 9){
-        item = new PassingCard(this->getCurrentPosition().getRow(), this->getCurrentPosition().getCol());
+        int t = (this->getCurrentPosition().getRow() * 11 + this->getCurrentPosition().getCol()) % 4;
+        if(t==0){
+            item = new PassingCard("RobotS");
+        }
+        else if(t==1){
+            item = new PassingCard("RobotC");
+        }
+        else if(t==2){
+            item = new PassingCard("RobotSW");
+        }
+        else if(t==3){
+            item = new PassingCard("all");
+        }
+        else item = NULL;
     }
     else item = NULL;
 };
@@ -991,23 +1004,10 @@ RobotType Robot::getType(){
 };
 BaseItem* Robot::NewItem(){
     if(item == NULL) return NULL;
-    if(dynamic_cast<MagicBook*>(item) != NULL){
-        return new MagicBook();
-    }
-    else if(dynamic_cast<EnergyDrink*>(item) != NULL){
-        return new EnergyDrink();
-    }
-    else if(dynamic_cast<FirstAid*>(item) != NULL){
-        return new FirstAid();
-    }
-    else if(dynamic_cast<ExemptionCard*>(item) != NULL){
-        return new ExemptionCard();
-    }
-    else if(dynamic_cast<PassingCard*>(item) != NULL){
-        PassingCard* passingCard = dynamic_cast<PassingCard*>(item);
-        return new PassingCard(this->getCurrentPosition().getRow(), this->getCurrentPosition().getCol());
-    }
-    else return NULL;
+    return item;
+};
+string Robot::str() const{
+    return "Robot[pos="+pos.str()+";type=;dist="+to_string(getDistance())+"]";
 };
 
 //TODO: 3.10.1: ROBOTC
@@ -1241,42 +1241,29 @@ string FirstAid::str() const{
     return "FirstAid";
 };
 
-//TODO: 3.11.4: EXEMPTIONCARD
-bool ExemptionCard::canUse(Character *obj, Robot *robot){
+//TODO: 3.11.4: EXCEMPTIONCARD
+bool ExcemptionCard::canUse(Character *obj, Robot *robot){
     if(obj->getObjectType() == SHERLOCK && obj->getHp()%2==1 && robot!=nullptr){
         return true;
     }
     return false;
 };
-void ExemptionCard::use(Character *obj, Robot *robot){
+void ExcemptionCard::use(Character *obj, Robot *robot){
     if(canUse(obj, robot)){
         obj->setExp(obj->getExp());
         obj->setHp(obj->getHp());
     }
 };
-ItemType ExemptionCard::getType() const{
-    return EXEMPTION_CARD;
+ItemType ExcemptionCard::getType() const{
+    return EXCEMPTION_CARD;
 };
-string ExemptionCard::str() const{
-    return "ExemptionCard";
+string ExcemptionCard::str() const{
+    return "ExcemptionCard";
 };
 
 //TODO: 3.11.5: PASSING CARD
-PassingCard::PassingCard(int i, int j){
-    int t = (i*11 + j)%4;
-    if(t==0){
-        challenge == "RobotS";
-    }
-    else if(t==1){
-        challenge == "RobotC";
-    }
-    else if(t==2){
-        challenge == "RobotSW";
-    }
-    else if(t==3){
-        challenge == "all";
-    }
-    else challenge == "none";
+PassingCard::PassingCard(string challenge){
+    this->challenge = challenge;
 };
 bool PassingCard::canUse(Character *obj, Robot *robot){
     if(obj->getObjectType() == WATSON && obj->getExp()%2==0 && robot!=nullptr){
@@ -1406,6 +1393,9 @@ bool BaseBag::checkItem(ItemType type) {
     }
     return false;
 };
+int BaseBag::getCount() const{
+    return size;
+};
 
 //TODO: 3.12.1: SHERLOCK BAG
 SherlockBag::SherlockBag(Sherlock* sherlock) 
@@ -1524,7 +1514,7 @@ void StudyPinkProgram::printStep(int si) const {
         << sherlock->str() << "--|--" << watson->str() << "--|--" << criminal->str() << endl;
 };
 
-//TODO: check 1000 tc
+//TODO: fix config, sherlock watson robotC getnext
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

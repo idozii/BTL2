@@ -45,7 +45,7 @@ class Node;
 class TestStudyInPink;
 
 enum Type{ SHERLOCK, WATSON, CRIMINAL, ROBOT };
-enum ItemType { MAGIC_BOOK, ENERGY_DRINK, FIRST_AID, EXEMPTION_CARD, PASSING_CARD };
+enum ItemType { MAGIC_BOOK, ENERGY_DRINK, FIRST_AID, EXCEMPTION_CARD, PASSING_CARD };
 enum ElementType { PATH, WALL, FAKE_WALL };
 enum RobotType { C=0, S, W, SW };
 
@@ -329,7 +329,7 @@ public:
     string str() const;
 };
 
-class ExemptionCard : public BaseItem{
+class ExcemptionCard : public BaseItem{
     friend class TestStudyInPink;
 
 public:
@@ -346,7 +346,7 @@ private:
     string challenge;
 
 public:
-    PassingCard(int i, int j);
+    PassingCard(string challenge);
     bool canUse(Character* obj, Robot *robot);
     void use(Character* obj, Robot *robot);
     ItemType getType() const;
@@ -379,6 +379,7 @@ public:
     virtual string str() const;
     bool isFull() const;
     bool checkItem(ItemType type);
+    int getCount() const;
 };
 
 class SherlockBag : public BaseBag {

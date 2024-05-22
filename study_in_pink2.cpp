@@ -810,6 +810,10 @@ Configuration::Configuration(const string & filepath){
         else if (line.find("ARRAY_WALLS") == 0)
         {
             num_walls = (line.length() - 13) / 6;
+            configString[0][3] = "NUM_WALLS=";
+            configString[1][3] = to_string(num_walls);
+            configString[0][4] = "ARRAY_WALLS=";
+            configString[1][4] = line.substr(12, line.length() - 12);
             if(num_walls > 0){
                 configString[0][3] = "NUM_WALLS=";
                 configString[1][3] = to_string(num_walls);
@@ -829,6 +833,10 @@ Configuration::Configuration(const string & filepath){
         else if (line.find("ARRAY_FAKE_WALLS") == 0)
         {
             num_fake_walls = (line.length() - 18) / 6;
+            configString[0][5] = "NUM_FAKE_WALLS=";
+            configString[1][5] = to_string(num_fake_walls);
+            configString[0][6] = "ARRAY_FAKE_WALLS=";
+            configString[1][6] = line.substr(17, line.length() - 17);
             if(num_fake_walls > 0){
                 configString[0][5] = "NUM_FAKE_WALLS=";
                 configString[1][5] = to_string(num_fake_walls);

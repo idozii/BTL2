@@ -227,7 +227,7 @@ Position Sherlock::getNextPosition() {
         index_moving_rule = 0;
     }
     if (map != NULL && map->isValid(next_pos, this)) return next_pos;
-    else return Position::npos;
+    return Position::npos;
 };
 void Sherlock::move(){
     if(this->getExp()==0) return;  
@@ -236,7 +236,7 @@ void Sherlock::move(){
     pos = next_pos;    
 };
 Type Sherlock::getObjectType()const{
-    return Type::SHERLOCK;
+    return SHERLOCK;
 };
 BaseBag* Sherlock::getSherlockBag() const{
     return sherlockBag;
@@ -395,7 +395,7 @@ Position Watson::getNextPosition() {
         index_moving_rule = 0;
     }
     if (map != NULL && map->isValid(next_pos, this)) return next_pos;
-    else return Position::npos;
+    return Position::npos;
 };
 void Watson::move(){
     if(this->getExp()==0) return;
@@ -404,7 +404,7 @@ void Watson::move(){
     pos = next_pos;
 };
 Type Watson::getObjectType() const {
-    return Type::WATSON;
+    return WATSON;
 };
 BaseBag* Watson::getWatsonBag() const{
     return watsonBag;
@@ -532,6 +532,7 @@ Criminal::Criminal(int index, const Position & init_pos, Map * map, Sherlock * s
     this->count = 0;
 };
 Position Criminal::getPrevPos() const{
+    if(prev_pos.isEqual(Position::npos)) return pos;
     return this->prev_pos;
 };
 Position Criminal::getNextPosition() {
@@ -566,7 +567,7 @@ void Criminal::move(){
     count++;
 };
 Type Criminal::getObjectType() const{
-    return Type::CRIMINAL;
+    return CRIMINAL;
 }
 string Criminal::str() const {
     return "Criminal[index="+to_string(index)+";pos="+pos.str()+"]";
@@ -630,14 +631,14 @@ string ArrayMovingObject::str() const{
     return arraymovingobject;
 };
 bool ArrayMovingObject::checkMeet(int index) {
-    if(arr_mv_objs[index]->getObjectType() == Type::SHERLOCK){
+    if(arr_mv_objs[index]->getObjectType() == SHERLOCK){
         for(int i = 0; i < count; i++){
-            if(arr_mv_objs[i]->getObjectType() == Type::CRIMINAL){
+            if(arr_mv_objs[i]->getObjectType() == CRIMINAL){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
                     return true;
                 }
             }
-            else if(arr_mv_objs[i]->getObjectType() == Type::ROBOT){
+            else if(arr_mv_objs[i]->getObjectType() == ROBOT){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
                     Sherlock* sherlock = dynamic_cast<Sherlock*>(arr_mv_objs[index]);
                     if(dynamic_cast<RobotC*>(arr_mv_objs[i]) != NULL){
@@ -658,7 +659,7 @@ bool ArrayMovingObject::checkMeet(int index) {
                     }
                 }
             }
-            else if(arr_mv_objs[i]->getObjectType() == Type::WATSON){
+            else if(arr_mv_objs[i]->getObjectType() == WATSON){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
                     Sherlock* sherlock = dynamic_cast<Sherlock*>(arr_mv_objs[index]);
                     Watson* watson = dynamic_cast<Watson*>(arr_mv_objs[i]);
@@ -667,14 +668,14 @@ bool ArrayMovingObject::checkMeet(int index) {
             }
         }
     }
-    else if(arr_mv_objs[index]->getObjectType() == Type::WATSON){
+    else if(arr_mv_objs[index]->getObjectType() == WATSON){
         for(int i = 0; i < count; i++){
-            if(arr_mv_objs[i]->getObjectType() == Type::CRIMINAL){
+            if(arr_mv_objs[i]->getObjectType() == CRIMINAL){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
                     return true;
                 }
             }
-            else if(arr_mv_objs[i]->getObjectType() == Type::ROBOT){
+            else if(arr_mv_objs[i]->getObjectType() == ROBOT){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
                     Watson* watson = dynamic_cast<Watson*>(arr_mv_objs[index]);
                     if(dynamic_cast<RobotC*>(arr_mv_objs[i]) != NULL){
@@ -695,7 +696,7 @@ bool ArrayMovingObject::checkMeet(int index) {
                     }
                 }
             }
-            else if(arr_mv_objs[i]->getObjectType() == Type::SHERLOCK){
+            else if(arr_mv_objs[i]->getObjectType() == SHERLOCK){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
                     Watson* watson = dynamic_cast<Watson*>(arr_mv_objs[index]);
                     Sherlock* sherlock = dynamic_cast<Sherlock*>(arr_mv_objs[i]);
@@ -704,28 +705,28 @@ bool ArrayMovingObject::checkMeet(int index) {
             }
         } 
     }
-    else if(arr_mv_objs[index]->getObjectType() == Type::CRIMINAL){
+    else if(arr_mv_objs[index]->getObjectType() == CRIMINAL){
         for(int i = 0; i < count; i++){
-            if(arr_mv_objs[i]->getObjectType() == Type::SHERLOCK){
+            if(arr_mv_objs[i]->getObjectType() == SHERLOCK){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
                     return true;
                 }
             }
-            else if(arr_mv_objs[i]->getObjectType() == Type::WATSON){
+            else if(arr_mv_objs[i]->getObjectType() == WATSON){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
                     return true;
                 }
             }
-            else if(arr_mv_objs[i]->getObjectType() == Type::ROBOT){
+            else if(arr_mv_objs[i]->getObjectType() == ROBOT){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
                     return false;
                 }
             }
         }
     }
-    else if(arr_mv_objs[index]->getObjectType() == Type::ROBOT){
+    else if(arr_mv_objs[index]->getObjectType() == ROBOT){
         for(int i = 0; i < count; i++){
-            if(arr_mv_objs[i]->getObjectType() == Type::SHERLOCK){
+            if(arr_mv_objs[i]->getObjectType() == SHERLOCK){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
                     Sherlock* sherlock = dynamic_cast<Sherlock*>(arr_mv_objs[index]); 
                     if(dynamic_cast<RobotC*>(arr_mv_objs[i]) != NULL){
@@ -746,7 +747,7 @@ bool ArrayMovingObject::checkMeet(int index) {
                     }
                 }
             }
-            else if(arr_mv_objs[i]->getObjectType() == Type::WATSON){
+            else if(arr_mv_objs[i]->getObjectType() == WATSON){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
                     Watson* watson = dynamic_cast<Watson*>(arr_mv_objs[index]);
                     if(dynamic_cast<RobotC*>(arr_mv_objs[i]) != NULL){
@@ -767,12 +768,12 @@ bool ArrayMovingObject::checkMeet(int index) {
                     }
                 }
             }
-            else if(arr_mv_objs[i]->getObjectType() == Type::CRIMINAL){
+            else if(arr_mv_objs[i]->getObjectType() == CRIMINAL){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
                     return false;
                 }
             }
-            else if(arr_mv_objs[i]->getObjectType() == Type::ROBOT){
+            else if(arr_mv_objs[i]->getObjectType() == ROBOT){
                 if(arr_mv_objs[i]->getCurrentPosition().isEqual(arr_mv_objs[index]->getCurrentPosition())){
                     return false;
                 }
@@ -1044,7 +1045,6 @@ string RobotC::str() const{
 //TODO:3.10.2: ROBOT S
 RobotS::RobotS(int index, const Position & init_pos, Map* map, Criminal* criminal, Sherlock* sherlock) 
       : Robot(index, pos, map, criminal, "RobotS"){
-    this->robot_type = S;
     this->pos = init_pos;
     this->criminal = criminal;
     this->sherlock = sherlock;
@@ -1090,7 +1090,6 @@ string RobotS::str() const{
 //TODO:3.10.3: ROBOT W
 RobotW::RobotW(int index, const Position & init_pos, Map* map, Criminal* criminal, Watson* watson) 
       : Robot(index, pos, map, criminal, "RobotW"){
-    this->robot_type = W;
     this->pos = init_pos;
     this->criminal = criminal;
     this->watson = watson;
@@ -1136,7 +1135,6 @@ string RobotW::str() const{
 //TODO:3.10.4: ROBOT SW
 RobotSW::RobotSW(int index, const Position & init_pos, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson) 
        : Robot(index, pos, map, criminal, "RobotSW"){
-    this->robot_type = SW;
     this->pos = init_pos;
     this->criminal = criminal;
     this->sherlock = sherlock;

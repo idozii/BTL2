@@ -195,8 +195,8 @@ class Watson : public Character {
 private:
     string moving_rule;
     int index_moving_rule;
-    int HP;
-    int EXP;
+    int hp;
+    int exp;
     BaseBag* watsonBag;
 
 public:
@@ -379,7 +379,6 @@ public:
     virtual string str() const;
     bool isFull() const;
     bool checkItem(ItemType type);
-    int getCount() const;
 };
 
 class SherlockBag : public BaseBag {

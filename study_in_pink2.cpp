@@ -250,18 +250,18 @@ int Sherlock::getHp() const {
 int Sherlock::getExp() const {
     return this->exp;
 };
-void Sherlock::setExp(int exp) {
-    if(exp < 0) this->exp = 0;
-    else if(exp > 900) this->exp = 900;
-    else this->exp = exp;
+void Sherlock::setExp(int EXP) {
+    if(EXP < 0) this->exp = 0;
+    else if(EXP > 900) this->exp = 900;
+    else this->exp = EXP;
 };
-void Sherlock::setHp(int hp) {
-    if(hp < 0) this->hp = 0;
-    else if(hp > 500) this->hp = 500;
-    else this->hp = hp;
+void Sherlock::setHp(int HP) {
+    if(HP < 0) this->hp = 0;
+    else if(HP > 500) this->hp = 500;
+    else this->hp = HP;
 };
-void Sherlock::setPos(Position pos){
-    this->pos = pos;
+void Sherlock::setPos(Position POS){
+    this->pos = POS;
 };
 bool Sherlock::meet(RobotS* robotS){
     if (pos.isEqual(robotS->getCurrentPosition())) {
@@ -365,8 +365,8 @@ bool Sherlock::meet(Watson* watson){
 //TODO: 3.6: WATSON
 Watson::Watson(int index, const string & moving_rule, const Position & init_pos, Map * map, int init_hp, int init_exp) 
       : Character(index, init_pos, map, "Watson"){
-    this->HP = init_hp;
-    this->EXP = init_exp;
+    this->hp = init_hp;
+    this->exp = init_exp;
     this->index_moving_rule = 0;
     this->moving_rule = moving_rule; 
     watsonBag = new WatsonBag(this);
@@ -418,15 +418,15 @@ int Watson::getExp() const {
 int Watson::getHp() const {
     return this->hp;
 };
-void Watson::setExp(int exp) {
-    if(exp < 0) this->exp = 0;
-    else if(exp > 900) this->exp = 900;
-    else this->exp = exp;
+void Watson::setExp(int EXP) {
+    if(EXP < 0) this->exp = 0;
+    else if(EXP > 900) this->exp = 900;
+    else this->exp = EXP;
 };
-void Watson::setHp(int hp) {
-    if(hp < 0) this->hp = 0;
-    else if(hp > 500) this->hp = 500;
-    else this->hp = hp;
+void Watson::setHp(int HP) {
+    if(HP < 0) this->hp = 0;
+    else if(HP > 500) this->hp = 500;
+    else this->hp = HP;
 };
 bool Watson::meet(RobotS* robotS){
     if (pos.isEqual(robotS->getCurrentPosition())){
@@ -944,13 +944,14 @@ string Configuration::str() const{
 };
 
 //TODO: 3.10: ROBOT
-Robot::Robot(int index , const Position &pos , Map * map , Criminal* criminal, const string &name) : MovingObject(index, pos, map, "Robot"){
+Robot::Robot(int index , const Position &pos , Map * map , Criminal* criminal, const string &name) 
+     : MovingObject(index, pos, map, "Robot"){
     this->criminal = criminal;
     this->robot_type = robot_type;
     int p = this->getCurrentPosition().getRow() * this->getCurrentPosition().getCol();
-    while(p > 9){
+    while(p > 9) {
         int sum = 0;
-        while(p > 0){
+        while(p > 0) {
             sum += p % 10;
             p /= 10;
         }
@@ -1052,9 +1053,7 @@ string RobotC::str() const{
 
 //TODO:3.10.2: ROBOT S
 RobotS::RobotS(int index, const Position & init_pos, Map* map, Criminal* criminal, Sherlock* sherlock) 
-      : Robot(index, pos, map, criminal, "RobotS"){
-    this->pos = init_pos;
-    this->criminal = criminal;
+      : Robot(index, init_pos, map, criminal, "RobotS"){
     this->sherlock = sherlock;
 };
 Position RobotS::getNextPosition() {
@@ -1097,9 +1096,7 @@ string RobotS::str() const{
 
 //TODO:3.10.3: ROBOT W
 RobotW::RobotW(int index, const Position & init_pos, Map* map, Criminal* criminal, Watson* watson) 
-      : Robot(index, pos, map, criminal, "RobotW"){
-    this->pos = init_pos;
-    this->criminal = criminal;
+      : Robot(index, init_pos, map, criminal, "RobotW"){
     this->watson = watson;
 };
 Position RobotW::getNextPosition() {
@@ -1142,9 +1139,7 @@ string RobotW::str() const{
 
 //TODO:3.10.4: ROBOT SW
 RobotSW::RobotSW(int index, const Position & init_pos, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson) 
-       : Robot(index, pos, map, criminal, "RobotSW"){
-    this->pos = init_pos;
-    this->criminal = criminal;
+       : Robot(index, init_pos, map, criminal, "RobotSW"){
     this->sherlock = sherlock;
     this->watson = watson;
 };
@@ -1399,9 +1394,6 @@ bool BaseBag::checkItem(ItemType type) {
     }
     return false;
 };
-int BaseBag::getCount() const{
-    return size;
-};
 
 //TODO: 3.12.1: SHERLOCK BAG
 SherlockBag::SherlockBag(Sherlock* sherlock) 
@@ -1411,16 +1403,13 @@ SherlockBag::SherlockBag(Sherlock* sherlock)
 BaseItem *SherlockBag::get(){
     Node *current = head;
     Node *prev = NULL;
-    while (current != NULL)
-    {
-        if (current->item->canUse(sherlock, NULL))
-        {
+    while (current != NULL) {
+        if (current->item->canUse(sherlock, NULL)) {
             if (prev != NULL) {
                 prev->next = current->next;
             } else {
                 head = current->next;
             }
-
             BaseItem *temp = current->item;
             delete current;
             size--;
@@ -1440,16 +1429,13 @@ WatsonBag::WatsonBag(Watson* watson)
 BaseItem *WatsonBag::get(){
     Node *current = head;
     Node *prev = NULL;
-    while (current != NULL)
-    {
-        if (current->item->canUse(watson, NULL))
-        {
+    while (current != NULL) {
+        if (current->item->canUse(watson, NULL)) {
             if (prev != NULL) {
                 prev->next = current->next;
             } else {
                 head = current->next;
             }
-
             BaseItem *temp = current->item;
             delete current;
             size--;

@@ -1410,17 +1410,23 @@ SherlockBag::SherlockBag(Sherlock* sherlock)
 };
 BaseItem *SherlockBag::get(){
     Node *current = head;
+    Node *prev = NULL;
     while (current != NULL)
     {
         if (current->item->canUse(sherlock, NULL))
         {
-            current->next = head;
-            head = current;
+            if (prev != NULL) {
+                prev->next = current->next;
+            } else {
+                head = current->next;
+            }
+
             BaseItem *temp = current->item;
             delete current;
             size--;
             return temp;
         }
+        prev = current;
         current = current->next;
     }
     return NULL;
@@ -1433,22 +1439,27 @@ WatsonBag::WatsonBag(Watson* watson)
 };
 BaseItem *WatsonBag::get(){
     Node *current = head;
+    Node *prev = NULL;
     while (current != NULL)
     {
         if (current->item->canUse(watson, NULL))
         {
-            current->next = head;
-            head = current;
+            if (prev != NULL) {
+                prev->next = current->next;
+            } else {
+                head = current->next;
+            }
+
             BaseItem *temp = current->item;
             delete current;
             size--;
             return temp;
         }
+        prev = current;
         current = current->next;
     }
     return NULL;
 };
-
 //TODO: 3.13: StudyPink
 StudyPinkProgram::StudyPinkProgram(const string &config_file_path){
     config = new Configuration(config_file_path);
@@ -1520,7 +1531,7 @@ void StudyPinkProgram::printStep(int si) const {
         << sherlock->str() << "--|--" << watson->str() << "--|--" << criminal->str() << endl;
 };
 
-//TODO: fix sherlock watson getnext
+
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

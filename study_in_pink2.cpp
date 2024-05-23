@@ -532,7 +532,7 @@ Criminal::Criminal(int index, const Position & init_pos, Map * map, Sherlock * s
     this->count = 0;
 };
 Position Criminal::getPrevPos() const{
-    if(prev_pos.isEqual(Position::npos)) return pos;
+    if(count == 0) return Position::npos;
     return this->prev_pos;
 };
 Position Criminal::getNextPosition() {
@@ -1520,7 +1520,7 @@ void StudyPinkProgram::printStep(int si) const {
         << sherlock->str() << "--|--" << watson->str() << "--|--" << criminal->str() << endl;
 };
 
-//TODO: fix config, sherlock watson robotC getnext
+//TODO: fix sherlock watson getnext
 
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER

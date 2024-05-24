@@ -630,7 +630,7 @@ string ArrayMovingObject::str() const{
     arraymovingobject += ']';
     return arraymovingobject;
 };
-bool ArrayMovingObject::checkMeet(int index) {
+bool ArrayMovingObject::checkMeet(int index) const {
     if(arr_mv_objs[index]->getObjectType() == SHERLOCK){
         for(int i = 0; i < count; i++){
             if(arr_mv_objs[i]->getObjectType() == CRIMINAL){

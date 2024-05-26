@@ -585,7 +585,7 @@ bool Criminal::isCreatedRobotNext() const {
 //TODO: 3.8: ARRAY MOVING OBJECT
 ArrayMovingObject::ArrayMovingObject(int capacity){
     this->capacity = capacity;
-    count = 0;
+    this->count = 0;
     arr_mv_objs = new MovingObject*[capacity];
     for(int i = 0; i < capacity; i++){
         arr_mv_objs[i] = nullptr;
@@ -1025,6 +1025,7 @@ string Robot::str() const{
 //TODO: 3.10.1: ROBOTC
 RobotC::RobotC(int index, const Position & init_pos, Map* map, Criminal* criminal) 
       : Robot(index, init_pos, map, criminal, "RobotC"){
+    this->robot_type = C;
 };
 Position RobotC::getNextPosition() {
     return criminal->getPrevPos();
@@ -1057,6 +1058,7 @@ string RobotC::str() const{
 RobotS::RobotS(int index, const Position & init_pos, Map* map, Criminal* criminal, Sherlock* sherlock) 
       : Robot(index, init_pos, map, criminal, "RobotS"){
     this->sherlock = sherlock;
+    this->robot_type = S;
 };
 Position RobotS::getNextPosition() {
     Position next_pos = pos;
@@ -1100,6 +1102,7 @@ string RobotS::str() const{
 RobotW::RobotW(int index, const Position & init_pos, Map* map, Criminal* criminal, Watson* watson) 
       : Robot(index, init_pos, map, criminal, "RobotW"){
     this->watson = watson;
+    this->robot_type = W;
 };
 Position RobotW::getNextPosition() {
     Position next_pos = pos;
@@ -1144,6 +1147,7 @@ RobotSW::RobotSW(int index, const Position & init_pos, Map* map, Criminal* crimi
        : Robot(index, init_pos, map, criminal, "RobotSW"){
     this->sherlock = sherlock;
     this->watson = watson;
+    this->robot_type = SW;
 };
 Position RobotSW::getNextPosition() {
     Position next_pos = pos;
@@ -1311,8 +1315,8 @@ string PassingCard::str() const{
 //TODO: 3.12: BASE BAG
 BaseBag::BaseBag(int capacity){
     this->capacity = capacity;
-    size = 0;
-    head = nullptr;
+    this->size = 0;
+    this->head = nullptr;
 };
 BaseBag::~BaseBag(){
     Node* temp = head;

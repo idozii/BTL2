@@ -139,8 +139,8 @@ public:
     Position getCurrentPosition() const;
     virtual void move() = 0;
     virtual string str() const = 0;
-    virtual int getExp() const;
-    virtual int getHp() const;
+    virtual int getEXP() const;
+    virtual int getHP() const;
     virtual Type getObjectType() const = 0;
 };
 
@@ -152,10 +152,10 @@ public:
     virtual Position getNextPosition() = 0;
     virtual void move() = 0;
     virtual string str() const = 0;
-    virtual int getHp() const;
-    virtual int getExp() const;
-    virtual void setHp(int init_hp);
-    virtual void setExp(int init_exp);
+    virtual int getHP() const;
+    virtual int getEXP() const;
+    virtual void setHP(int init_hp);
+    virtual void setEXP(int init_exp);
     virtual Type getObjectType() const = 0;
 };
 
@@ -177,10 +177,10 @@ public:
     Type getObjectType() const;
     BaseBag* getSherlockBag() const;
     string str() const;
-    int getHp() const;
-    int getExp() const;
-    void setHp(int hp);
-    void setExp(int exp);
+    int getHP() const;
+    int getEXP() const;
+    void setHP(int hp);
+    void setEXP(int exp);
     void setPos(Position pos);
     bool meet(RobotS* robotS);
     bool meet(RobotW* robotW);
@@ -207,10 +207,10 @@ public:
     Type getObjectType() const;
     BaseBag* getWatsonBag() const;
     string str() const;
-    int getExp() const;
-    int getHp() const;
-    void setHp(int hp);
-    void setExp(int exp);
+    int getEXP() const;
+    int getHP() const;
+    void setHP(int HP);
+    void setEXP(int EXP);
     bool meet(Sherlock* sherlock);
     bool meet(RobotS* robotS);
     bool meet(RobotW* robotW);

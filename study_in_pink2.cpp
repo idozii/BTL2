@@ -109,7 +109,7 @@ bool Map::isValid ( const Position & pos , MovingObject * mv_obj ) const {
         if(mv_obj != NULL) {
             if(mv_obj->getObjectType() == SHERLOCK || mv_obj->getObjectType() == CRIMINAL || mv_obj->getObjectType() == ROBOT) return true;
             else if(mv_obj->getObjectType() == WATSON){
-                if(mv_obj->getExp()>((pos.getRow()*257+pos.getCol()*139+89)%900+1)) return true;
+                if(mv_obj->getEXP()>((pos.getRow()*257+pos.getCol()*139+89)%900+1)) return true;
                 else return false;
             }
         }
@@ -161,15 +161,17 @@ MovingObject::MovingObject(int index, const Position pos, Map * map, const strin
     this->pos = pos;
     this->map = map;
     this->name = name;
+    this->exp = 0;
+    this->hp = 0;
 };
 MovingObject::~MovingObject(){};
 Position MovingObject::getCurrentPosition() const{
     return this->pos;
 };
-int MovingObject::getExp() const{
+int MovingObject::getEXP() const{
     return this->exp;
 };
-int MovingObject::getHp() const{
+int MovingObject::getHP() const{
     return this->hp;
 };
 
@@ -177,18 +179,18 @@ int MovingObject::getHp() const{
 Character::Character(int index, const Position & init_pos, Map * map, const string & name) 
          : MovingObject(index, init_pos, map, name){
 };
-int Character::getExp() const{
+int Character::getEXP() const{
     return this->exp;
 };
-void Character::setExp(int init_exp) {
+void Character::setEXP(int init_exp) {
     if(init_exp < 0) this->exp = 0;
     else if(init_exp > 900) this->exp = 900;
     else this->exp = init_exp;
 };
-int Character::getHp() const{
+int Character::getHP() const{
     return this->hp;
 };
-void Character::setHp(int init_hp) {
+void Character::setHP(int init_hp) {
     if(init_hp < 0) this->hp = 0;
     else if(init_hp > 500) this->hp = 500;
     else this->hp = init_hp;
@@ -230,7 +232,7 @@ Position Sherlock::getNextPosition() {
     return Position::npos;
 };
 void Sherlock::move(){
-    if(this->getExp()==0) return;  
+    if(this->getEXP()==0) return;  
     Position next_pos = getNextPosition();
     if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;    
@@ -244,18 +246,18 @@ BaseBag* Sherlock::getSherlockBag() const{
 string Sherlock::str() const {
     return "Sherlock[index="+to_string(index)+";pos="+pos.str()+";moving_rule="+moving_rule+"]";
 };
-int Sherlock::getHp() const {
+int Sherlock::getHP() const {
     return this->hp;
 };
-int Sherlock::getExp() const {
+int Sherlock::getEXP() const {
     return this->exp;
 };
-void Sherlock::setExp(int EXP) {
+void Sherlock::setEXP(int EXP) {
     if(EXP < 0) this->exp = 0;
     else if(EXP > 900) this->exp = 900;
     else this->exp = EXP;
 };
-void Sherlock::setHp(int HP) {
+void Sherlock::setHP(int HP) {
     if(HP < 0) this->hp = 0;
     else if(HP > 500) this->hp = 500;
     else this->hp = HP;
@@ -398,7 +400,7 @@ Position Watson::getNextPosition() {
     return Position::npos;
 };
 void Watson::move(){
-    if(this->getExp()==0) return;
+    if(this->getEXP()==0) return;
     Position next_pos = getNextPosition();
     if (next_pos.isEqual(Position::npos)) return;
     pos = next_pos;
@@ -412,18 +414,18 @@ BaseBag* Watson::getWatsonBag() const{
 string Watson::str() const {
     return "Watson[index="+to_string(index)+";pos="+pos.str()+";moving_rule="+moving_rule+"]";
 };
-int Watson::getExp() const {
+int Watson::getEXP() const {
     return this->exp;
 };
-int Watson::getHp() const {
+int Watson::getHP() const {
     return this->hp;
 };
-void Watson::setExp(int EXP) {
+void Watson::setEXP(int EXP) {
     if(EXP < 0) this->exp = 0;
     else if(EXP > 900) this->exp = 900;
     else this->exp = EXP;
 };
-void Watson::setHp(int HP) {
+void Watson::setHP(int HP) {
     if(HP < 0) this->hp = 0;
     else if(HP > 500) this->hp = 500;
     else this->hp = HP;
@@ -530,9 +532,9 @@ Criminal::Criminal(int index, const Position & init_pos, Map * map, Sherlock * s
     this->sherlock = sherlock;
     this->watson = watson;
     this->count = 0;
+    this->prev_pos = Position::npos;
 };
 Position Criminal::getPrevPos() const{
-    if(count == 0) return Position::npos;
     return this->prev_pos;
 };
 Position Criminal::getNextPosition() {
@@ -1187,14 +1189,14 @@ BaseItem::~BaseItem(){};
 
 //TODO: 3.11.1: MAGIC BOOK
 bool MagicBook::canUse(Character *obj, Robot *robot){
-    if(obj->getExp()<=350 && robot==nullptr){
+    if(obj->getEXP()<=350 && robot==nullptr){
         return true;
     }
     return false;
 };
 void MagicBook::use(Character *obj, Robot *robot){
     if(canUse(obj, robot)){
-        obj->setExp(obj->getExp()*125/100);
+        obj->setEXP(obj->getEXP()*125/100);
     }
 };
 ItemType MagicBook::getType() const{
@@ -1206,14 +1208,14 @@ string MagicBook::str() const{
 
 //TODO: 3.11.2: ENERGY DRINK
 bool EnergyDrink::canUse(Character *obj, Robot *robot){
-    if(obj->getHp()<=100 && robot==nullptr){
+    if(obj->getHP()<=100 && robot==nullptr){
         return true;
     }
     return false;
 };
 void EnergyDrink::use(Character *obj, Robot *robot){
     if(canUse(obj, robot)){
-        obj->setHp(obj->getHp()*120/100);
+        obj->setHP(obj->getHP()*120/100);
     }
 };
 ItemType EnergyDrink::getType() const{
@@ -1225,14 +1227,14 @@ string EnergyDrink::str() const{
 
 //TODO: 3.11.3: FIRST AID
 bool FirstAid::canUse(Character *obj, Robot *robot){
-    if((obj->getHp()<=100 || obj->getExp()<=350) && robot==nullptr){
+    if((obj->getHP()<=100 || obj->getEXP()<=350) && robot==nullptr){
         return true;
     }
     return false;
 };
 void FirstAid::use(Character *obj, Robot *robot){
     if(canUse(obj, robot)){
-        obj->setHp(obj->getHp()*150/100);
+        obj->setHP(obj->getHP()*150/100);
     }
 };
 ItemType FirstAid::getType() const{
@@ -1244,15 +1246,15 @@ string FirstAid::str() const{
 
 //TODO: 3.11.4: EXCEMPTIONCARD
 bool ExcemptionCard::canUse(Character *obj, Robot *robot){
-    if(obj->getObjectType() == SHERLOCK && obj->getHp()%2==1 && robot!=nullptr){
+    if(obj->getObjectType() == SHERLOCK && obj->getHP()%2==1 && robot!=nullptr){
         return true;
     }
     return false;
 };
 void ExcemptionCard::use(Character *obj, Robot *robot){
     if(canUse(obj, robot)){
-        obj->setExp(obj->getExp());
-        obj->setHp(obj->getHp());
+        obj->setEXP(obj->getEXP());
+        obj->setHP(obj->getHP());
     }
 };
 ItemType ExcemptionCard::getType() const{
@@ -1267,7 +1269,7 @@ PassingCard::PassingCard(string challenge){
     this->challenge = challenge;
 };
 bool PassingCard::canUse(Character *obj, Robot *robot){
-    if(obj->getObjectType() == WATSON && obj->getExp()%2==0 && robot!=nullptr){
+    if(obj->getObjectType() == WATSON && obj->getEXP()%2==0 && robot!=nullptr){
         return true;
     }
     else return false;
@@ -1276,27 +1278,27 @@ void PassingCard::use(Character *obj, Robot *robot){
     if(canUse(obj, robot)){
         if(challenge=="RobotS"){
             if(robot->getType()==S){
-                obj->setHp(obj->getHp());
-                obj->setExp(obj->getExp());
+                obj->setHP(obj->getHP());
+                obj->setEXP(obj->getEXP());
             }
         }
         else if(challenge=="RobotC"){
             if(robot->getType()==C){
-                obj->setExp(obj->getExp());
-                obj->setHp(obj->getHp());
+                obj->setEXP(obj->getEXP());
+                obj->setHP(obj->getHP());
             }
         }
         else if(challenge=="RobotSW"){
             if(robot->getType()==SW){
-                obj->setExp(obj->getExp());
-                obj->setHp(obj->getHp());
+                obj->setEXP(obj->getEXP());
+                obj->setHP(obj->getHP());
             }
         }
         else if(challenge=="all"){
-            obj->setExp(obj->getExp());
-            obj->setHp(obj->getHp());
+            obj->setEXP(obj->getEXP());
+            obj->setHP(obj->getHP());
         }
-        else obj->setHp(obj->getHp()-50);
+        else obj->setHP(obj->getHP()-50);
     }
 };
 ItemType PassingCard::getType() const{
@@ -1467,7 +1469,7 @@ StudyPinkProgram::~StudyPinkProgram(){
     config = nullptr;
 };
 bool StudyPinkProgram::isStop() const{
-    if(sherlock->getHp() == 0 || watson->getHp() == 0 || sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition()) || watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())){
+    if(sherlock->getHP() == 0 || watson->getHP() == 0 || sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition()) || watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())){
         return true;
     }
     return false;

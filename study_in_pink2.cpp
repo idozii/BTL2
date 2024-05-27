@@ -215,20 +215,24 @@ Sherlock::~Sherlock(){
     sherlockBag = nullptr;
 };
 Position Sherlock::getNextPosition() {
-    Position next_pos = pos;
+    int row = pos.getRow();
+    int col = pos.getCol();
     if(moving_rule.length() == 0) return Position::npos;
-    if (moving_rule[index_moving_rule] == 'U'){
-        next_pos.setRow(next_pos.getRow() - 1);
+    switch (moving_rule[index_moving_rule]) {
+        case 'U':
+            row--;
+            break;
+        case 'L':
+            col--;
+            break;
+        case 'D':
+            row++;
+            break;
+        case 'R':
+            col++;
+            break;
     }
-    else if (moving_rule[index_moving_rule] == 'L'){
-        next_pos.setCol(next_pos.getCol() - 1);
-    }
-    else if (moving_rule[index_moving_rule] == 'D'){
-        next_pos.setRow(next_pos.getRow() + 1);
-    }
-    else if (moving_rule[index_moving_rule] == 'R'){
-        next_pos.setCol(next_pos.getCol() + 1);
-    }
+    Position next_pos(row, col);
     index_moving_rule++;
     if (index_moving_rule == moving_rule.length()){
         index_moving_rule = 0;
@@ -384,20 +388,24 @@ Watson::~Watson(){
     watsonBag = nullptr;
 };
 Position Watson::getNextPosition() {
-    Position next_pos = pos;
+    int row = pos.getRow();
+    int col = pos.getCol();
     if(moving_rule.length() == 0) return Position::npos;
-    if (moving_rule[index_moving_rule] == 'U'){
-        next_pos.setRow(next_pos.getRow() - 1);
+    switch (moving_rule[index_moving_rule]) {
+        case 'U':
+            row--;
+            break;
+        case 'L':
+            col--;
+            break;
+        case 'D':
+            row++;
+            break;
+        case 'R':
+            col++;
+            break;
     }
-    else if (moving_rule[index_moving_rule] == 'L'){
-        next_pos.setCol(next_pos.getCol() - 1);
-    }
-    else if (moving_rule[index_moving_rule] == 'D'){
-        next_pos.setRow(next_pos.getRow() + 1);
-    }
-    else if (moving_rule[index_moving_rule] == 'R'){
-        next_pos.setCol(next_pos.getCol() + 1);
-    }
+    Position next_pos(row, col);
     index_moving_rule++;
     if (index_moving_rule == moving_rule.length()){
         index_moving_rule = 0;

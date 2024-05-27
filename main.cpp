@@ -36,7 +36,7 @@ public:
         Sherlock * sherlock = new Sherlock(1, "RUU", Position(1, 3), map, 250, 450);
         cout << sherlock->str() << endl;
 
-        Watson * watson = new Watson(2, "LU", Position(2, 1), map, 300, 350);
+        Watson * watson = new Watson(2, "L", Position(0, 1), map, 300, 350);
         cout << watson->str() << endl;
 
         Criminal * criminal = new Criminal(0, Position(7, 9), map, sherlock, watson);

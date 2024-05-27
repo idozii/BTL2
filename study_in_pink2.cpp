@@ -105,18 +105,23 @@ bool Map::isValid ( const Position & pos , MovingObject * mv_obj ) const {
     if ( (pos.getRow()) < 0 || pos.getRow() >= num_rows || pos.getCol() < 0 || pos.getCol() >= num_cols ) {
         return false;
     }
-    if ( getElementType(pos) == FAKE_WALL ) {
-        if(mv_obj != NULL) {
+    else if (getElementType(pos) == FAKE_WALL ) {
+        if(mv_obj) {
             if(mv_obj->getObjectType() == SHERLOCK || mv_obj->getObjectType() == CRIMINAL || mv_obj->getObjectType() == ROBOT) return true;
             else if(mv_obj->getObjectType() == WATSON){
-                if(mv_obj->getEXP()>((pos.getRow()*257+pos.getCol()*139+89)%900+1)) return true;
-                else return false;
+                Watson* watson = dynamic_cast<Watson*>(mv_obj);
+                FakeWall* fakeWall = dynamic_cast<FakeWall*>(map[pos.getRow()][pos.getCol()]);
+                if(watson->getEXP()>(fakeWall->getReqExp())) return true;
+                return false;
             }
         }
         return false;
     }
-    if (getElementType(pos) == PATH) {
+    else if (getElementType(pos) == PATH) {
         return true;
+    }
+    else if(getElementType(pos) == WALL) {
+        return false;
     }
     return false;
 };
@@ -234,8 +239,9 @@ Position Sherlock::getNextPosition() {
 void Sherlock::move(){
     if(this->getEXP()==0) return;  
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(Position::npos)) return;
-    pos = next_pos;    
+    if (!next_pos.isEqual(Position::npos)){
+        pos = next_pos;
+    }   
 };
 Type Sherlock::getObjectType()const{
     return SHERLOCK;
@@ -402,8 +408,9 @@ Position Watson::getNextPosition() {
 void Watson::move(){
     if(this->getEXP()==0) return;
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(Position::npos)) return;
-    pos = next_pos;
+    if (!next_pos.isEqual(Position::npos)){
+        pos = next_pos;
+    }
 };
 Type Watson::getObjectType() const {
     return WATSON;

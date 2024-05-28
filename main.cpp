@@ -15,7 +15,7 @@ using namespace std;
 
 void g_satc_02() { // global
     cout << "----- Sample Testcase 02 -----" << endl;
-    Configuration * config = new Configuration("sa_tc_02_config");
+    Configuration * config = new Configuration("input0.txt");
     cout << config->str() << endl;
     delete config;
 }
@@ -107,7 +107,7 @@ public:
 
 int main(int argc, const char * argv[]) {
     //TestStudyInPink::satc_01();
-    TestStudyInPink::satc_02();
-    //TestStudyInPink::satc_03();
+    //TestStudyInPink::satc_02();
+    TestStudyInPink::satc_03();
     return 0;
 }

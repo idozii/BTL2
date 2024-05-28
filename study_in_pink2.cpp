@@ -278,13 +278,13 @@ void Sherlock::setPos(Position POS){
 bool Sherlock::meet(RobotS* robotS){
     if (pos.isEqual(robotS->getCurrentPosition())) {
         if (exp > 400){
-            sherlockBag->insert(robotS->NewItem());
+            BaseItem* item = robotS->NewItem();
+            sherlockBag->insert(item);
             delete robotS;
             return false;
         }
         else{
             if(sherlockBag->checkItem(EXCEMPTION_CARD) > 0){
-                sherlockBag->insert(robotS->NewItem());
                 sherlockBag->get(EXCEMPTION_CARD);
                 return false;
             }
@@ -315,7 +315,8 @@ bool Sherlock::meet(RobotC* robotC){
             return true;
         }
         else {
-            sherlockBag->insert(robotC->NewItem());
+            BaseItem* item = robotC->NewItem();
+            sherlockBag->insert(item);
             delete robotC;
             return false;
         }
@@ -325,13 +326,13 @@ bool Sherlock::meet(RobotC* robotC){
 bool Sherlock::meet(RobotSW* robotSW){
     if (pos.isEqual(robotSW->getCurrentPosition())) {
         if (exp > 300 && hp > 335){
-            sherlockBag->insert(robotSW->NewItem());
+            BaseItem* item = robotSW->NewItem();
+            sherlockBag->insert(item);
             delete robotSW;
             return false;
         }
         else{
             if(sherlockBag->checkItem(EXCEMPTION_CARD) > 0){
-                sherlockBag->insert(robotSW->NewItem());
                 sherlockBag->get(EXCEMPTION_CARD);
                 return false;
             }
@@ -357,8 +358,8 @@ bool Sherlock::meet(RobotSW* robotSW){
 };
 bool Sherlock::meet(RobotW* robotW){
     if (pos.isEqual(robotW->getCurrentPosition())) {
-        sherlockBag->insert(robotW->NewItem());
-        delete robotW;
+        BaseItem* item = robotW->NewItem();
+        sherlockBag->insert(item);
         return false;
     }
     return false;
@@ -447,19 +448,20 @@ void Watson::setHP(int HP) {
 };
 bool Watson::meet(RobotS* robotS){
     if (pos.isEqual(robotS->getCurrentPosition())){
-        delete robotS;
         return false;
     }
     return false;
 };
 bool Watson::meet(RobotC* robotC){
     if (pos.isEqual(robotC->getCurrentPosition())){
+        BaseItem* item = robotC->NewItem();
         if(watsonBag->checkItem(PASSING_CARD) > 0){
-            watsonBag->insert(robotC->NewItem());
+            watsonBag->insert(item);
             watsonBag->get(PASSING_CARD);
+            delete robotC;
             return false;
         }
-        watsonBag->insert(robotC->NewItem());
+        watsonBag->insert(item);
         delete robotC;
         return false;
     }
@@ -467,14 +469,15 @@ bool Watson::meet(RobotC* robotC){
 };
 bool Watson::meet(RobotSW* robotSW){
     if (pos.isEqual(robotSW->getCurrentPosition())){
+        BaseItem* item = robotSW->NewItem();
         if(watsonBag->checkItem(PASSING_CARD) > 0){
-            watsonBag->insert(robotSW->NewItem());
+            watsonBag->insert(item);
             watsonBag->get(PASSING_CARD);
             return false;
         }
         else{
             if(exp > 600 && hp > 165){
-                watsonBag->insert(robotSW->NewItem());
+                watsonBag->insert(item);
                 delete robotSW;
                 return false;
             }
@@ -500,14 +503,15 @@ bool Watson::meet(RobotSW* robotSW){
 };
 bool Watson::meet(RobotW* robotW){
     if (pos.isEqual(robotW->getCurrentPosition())){
+        BaseItem* item = robotW->NewItem();
         if(watsonBag->checkItem(PASSING_CARD) > 0){
-            watsonBag->insert(robotW->NewItem());
+            watsonBag->insert(item);
             watsonBag->get(PASSING_CARD);
             return false;
         }
         else{
             if (hp > 350){
-                watsonBag->insert(robotW->NewItem());
+                watsonBag->insert(item);
                 delete robotW;
                 return false;
             }
@@ -1013,20 +1017,23 @@ Robot::~Robot(){
     delete item;
     item = nullptr;
 };
-Robot* Robot::create(int index, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson){
+Robot* Robot::create(int index, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson){  
     if(criminal->isCreatedRobotNext()){
-        return new RobotC(index, criminal->getCurrentPosition(), map, criminal);
-    }    
-    else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) > distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
-        return new RobotS(index, criminal->getCurrentPosition(), map, criminal, sherlock);
+        if(criminal->getCount() == 3){
+            return new RobotC(index, criminal->getCurrentPosition(), map, criminal);
+        }    
+        else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) > distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
+            return new RobotS(index, criminal->getCurrentPosition(), map, criminal, sherlock);
+        }
+        else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) < distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
+            return new RobotW(index, criminal->getCurrentPosition(), map, criminal, watson);
+        }
+        else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) == distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
+            return new RobotSW(index, criminal->getCurrentPosition(), map, criminal, sherlock, watson);
+        }
+        else return NULL;
     }
-    else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) < distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
-        return new RobotW(index, criminal->getCurrentPosition(), map, criminal, watson);
-    }
-    else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) == distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
-        return new RobotSW(index, criminal->getCurrentPosition(), map, criminal, sherlock, watson);
-    }
-    else return NULL;
+    return NULL;
 };
 Type Robot::getObjectType() const{
     return ROBOT;
@@ -1487,13 +1494,23 @@ StudyPinkProgram::StudyPinkProgram(const string &config_file_path){
     arr_mv_objs->add(sherlock);
     arr_mv_objs->add(watson);
 };
+void StudyPinkProgram::check() const{
+    cout << config->str() << endl;
+    cout<<config->watson_init_pos.str()<<endl;
+};
 StudyPinkProgram::~StudyPinkProgram(){
-    delete[] map;
-    delete[] arr_mv_objs;
-    delete[] config;
+    delete map;
+    delete arr_mv_objs;
+    delete config;
+    delete sherlock;
+    delete watson;
+    delete criminal;
     map = nullptr;
     arr_mv_objs = nullptr;
     config = nullptr;
+    sherlock = nullptr;
+    watson = nullptr;
+    criminal = nullptr;
 };
 bool StudyPinkProgram::isStop() const{
     if(sherlock->getHP() == 1 || watson->getHP() == 1 || sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition()) || watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())){
@@ -1502,20 +1519,21 @@ bool StudyPinkProgram::isStop() const{
     return false;
 };
 void StudyPinkProgram::run(bool verbose){
+    if (config == nullptr || arr_mv_objs == nullptr || criminal == nullptr || sherlock == nullptr || watson == nullptr) {
+        return;
+    }
     for (int istep = 0; istep < config->num_steps; ++istep) {
         for (int i = 0; i < arr_mv_objs->size(); ++i) {
-            arr_mv_objs->get(i)->move();
-            if (arr_mv_objs->checkMeet(i)) {
-                printStep(istep);
-                break;
-            }
+            MovingObject *obj = arr_mv_objs->get(i);
+            if(obj==nullptr) continue;
+            obj->move();
             if (isStop()) {
                 printStep(istep);
                 break;
             }
             if(criminal->isCreatedRobotNext()){
                 Robot *robot = Robot::create(arr_mv_objs->size(), map, criminal, sherlock, watson);
-                if (robot != NULL) {
+                if (robot != nullptr) {
                     arr_mv_objs->add(robot);
                 }
             }
@@ -1546,12 +1564,16 @@ void StudyPinkProgram::printStep(int si) const {
         << "--"
         << sherlock->str() << "--|--" << watson->str() << "--|--" << criminal->str() << endl;
 };
-
-
-
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER
 ////////////////////////////////////////////////
 
 
-//* check robotSW getnext, fight, studypink
+//* sherlockmeetwatson
+
+int main(){
+    StudyPinkProgram* program = new StudyPinkProgram("input0.txt");
+    program->check();
+    delete program;
+    return 0;
+}

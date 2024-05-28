@@ -503,7 +503,6 @@ private:
 public:
     StudyPinkProgram(const string & config_file_path);
     ~StudyPinkProgram();
-    void check() const;
     bool isStop() const;
     void printResult() const;
     void printStep(int si) const;

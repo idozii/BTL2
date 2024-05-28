@@ -889,10 +889,9 @@ Configuration::Configuration(const string & filepath){
         {
             configString[0][8] = "SHERLOCK_INIT_POS=";
             configString[1][8] = line.substr(18, line.length() - 18);
-            char c;
-            int temp1, temp2;
-            istringstream temp(line.substr(19, 3));
-            temp >> temp1 >> c >> temp2;
+            size_t commaPos = line.find(',', 19);
+            int temp1 = stoi(line.substr(19, commaPos - 19));
+            int temp2 = stoi(line.substr(commaPos + 1));
             sherlock_init_pos = Position(temp1, temp2);
         }
         else if (line.find("SHERLOCK_INIT_HP") == 0)
@@ -917,10 +916,9 @@ Configuration::Configuration(const string & filepath){
         {
             configString[0][12] = "WATSON_INIT_POS=";
             configString[1][12] = line.substr(16, line.length() - 16);
-            char c;
-            int temp1, temp2;
-            istringstream temp(line.substr(17, 3));
-            temp >> temp1 >> c >> temp2;
+            size_t commaPos = line.find(',', 17);
+            int temp1 = stoi(line.substr(17, commaPos - 17));
+            int temp2 = stoi(line.substr(commaPos + 1));
             watson_init_pos = Position(temp1, temp2);
         }
         else if (line.find("WATSON_INIT_HP") == 0)
@@ -939,10 +937,9 @@ Configuration::Configuration(const string & filepath){
         {
             configString[0][15] = "CRIMINAL_INIT_POS=";
             configString[1][15] = line.substr(18, line.length() - 18);
-            char c;
-            int temp1, temp2;
-            istringstream temp(line.substr(19, 3));
-            temp >> temp1 >> c >> temp2;
+            size_t commaPos = line.find(',', 19);
+            int temp1 = stoi(line.substr(19, commaPos - 19));
+            int temp2 = stoi(line.substr(commaPos + 1));
             criminal_init_pos = Position(temp1, temp2);
         }
         else if (line.find("NUM_STEPS") == 0)
@@ -1494,10 +1491,6 @@ StudyPinkProgram::StudyPinkProgram(const string &config_file_path){
     arr_mv_objs->add(sherlock);
     arr_mv_objs->add(watson);
 };
-void StudyPinkProgram::check() const{
-    cout << config->str() << endl;
-    cout<<config->watson_init_pos.str()<<endl;
-};
 StudyPinkProgram::~StudyPinkProgram(){
     delete map;
     delete arr_mv_objs;
@@ -1570,10 +1563,3 @@ void StudyPinkProgram::printStep(int si) const {
 
 
 //* sherlockmeetwatson
-
-int main(){
-    StudyPinkProgram* program = new StudyPinkProgram("input0.txt");
-    program->check();
-    delete program;
-    return 0;
-}

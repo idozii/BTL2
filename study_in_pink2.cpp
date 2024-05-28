@@ -1496,7 +1496,7 @@ StudyPinkProgram::~StudyPinkProgram(){
     config = nullptr;
 };
 bool StudyPinkProgram::isStop() const{
-    if(sherlock->getHP() == 0 || watson->getHP() == 0 || sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition()) || watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())){
+    if(sherlock->getHP() == 1 || watson->getHP() == 1 || sherlock->getCurrentPosition().isEqual(criminal->getCurrentPosition()) || watson->getCurrentPosition().isEqual(criminal->getCurrentPosition())){
         return true;
     }
     return false;
@@ -1552,3 +1552,6 @@ void StudyPinkProgram::printStep(int si) const {
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER
 ////////////////////////////////////////////////
+
+
+//* check robotSW getnext, fight, studypink

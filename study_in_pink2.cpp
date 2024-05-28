@@ -1517,9 +1517,11 @@ void StudyPinkProgram::run(bool verbose){
     }
     for (int istep = 0; istep < config->num_steps; ++istep) {
         for (int i = 0; i < arr_mv_objs->size(); ++i) {
-            MovingObject *obj = arr_mv_objs->get(i);
-            if(obj==nullptr) continue;
-            obj->move();
+            arr_mv_objs->get(i)->move();
+            if(arr_mv_objs->checkMeet(i)){
+                printStep(istep);
+                break;
+            }
             if (isStop()) {
                 printStep(istep);
                 break;
@@ -1532,7 +1534,6 @@ void StudyPinkProgram::run(bool verbose){
             }
             if (verbose) {
                 printStep(istep);
-                break;
             }
         }
         if (isStop()) {
@@ -1560,6 +1561,4 @@ void StudyPinkProgram::printStep(int si) const {
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER
 ////////////////////////////////////////////////
-
-
 //* sherlockmeetwatson

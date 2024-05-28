@@ -613,7 +613,7 @@ ArrayMovingObject::~ArrayMovingObject(){
     }
 };
 bool ArrayMovingObject::isFull() const {
-    if(count==capacity) return true;
+    if(count>=capacity) return true;
     return false;
 };
 bool ArrayMovingObject::add(MovingObject* mv_obj){
@@ -637,7 +637,6 @@ int ArrayMovingObject::size() const{
 };
 string ArrayMovingObject::str() const{
     string arraymovingobject;
-    int i = 0;
     arraymovingobject = "ArrayMovingObject[count="+to_string(count)+";capacity="+to_string(capacity)+";";
     for (int i = 0; i < count; i++){
         arraymovingobject += get(i)->str();
@@ -826,22 +825,24 @@ Configuration::Configuration(const string & filepath){
         }
         else if (line.find("ARRAY_WALLS") == 0)
         {
-            num_walls = (line.length() - 13) / 6;
+            string walls = line.substr(12); 
+            walls = walls.substr(1, walls.length() - 2); 
+            num_walls = 0;
+            for (char c : walls) {
+                if (c == '(') {
+                    num_walls++;
+                }
+            }
             configString[0][3] = "NUM_WALLS=";
             configString[1][3] = to_string(num_walls);
             configString[0][4] = "ARRAY_WALLS=";
             configString[1][4] = line.substr(12, line.length() - 12);
             if(num_walls > 0){
-                configString[0][3] = "NUM_WALLS=";
-                configString[1][3] = to_string(num_walls);
-                configString[0][4] = "ARRAY_WALLS=";
-                configString[1][4] = line.substr(12, line.length() - 12);
                 arr_walls = new Position[num_walls];
-                for (int k = 0; k < num_walls; k++)
-                {
+                istringstream temp(line.substr(14));
+                for (int k = 0; k < num_walls; k++){
                     char c;
                     int temp1, temp2;
-                    istringstream temp(line.substr(14 + k * 6, 3));
                     temp >> temp1 >> c >> temp2;
                     arr_walls[k] = Position(temp1, temp2);
                 }
@@ -849,17 +850,21 @@ Configuration::Configuration(const string & filepath){
         }
         else if (line.find("ARRAY_FAKE_WALLS") == 0)
         {
-            num_fake_walls = (line.length() - 18) / 6;
+            string fake_walls = line.substr(17);
+            fake_walls = fake_walls.substr(1, fake_walls.length() - 2);
+            num_fake_walls = 0;
+            for (char c : fake_walls) {
+                if (c == '(') {
+                    num_fake_walls++;
+                }
+            }
             configString[0][5] = "NUM_FAKE_WALLS=";
             configString[1][5] = to_string(num_fake_walls);
             configString[0][6] = "ARRAY_FAKE_WALLS=";
             configString[1][6] = line.substr(17, line.length() - 17);
             if(num_fake_walls > 0){
-                configString[0][5] = "NUM_FAKE_WALLS=";
-                configString[1][5] = to_string(num_fake_walls);
-                configString[0][6] = "ARRAY_FAKE_WALLS=";
-                configString[1][6] = line.substr(17, line.length() - 17);
                 arr_fake_walls = new Position[num_fake_walls];
+                istringstream temp(line.substr(19));
                 for (int k = 0; k < num_fake_walls; k++)
                 {
                     char c;
@@ -1079,10 +1084,10 @@ Position RobotS::getNextPosition() {
     Position next_pos = pos;
     int min_distance = 100;
     Position arr[4];
-    arr[0] = Position(pos.getRow(), pos.getCol()+1);
-    arr[1] = Position(pos.getRow()+1, pos.getCol());
-    arr[2] = Position(pos.getRow(), pos.getCol()-1);
-    arr[3] = Position(pos.getRow()-1, pos.getCol());
+    arr[0] = Position(pos.getRow()-1, pos.getCol());
+    arr[1] = Position(pos.getRow(), pos.getCol()+1);
+    arr[2] = Position(pos.getRow()+1, pos.getCol());
+    arr[3] = Position(pos.getRow(), pos.getCol()-1);
     for (int i = 0; i < 4; i++){
         if (map->isValid(arr[i], this)){
             int distance = abs(arr[i].getRow() - sherlock->getCurrentPosition().getRow()) + abs(arr[i].getCol() - sherlock->getCurrentPosition().getCol());
@@ -1090,7 +1095,7 @@ Position RobotS::getNextPosition() {
                 min_distance = distance;
                 next_pos = arr[i];
             }
-            else if (distance == min_distance){
+            else if (distance >= min_distance){
                 continue;
             }
         }
@@ -1123,10 +1128,10 @@ Position RobotW::getNextPosition() {
     Position next_pos = pos;
     int min_distance = 100;
     Position arr[4];
-    arr[0] = Position(pos.getRow(), pos.getCol()+1);
-    arr[1] = Position(pos.getRow()+1, pos.getCol());
-    arr[2] = Position(pos.getRow(), pos.getCol()-1);
-    arr[3] = Position(pos.getRow()-1, pos.getCol());
+    arr[0] = Position(pos.getRow()-1, pos.getCol());
+    arr[1] = Position(pos.getRow(), pos.getCol()+1);
+    arr[2] = Position(pos.getRow()+1, pos.getCol());
+    arr[3] = Position(pos.getRow(), pos.getCol()-1);
     for (int i = 0; i < 4; i++){
         if (map->isValid(arr[i], this)){
             int distance = abs(arr[i].getRow() - watson->getCurrentPosition().getRow()) + abs(arr[i].getCol() - watson->getCurrentPosition().getCol());
@@ -1134,7 +1139,7 @@ Position RobotW::getNextPosition() {
                 min_distance = distance;
                 next_pos = arr[i];
             }
-            else if (distance == min_distance){
+            else if (distance >= min_distance){
                 continue;
             }
         }
@@ -1167,19 +1172,23 @@ RobotSW::RobotSW(int index, const Position & init_pos, Map* map, Criminal* crimi
 Position RobotSW::getNextPosition() {
     Position next_pos = pos;
     int min_distance = 100;
-    Position arr[4];
-    arr[0] = Position(pos.getRow(), pos.getCol()+2);
-    arr[1] = Position(pos.getRow()+2, pos.getCol());
-    arr[2] = Position(pos.getRow(), pos.getCol()-2);
-    arr[3] = Position(pos.getRow()-2, pos.getCol());
-    for (int i = 0; i < 4; i++){
+    Position arr[8];
+    arr[0] = Position(pos.getRow()-2, pos.getCol());
+    arr[1] = Position(pos.getRow()-1, pos.getCol()+1);
+    arr[2] = Position(pos.getRow(), pos.getCol()+2);
+    arr[3] = Position(pos.getRow()+1, pos.getCol()+1);
+    arr[4] = Position(pos.getRow()+2, pos.getCol());
+    arr[5] = Position(pos.getRow()+1, pos.getCol()-1);
+    arr[6] = Position(pos.getRow(), pos.getCol()-2);
+    arr[7] = Position(pos.getRow()-1, pos.getCol()-1);
+    for (int i = 0; i < 8; i++){
         if (map->isValid(arr[i], this)){
             int distance = abs(arr[i].getRow() - sherlock->getCurrentPosition().getRow()) + abs(arr[i].getCol() - sherlock->getCurrentPosition().getCol()) + abs(arr[i].getRow() - watson->getCurrentPosition().getRow()) + abs(arr[i].getCol() - watson->getCurrentPosition().getCol());
             if (distance < min_distance){
                 min_distance = distance;
                 next_pos = arr[i];
             }
-            else if (distance == min_distance){
+            else if (distance >= min_distance){
                 continue;
             }
         }
@@ -1337,7 +1346,6 @@ BaseBag::~BaseBag(){
     Node* temp = head;
     while (temp != nullptr){
         head = head->next;
-        delete temp->item;
         delete temp;
         temp = head;
     }
@@ -1400,7 +1408,7 @@ BaseItem* BaseBag::get(ItemType type){
     return nullptr;
 };
 bool BaseBag::isFull() const{
-    if(size==capacity) return true;
+    if(size>=capacity) return true;
     return false;
 };
 bool BaseBag::checkItem(ItemType type) {
@@ -1513,6 +1521,7 @@ void StudyPinkProgram::run(bool verbose){
             }
             if (verbose) {
                 printStep(istep);
+                break;
             }
         }
         if (isStop()) {

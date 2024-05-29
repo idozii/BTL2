@@ -1609,13 +1609,6 @@ void StudyPinkProgram::printStep(int si) const {
         << "--"
         << sherlock->str() << "--|--" << watson->str() << "--|--" << criminal->str() << endl;
 };
-
-int main(){
-    StudyPinkProgram* program = new StudyPinkProgram("input0.txt");
-    program->run(true);
-    delete program;
-    return 0;
-}
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER
 ////////////////////////////////////////////////

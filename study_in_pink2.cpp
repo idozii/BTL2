@@ -599,7 +599,6 @@ Position Criminal::getPrevPos() const{
 };
 Position Criminal::getNextPosition() {
     Position next_pos = pos;
-    prev_pos = pos;
     int max_distance = -1;
     Position arr[4];
     arr[0] = Position(pos.getRow() - 1, pos.getCol());
@@ -623,6 +622,7 @@ Position Criminal::getNextPosition() {
     return next_pos;
 };
 void Criminal::move(){
+    prev_pos = pos;
     Position next_pos = getNextPosition();
     if (!next_pos.isEqual(Position::npos)){
         pos = next_pos;

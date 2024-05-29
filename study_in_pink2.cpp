@@ -272,7 +272,6 @@ bool Sherlock::meet(RobotS* robotS){
         if (exp > 400){
             BaseItem* item = robotS->NewItem();
             sherlockBag->insert(item);
-            delete robotS;
             return false;
         }
         else{
@@ -303,13 +302,11 @@ bool Sherlock::meet(RobotC* robotC){
     if (pos.isEqual(robotC->getCurrentPosition())) {
         if (exp > 500){
             this->setPos(robotC->getCrimePosition());
-            delete robotC;
             return true;
         }
         else {
             BaseItem* item = robotC->NewItem();
             sherlockBag->insert(item);
-            delete robotC;
             return false;
         }
     }
@@ -320,7 +317,6 @@ bool Sherlock::meet(RobotSW* robotSW){
         if (exp > 300 && hp > 335){
             BaseItem* item = robotSW->NewItem();
             sherlockBag->insert(item);
-            delete robotSW;
             return false;
         }
         else{
@@ -450,11 +446,9 @@ bool Watson::meet(RobotC* robotC){
         if(watsonBag->checkItem(PASSING_CARD) > 0){
             watsonBag->insert(item);
             watsonBag->get(PASSING_CARD);
-            delete robotC;
             return false;
         }
         watsonBag->insert(item);
-        delete robotC;
         return false;
     }
     return false;
@@ -470,7 +464,6 @@ bool Watson::meet(RobotSW* robotSW){
         else{
             if(exp > 600 && hp > 165){
                 watsonBag->insert(item);
-                delete robotSW;
                 return false;
             }
             else{
@@ -504,7 +497,6 @@ bool Watson::meet(RobotW* robotW){
         else{
             if (hp > 350){
                 watsonBag->insert(item);
-                delete robotW;
                 return false;
             }
             else{

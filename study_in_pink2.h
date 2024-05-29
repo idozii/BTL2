@@ -126,8 +126,6 @@ class MovingObject {
 
 protected:
     int index;
-    int exp;
-    int hp;
     Position pos;
     Map* map;
     string name;
@@ -139,13 +137,15 @@ public:
     Position getCurrentPosition() const;
     virtual void move() = 0;
     virtual string str() const = 0;
-    virtual int getEXP() const;
-    virtual int getHP() const;
     virtual Type getObjectType() const = 0;
 };
 
 class Character : public MovingObject {
     friend class TestStudyInPink;
+
+protected:
+    int hp;
+    int exp;
 
 public:
     Character(int index, const Position &pos, Map* map, const string &name="");
@@ -154,8 +154,8 @@ public:
     virtual string str() const = 0;
     virtual int getHP() const;
     virtual int getEXP() const;
-    virtual void setHP(int init_hp);
-    virtual void setEXP(int init_exp);
+    virtual void setHP(int HP);
+    virtual void setEXP(int EXP);
     virtual Type getObjectType() const = 0;
 };
 
@@ -179,8 +179,8 @@ public:
     string str() const;
     int getHP() const;
     int getEXP() const;
-    void setHP(int hp);
-    void setEXP(int exp);
+    void setHP(int HP);
+    void setEXP(int EXP);
     void setPos(Position pos);
     bool meet(RobotS* robotS);
     bool meet(RobotW* robotW);

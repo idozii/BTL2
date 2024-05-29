@@ -70,7 +70,7 @@ Map::Map(int num_rows, int num_cols, int num_walls, Position *array_walls, int n
             }
             for (int k = 0; k < num_fake_walls; k++){
                 if (array_fake_walls[k].getRow() == i && array_fake_walls[k].getCol() == j){
-                    map[i][j] = new FakeWall((i * 257 + j * 139 + 89) % 900 + 1);
+                    map[i][j] = new FakeWall(ceil((i * 257 + j * 139 + 89) % 900 + 1));
                 }
             }
         }
@@ -166,18 +166,10 @@ MovingObject::MovingObject(int index, const Position pos, Map * map, const strin
     this->pos = pos;
     this->map = map;
     this->name = name;
-    this->exp = 0;
-    this->hp = 0;
 };
 MovingObject::~MovingObject(){};
 Position MovingObject::getCurrentPosition() const{
     return this->pos;
-};
-int MovingObject::getEXP() const{
-    return this->exp;
-};
-int MovingObject::getHP() const{
-    return this->hp;
 };
 
 //TODO: 3.5.1: CHARACTER
@@ -187,18 +179,18 @@ Character::Character(int index, const Position & init_pos, Map * map, const stri
 int Character::getEXP() const{
     return this->exp;
 };
-void Character::setEXP(int init_exp) {
-    if(init_exp < 0) this->exp = 0;
-    else if(init_exp > 900) this->exp = 900;
-    else this->exp = init_exp;
+void Character::setEXP(int EXP) {
+    if(EXP < 0) this->exp = 0;
+    else if(EXP > 900) this->exp = 900;
+    else this->exp = ceil(EXP);
 };
 int Character::getHP() const{
     return this->hp;
 };
-void Character::setHP(int init_hp) {
-    if(init_hp < 0) this->hp = 0;
-    else if(init_hp > 500) this->hp = 500;
-    else this->hp = init_hp;
+void Character::setHP(int HP) {
+    if(HP < 0) this->hp = 0;
+    else if(HP > 500) this->hp = 500;
+    else this->hp = ceil(HP);
 };
 
 //TODO: 3.5.2: SHERLOCK
@@ -265,12 +257,12 @@ int Sherlock::getEXP() const {
 void Sherlock::setEXP(int EXP) {
     if(EXP < 0) this->exp = 0;
     else if(EXP > 900) this->exp = 900;
-    else this->exp = EXP;
+    else this->exp = ceil(EXP);
 };
 void Sherlock::setHP(int HP) {
     if(HP < 0) this->hp = 0;
     else if(HP > 500) this->hp = 500;
-    else this->hp = HP;
+    else this->hp = ceil(HP);
 };
 void Sherlock::setPos(Position POS){
     this->pos = POS;
@@ -289,7 +281,7 @@ bool Sherlock::meet(RobotS* robotS){
                 return false;
             }
             else{
-                exp = exp*90/100;
+                exp = ceil(exp*0.90);
                 if(sherlockBag->checkItem(ENERGY_DRINK) > 0) {
                     sherlockBag->get(ENERGY_DRINK);
                     return false;
@@ -337,8 +329,8 @@ bool Sherlock::meet(RobotSW* robotSW){
                 return false;
             }
             else{
-                exp = exp*0.85;
-                hp = hp*0.85;
+                exp = ceil(exp*0.85);
+                hp = ceil(hp*0.85);
                 if(sherlockBag->checkItem(ENERGY_DRINK) > 0) {
                     sherlockBag->get(ENERGY_DRINK);
                     return false;
@@ -439,12 +431,12 @@ int Watson::getHP() const {
 void Watson::setEXP(int EXP) {
     if(EXP < 0) this->exp = 0;
     else if(EXP > 900) this->exp = 900;
-    else this->exp = EXP;
+    else this->exp = ceil(EXP);
 };
 void Watson::setHP(int HP) {
     if(HP < 0) this->hp = 0;
     else if(HP > 500) this->hp = 500;
-    else this->hp = HP;
+    else this->hp = ceil(HP);
 };
 bool Watson::meet(RobotS* robotS){
     if (pos.isEqual(robotS->getCurrentPosition())){
@@ -482,8 +474,8 @@ bool Watson::meet(RobotSW* robotSW){
                 return false;
             }
             else{
-                hp = hp*0.85;
-                exp = exp*0.85;
+                hp = ceil(hp*0.85);
+                exp = ceil(exp*0.85);
                 if(watsonBag->checkItem(ENERGY_DRINK) > 0) {
                     watsonBag->get(ENERGY_DRINK);
                     return false;
@@ -516,7 +508,7 @@ bool Watson::meet(RobotW* robotW){
                 return false;
             }
             else{
-                hp = hp*0.95;
+                hp = ceil(hp*0.95);
                 if(watsonBag->checkItem(ENERGY_DRINK) > 0) {
                     watsonBag->get(ENERGY_DRINK);
                     return false;
@@ -583,8 +575,9 @@ Position Criminal::getNextPosition() {
 };
 void Criminal::move(){
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(Position::npos)) return;
-    pos = next_pos;
+    if (!next_pos.isEqual(Position::npos)){
+        pos = next_pos;
+    } 
     count++;
 };
 Type Criminal::getObjectType() const{
@@ -1015,20 +1008,17 @@ Robot::~Robot(){
     item = nullptr;
 };
 Robot* Robot::create(int index, Map* map, Criminal* criminal, Sherlock* sherlock, Watson* watson){  
-    if(criminal->isCreatedRobotNext()){
-        if(criminal->getCount() == 3){
-            return new RobotC(index, criminal->getCurrentPosition(), map, criminal);
-        }    
-        else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) > distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
-            return new RobotS(index, criminal->getCurrentPosition(), map, criminal, sherlock);
-        }
-        else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) < distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
-            return new RobotW(index, criminal->getCurrentPosition(), map, criminal, watson);
-        }
-        else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) == distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
-            return new RobotSW(index, criminal->getCurrentPosition(), map, criminal, sherlock, watson);
-        }
-        else return NULL;
+    if(criminal->getCount() == 3){
+        return new RobotC(index, criminal->getCurrentPosition(), map, criminal);
+    }    
+    else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) > distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
+        return new RobotS(index, criminal->getCurrentPosition(), map, criminal, sherlock);
+    }
+    else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) < distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
+        return new RobotW(index, criminal->getCurrentPosition(), map, criminal, watson);
+    }
+    else if(distance(criminal->getCurrentPosition(), sherlock->getCurrentPosition()) == distance(criminal->getCurrentPosition(), watson->getCurrentPosition())){
+        return new RobotSW(index, criminal->getCurrentPosition(), map, criminal, sherlock, watson);
     }
     return NULL;
 };
@@ -1059,8 +1049,9 @@ Position RobotC::getCrimePosition() {
 };
 void RobotC::move(){
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(Position::npos)) return;
-    pos = next_pos;
+    if (!next_pos.isEqual(Position::npos)){
+        pos = next_pos;
+    }
 };
 RobotType RobotC::getType() const{
     return C;
@@ -1109,8 +1100,9 @@ Position RobotS::getNextPosition() {
 };
 void RobotS::move(){
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(Position::npos)) return;
-    pos = next_pos;
+    if (!next_pos.isEqual(Position::npos)){
+        pos = next_pos;
+    } 
 };
 RobotType RobotS::getType() const{
     return S;
@@ -1153,8 +1145,9 @@ Position RobotW::getNextPosition() {
 };
 void RobotW::move(){
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(Position::npos)) return;
-    pos = next_pos;
+    if (!next_pos.isEqual(Position::npos)){
+        pos = next_pos;
+    } 
 };
 RobotType RobotW::getType() const{
     return W;
@@ -1202,8 +1195,9 @@ Position RobotSW::getNextPosition() {
 };
 void RobotSW::move(){
     Position next_pos = getNextPosition();
-    if (next_pos.isEqual(Position::npos)) return;
-    pos = next_pos;
+    if (!next_pos.isEqual(Position::npos)){
+        pos = next_pos;
+    } 
 };
  RobotType RobotSW::getType() const{
     return SW;

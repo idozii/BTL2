@@ -268,95 +268,129 @@ void Sherlock::setPos(Position POS){
     this->pos = POS;
 };
 bool Sherlock::meet(RobotS* robotS){
+    if(sherlockBag==NULL || robotS==NULL){
+        return false;
+    }
     if (pos.isEqual(robotS->getCurrentPosition())) {
-        if (exp > 400){
-            BaseItem* item = robotS->NewItem();
-            sherlockBag->insert(item);
-            delete robotS;
-            return false;
-        }
-        else{
-            if(sherlockBag->checkItem(EXCEMPTION_CARD) > 0){
-                sherlockBag->get(EXCEMPTION_CARD);
+        if(this->hp%2!=0){
+            BaseItem *item = sherlockBag->get(EXCEMPTION_CARD);
+            if (item != NULL){
+                if (this->getEXP() > 400){
+                    sherlockBag->insert(robotS->NewItem());
+                }
+                BaseItem *second = sherlockBag->get();
+                if(second != NULL) {
+                    second->use(this, NULL);
+                } 
                 return false;
             }
-            else{
-                exp = ceil(exp*0.90);
-                if(sherlockBag->checkItem(ENERGY_DRINK) > 0) {
-                    sherlockBag->get(ENERGY_DRINK);
-                    return false;
-                }
-                else if(sherlockBag->checkItem(FIRST_AID) > 0) {
-                    sherlockBag->get(FIRST_AID);
-                    return false;
-                }
-                else if(sherlockBag->checkItem(MAGIC_BOOK) > 0) {
-                    sherlockBag->get(MAGIC_BOOK);
-                    return false;
-                }
-            }
         }
+        if (this->getEXP() > 400) {
+            sherlockBag->insert(robotS->NewItem());
+            BaseItem *second = sherlockBag->get();
+            if (second != NULL) {
+                second->use(this, NULL);
+            }
+            return false;
+        }
+        this->setEXP(this->getEXP() * 0.9);
+        BaseItem *second = sherlockBag->get();
+        if (second != NULL) {
+            second->use(this, NULL);
+        }
+        return false;
     }
     return false;
 };
 bool Sherlock::meet(RobotC* robotC){
+    if(robotC==NULL || sherlockBag==NULL){
+        return false;
+    }
     if (pos.isEqual(robotC->getCurrentPosition())) {
-        if (exp > 500){
+        if (this->getHP() % 2 != 0) {
+            BaseItem *item = sherlockBag->get(EXCEMPTION_CARD);
+            if (item != NULL) {
+                if (this->getEXP() > 500) {
+                    this->setPos(robotC->getCrimePosition());
+                    BaseItem *second = sherlockBag->get();
+                    if (second != NULL) second->use(this, NULL);
+                    return true;
+                }
+                else {
+                    sherlockBag->insert(robotC->NewItem());
+                    BaseItem *second = sherlockBag->get();
+                    if (second != NULL) second->use(this, NULL);
+                    return false;
+                }
+            }
+        }
+        if (this->getEXP() > 500) {
             this->setPos(robotC->getCrimePosition());
-            delete robotC;
+            BaseItem *second = sherlockBag->get();
+            if (second != NULL) second->use(this, NULL);
             return true;
         }
-        else {
-            BaseItem* item = robotC->NewItem();
-            sherlockBag->insert(item);
-            delete robotC;
-            return false;
-        }
+        sherlockBag->insert(robotC->NewItem());
+        BaseItem *second = sherlockBag->get();
+        if (second != NULL) second->use(this, NULL);
+        return false;
     }
     return false;
 };
 bool Sherlock::meet(RobotSW* robotSW){
+    if(robotSW==NULL || sherlockBag==NULL){
+        return false;
+    }
     if (pos.isEqual(robotSW->getCurrentPosition())) {
-        if (exp > 300 && hp > 335){
-            BaseItem* item = robotSW->NewItem();
-            sherlockBag->insert(item);
-            delete robotSW;
-            return false;
-        }
-        else{
-            if(sherlockBag->checkItem(EXCEMPTION_CARD) > 0){
-                sherlockBag->get(EXCEMPTION_CARD);
+        if (this->getHP() % 2 != 0) {
+            BaseItem *item = sherlockBag->get(EXCEMPTION_CARD);
+            if (item != NULL) {
+                if (this->getEXP() > 300 && this->getHP() > 335) sherlockBag->insert(robotSW->NewItem());
+                BaseItem *second = sherlockBag->get();
+                if (second != NULL) second->use(this, NULL);
                 return false;
             }
-            else{
-                exp = ceil(exp*0.85);
-                hp = ceil(hp*0.85);
-                if(sherlockBag->checkItem(ENERGY_DRINK) > 0) {
-                    sherlockBag->get(ENERGY_DRINK);
-                    return false;
-                }
-                else if(sherlockBag->checkItem(FIRST_AID) > 0) {
-                    sherlockBag->get(FIRST_AID);
-                    return false;
-                }
-                else if(sherlockBag->checkItem(MAGIC_BOOK) > 0) {
-                    sherlockBag->get(MAGIC_BOOK);
-                    return false;
-                }
-            }
         }
+        if (this->getEXP() > 300 && this->getHP() > 335) {
+            sherlockBag->insert(robotSW->NewItem());
+            BaseItem *second = sherlockBag->get();
+            if (second != NULL) second->use(this, NULL);
+            return false;
+        }
+        this->setHP(this->getHP() * 0.85);
+        this->setEXP(this->getEXP() * 0.85);
+        BaseItem *second = sherlockBag->get();
+        if (second != NULL) second->use(this, NULL);
+        return false;
     }
     return false;
 };
 bool Sherlock::meet(RobotW* robotW){
+    if(robotW==NULL || sherlockBag==NULL){
+        return false;
+    }
     if (pos.isEqual(robotW->getCurrentPosition())) {
-        BaseItem* item = robotW->NewItem();
-        sherlockBag->insert(item);
+        if (this->getHP() % 2 != 0) {
+            BaseItem *item = sherlockBag->get(EXCEMPTION_CARD);
+            if (item != NULL) {
+                sherlockBag->insert(robotW->NewItem());
+                BaseItem *second = sherlockBag->get();
+                if (second != NULL) second->use(this, NULL);
+                return false;
+            }
+        }
+        sherlockBag->insert(robotW->NewItem());
+        BaseItem *second = sherlockBag->get();
+        if (second != NULL) second->use(this, NULL);
         return false;
     }
     return false;
 };
 bool Sherlock::meet(Watson* watson){
+    Sherlock* sherlock = dynamic_cast<Sherlock*>(this);
+    if(sherlockBag==NULL || watson==NULL || watson->getWatsonBag()==NULL || sherlock==NULL){
+        return false;
+    }
     if(pos.isEqual(watson->getCurrentPosition())){
         while(watson->getWatsonBag()->checkItem(EXCEMPTION_CARD) > 0 && sherlockBag->checkItem(PASSING_CARD) > 0) {
             watson->getWatsonBag()->insert(sherlockBag->get(PASSING_CARD));
@@ -439,94 +473,109 @@ void Watson::setHP(int HP) {
     else this->hp = ceil(HP);
 };
 bool Watson::meet(RobotS* robotS){
+    if(watsonBag==NULL || robotS==NULL){
+        return false;
+    }
     if (pos.isEqual(robotS->getCurrentPosition())){
+        if (this->getHP() % 2 == 0) {
+            BaseItem *item = watsonBag->get(PASSING_CARD);
+            if (item != NULL) {
+                item->use(this, robotS);
+                BaseItem *second = watsonBag->get();
+                if (second != NULL) second->use(this, NULL);
+                return false;
+            }
+        }
+        BaseItem *second = watsonBag->get();
+        if (second != NULL) second->use(this, NULL);
         return false;
     }
     return false;
 };
 bool Watson::meet(RobotC* robotC){
+    if(watsonBag==NULL || robotC == NULL){
+        return false;
+    }
     if (pos.isEqual(robotC->getCurrentPosition())){
-        BaseItem* item = robotC->NewItem();
-        if(watsonBag->checkItem(PASSING_CARD) > 0){
-            watsonBag->insert(item);
-            watsonBag->get(PASSING_CARD);
-            delete robotC;
-            return false;
+        if (this->getHP() % 2 == 0) {
+            BaseItem *item = watsonBag->get(PASSING_CARD);
+            if (item != NULL) {
+                item->use(this, robotC);
+                watsonBag->insert(robotC->NewItem());
+                BaseItem *second = watsonBag->get();
+                if (second != NULL) second->use(this, NULL);
+                return false;
+            }
         }
-        watsonBag->insert(item);
-        delete robotC;
+        watsonBag->insert(robotC->NewItem());
+        BaseItem *second = watsonBag->get();
+        if (second != NULL) second->use(this, NULL);
         return false;
     }
     return false;
 };
 bool Watson::meet(RobotSW* robotSW){
+    if(watsonBag==NULL || robotSW==NULL){
+        return false;
+    }
     if (pos.isEqual(robotSW->getCurrentPosition())){
-        BaseItem* item = robotSW->NewItem();
-        if(watsonBag->checkItem(PASSING_CARD) > 0){
-            watsonBag->insert(item);
-            watsonBag->get(PASSING_CARD);
-            return false;
-        }
-        else{
-            if(exp > 600 && hp > 165){
-                watsonBag->insert(item);
-                delete robotSW;
+        if (this->getHP() % 2 == 0) {
+            BaseItem *item = watsonBag->get(PASSING_CARD);
+            if (item != NULL) {
+                item->use(this, robotSW);
+                watsonBag->insert(robotSW->NewItem());
+                BaseItem *second = watsonBag->get();
+                if (second != NULL) second->use(this, NULL);
                 return false;
             }
-            else{
-                hp = ceil(hp*0.85);
-                exp = ceil(exp*0.85);
-                if(watsonBag->checkItem(ENERGY_DRINK) > 0) {
-                    watsonBag->get(ENERGY_DRINK);
-                    return false;
-                }
-                else if(watsonBag->checkItem(FIRST_AID) > 0) {
-                    watsonBag->get(FIRST_AID);
-                    return false;
-                }
-                else if(watsonBag->checkItem(MAGIC_BOOK) > 0) {
-                    watsonBag->get(MAGIC_BOOK);
-                    return false;
-                }
-            }
         }
+        if (this->getEXP() > 600 && this->getHP() > 165) {
+            watsonBag->insert(robotSW->NewItem());
+            BaseItem *second = watsonBag->get();
+            if (second != NULL) second->use(this, NULL);
+            return false;
+        }
+        this->setHP(this->getHP() * 0.85);
+        this->setEXP(this->getEXP() * 0.85);
+        BaseItem *second = watsonBag->get();
+        if (second != NULL) second->use(this, NULL);
+        return false;
     }
     return false;
 };
 bool Watson::meet(RobotW* robotW){
+    if(watsonBag==NULL || robotW==NULL){
+        return false;
+    }
     if (pos.isEqual(robotW->getCurrentPosition())){
-        BaseItem* item = robotW->NewItem();
-        if(watsonBag->checkItem(PASSING_CARD) > 0){
-            watsonBag->insert(item);
-            watsonBag->get(PASSING_CARD);
-            return false;
-        }
-        else{
-            if (hp > 350){
-                watsonBag->insert(item);
-                delete robotW;
+        if (this->getHP() % 2 == 0) {
+            BaseItem *item = watsonBag->get(PASSING_CARD);
+            if (item != NULL) {
+                item->use(this, robotW);
+                watsonBag->insert(robotW->NewItem());
+                BaseItem *second = watsonBag->get();
+                if (second != NULL) second->use(this, NULL);
                 return false;
             }
-            else{
-                hp = ceil(hp*0.95);
-                if(watsonBag->checkItem(ENERGY_DRINK) > 0) {
-                    watsonBag->get(ENERGY_DRINK);
-                    return false;
-                }
-                else if(watsonBag->checkItem(FIRST_AID) > 0) {
-                    watsonBag->get(FIRST_AID);
-                    return false;
-                }
-                else if(watsonBag->checkItem(MAGIC_BOOK) > 0) {
-                    watsonBag->get(MAGIC_BOOK);
-                    return false;
-                }
-            }
         }
+        if (this->getHP() > 350) {
+            watsonBag->insert(robotW->NewItem());
+            BaseItem *second = watsonBag->get();
+            if (second != NULL) second->use(this, NULL);
+            return false;
+        }
+        this->setHP(this->getHP() * 0.95);
+        BaseItem *second = watsonBag->get();
+        if (second != NULL) second->use(this, NULL);
+        return false;
     }
     return false;
 };
 bool Watson::meet(Sherlock* sherlock){
+    Watson* watson = dynamic_cast<Watson*>(this);
+    if(sherlock==NULL || sherlock->getSherlockBag()==NULL || watson==NULL || watsonBag==NULL){
+        return false;
+    }
     if(pos.isEqual(sherlock->getCurrentPosition())){
         while(watsonBag->checkItem(EXCEMPTION_CARD) > 0 && sherlock->getSherlockBag()->checkItem(PASSING_CARD) > 0) {
             watsonBag->insert(sherlock->getSherlockBag()->get(PASSING_CARD));
@@ -1555,4 +1604,3 @@ void StudyPinkProgram::printStep(int si) const {
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER
 ////////////////////////////////////////////////
-//* sherlockmeetwatson

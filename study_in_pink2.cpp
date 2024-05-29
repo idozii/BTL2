@@ -392,11 +392,15 @@ bool Sherlock::meet(Watson* watson){
         return false;
     }
     if(pos.isEqual(watson->getCurrentPosition())){
-        while(watson->getWatsonBag()->checkItem(EXCEMPTION_CARD) > 0 && sherlockBag->checkItem(PASSING_CARD) > 0) {
-            watson->getWatsonBag()->insert(sherlockBag->get(PASSING_CARD));
-            sherlockBag->insert(watson->getWatsonBag()->get(EXCEMPTION_CARD));
+        BaseItem* item1;
+        BaseItem* item2;
+        do {
+            if(item1==NULL) return false;
+            watson->getWatsonBag()->insert(item1);
+            if(item2==NULL) return false;
+            sherlockBag->insert(item2);
         }
-        return false;
+        while((item1 = sherlockBag->get(PASSING_CARD))!=NULL && (item2 = watson->getWatsonBag()->get(EXCEMPTION_CARD))!=NULL);
     }
     return false;
 };
@@ -577,11 +581,15 @@ bool Watson::meet(Sherlock* sherlock){
         return false;
     }
     if(pos.isEqual(sherlock->getCurrentPosition())){
-        while(watsonBag->checkItem(EXCEMPTION_CARD) > 0 && sherlock->getSherlockBag()->checkItem(PASSING_CARD) > 0) {
-            watsonBag->insert(sherlock->getSherlockBag()->get(PASSING_CARD));
-            sherlock->getSherlockBag()->insert(watsonBag->get(EXCEMPTION_CARD));
+        BaseItem* item1;
+        BaseItem* item2;
+        do {
+            if(item1==NULL) return false;
+            watsonBag->insert(item1);
+            if(item2==NULL) return false;
+            sherlock->getSherlockBag()->insert(item2);
         }
-        return false;
+        while((item1 = sherlock->getSherlockBag()->get(PASSING_CARD))!=NULL && (item2 = watsonBag->get(EXCEMPTION_CARD))!=NULL);
     }
     return false;
 };
@@ -1601,6 +1609,13 @@ void StudyPinkProgram::printStep(int si) const {
         << "--"
         << sherlock->str() << "--|--" << watson->str() << "--|--" << criminal->str() << endl;
 };
+
+int main(){
+    StudyPinkProgram* program = new StudyPinkProgram("input0.txt");
+    program->run(true);
+    delete program;
+    return 0;
+}
 ////////////////////////////////////////////////
 /// END OF STUDENT'S ANSWER
 ////////////////////////////////////////////////
